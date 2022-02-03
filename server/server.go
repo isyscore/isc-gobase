@@ -2,7 +2,8 @@ package server
 
 import (
 	"fmt"
-	"isc-gobase/logger"
+
+	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
 )

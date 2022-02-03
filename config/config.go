@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"isc-gobase/logger"
 	"reflect"
+
+	"github.com/isyscore/isc-gobase/logger"
+	"gopkg.in/yaml.v2"
 )
 
 type AppServer struct {

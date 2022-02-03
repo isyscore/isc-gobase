@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"isc-gobase/logger"
 	"log"
 	"net"
 	"net/http"
@@ -12,23 +11,25 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/isyscore/isc-gobase/logger"
 )
 
 var httpClient = createHTTPClient()
 
 const (
-	MaxIdleConns        int = 100
-	MaxIdleConnsPerHost int = 100
-	IdleConnTimeout     int = 90
-	ContentTypeJson string = "application/json; charset=utf-8"
-	ContentTypeHtml string = "text/html; charset=utf-8"
-	ContentTypeText string = "text/plain; charset=utf-8"
-	ContentTypeCss string = "text/css; charset=utf-8"
+	MaxIdleConns          int    = 100
+	MaxIdleConnsPerHost   int    = 100
+	IdleConnTimeout       int    = 90
+	ContentTypeJson       string = "application/json; charset=utf-8"
+	ContentTypeHtml       string = "text/html; charset=utf-8"
+	ContentTypeText       string = "text/plain; charset=utf-8"
+	ContentTypeCss        string = "text/css; charset=utf-8"
 	ContentTypeJavaScript string = "application/x-javascript; charset=utf-8"
-	ContentTypeJpeg string = "image/jpeg"
-	ContentTypePng string = "image/png"
-	ContentTypeGif string = "image/gif"
-	ContentTypeAll string = "*/*"
+	ContentTypeJpeg       string = "image/jpeg"
+	ContentTypePng        string = "image/png"
+	ContentTypeGif        string = "image/gif"
+	ContentTypeAll        string = "*/*"
 )
 
 type NetError struct {

@@ -2,10 +2,11 @@ package database
 
 import (
 	"database/sql"
-	"isc-gobase/isc"
-	"isc-gobase/logger"
 	"strings"
 	"time"
+
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 )
 
 type DatabaseType int
