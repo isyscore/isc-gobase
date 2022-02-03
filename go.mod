@@ -1,4 +1,4 @@
-module isc-gobase
+module github.com/isyscore/isc-gobase
 
 go 1.18
 
