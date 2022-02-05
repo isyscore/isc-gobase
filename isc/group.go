@@ -6,6 +6,7 @@ func GroupBy[T any, K comparable](list []T, f func(T) K) map[K][]T {
 		key := f(e)
 		sl, _ := r[key]
 		sl = append(sl, e)
+		r[key] = sl
 	}
 	return r
 }
@@ -16,6 +17,7 @@ func GroupByTransform[T any, K comparable, V any](list []T, f func(T) K, trans f
 		key := f(e)
 		sl, _ := r[key]
 		sl = append(sl, trans(e))
+		r[key] = sl
 	}
 	return r
 }
