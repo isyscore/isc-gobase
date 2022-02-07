@@ -1,184 +1,215 @@
 package isc
 
-type ISCList[T comparable] struct {
-	l []T
+type ISCList[T comparable] []T
+
+func NewList[T comparable]() ISCList[T] {
+	return []T{}
 }
 
-func NewList[T comparable](list []T) ISCList[T] {
-	return ISCList[T]{l: list}
+func NewListWithList[T comparable](list []T) ISCList[T] {
+	return list
 }
 
 func NewListWithItems[T comparable](items ...T) ISCList[T] {
-	return ISCList[T]{l: items}
+	return items
 }
 
-func (l ISCList[T]) ToArray() []T {
-	return l.l
+func (l ISCList[T]) Add(item T) int {
+	idx := len(l)
+	l = append(l, item)
+	return idx
+}
+
+func (l ISCList[T]) AddAll(item ...T) {
+	l = append(l, item...)
+}
+
+func (l ISCList[T]) Insert(index int, item T) int {
+	l = append(l[:index], append([]T{item}, l[index:]...)...)
+	return index
+}
+
+func (l ISCList[T]) Delete(index int) T {
+	item := l[index]
+	l = append(l[:index], l[index+1:]...)
+	return item
+}
+
+func (l ISCList[T]) Clear() {
+	l = []T{}
 }
 
 func (l ISCList[T]) IsEmpty() bool {
-	return len(l.l) == 0
+	return len(l) == 0
+}
+
+func (l ISCList[T]) ForEach(f func(T)) {
+	for _, item := range l {
+		f(item)
+	}
+}
+
+func (l ISCList[T]) ForEachIndexed(f func(int, T)) {
+	for idx, item := range l {
+		f(idx, item)
+	}
+}
+
+func (l ISCList[T]) Distinct() ISCList[T] {
+	return ListDistinct(l)
 }
 
 func (l ISCList[T]) Filter(f func(T) bool) ISCList[T] {
-	r := ListFilter(l.l, f)
-	return NewList(r)
+	return ListFilter(l, f)
 }
 
 func (l ISCList[T]) FilterNot(f func(T) bool) ISCList[T] {
-	r := ListFilterNot(l.l, f)
-	return NewList(r)
+	return ListFilterNot(l, f)
 }
 
 func (l ISCList[T]) FilterIndexed(f func(int, T) bool) ISCList[T] {
-	r := ListFilterIndexed(l.l, f)
-	return NewList(r)
+	return ListFilterIndexed(l, f)
 }
 
 func (l ISCList[T]) FilterNotIndexed(f func(int, T) bool) ISCList[T] {
-	r := ListFilterNotIndexed(l.l, f)
-	return NewList(r)
+	return ListFilterNotIndexed(l, f)
 }
 
 func (l ISCList[T]) FilterTo(dest *[]T, f func(T) bool) ISCList[T] {
-	r := ListFilterTo(l.l, dest, f)
-	return NewList(r)
+	return ListFilterTo(l, dest, f)
 }
 
 func (l ISCList[T]) FilterNotTo(dest *[]T, f func(T) bool) ISCList[T] {
-	r := ListFilterNotTo(l.l, dest, f)
-	return NewList(r)
+	return ListFilterNotTo(l, dest, f)
 }
 
 func (l ISCList[T]) FilterIndexedTo(dest *[]T, f func(int, T) bool) ISCList[T] {
-	r := ListFilterIndexedTo(l.l, dest, f)
-	return NewList(r)
+	return ListFilterIndexedTo(l, dest, f)
 }
 
 func (l ISCList[T]) FilterNotIndexedTo(dest *[]T, f func(int, T) bool) ISCList[T] {
-	r := ListFilterNotIndexedTo(l.l, dest, f)
-	return NewList(r)
+	return ListFilterNotIndexedTo(l, dest, f)
 }
 
 func (l ISCList[T]) Contains(item T) bool {
-	return ListContains(l.l, item)
+	return ListContains(l, item)
 }
 
 func (l ISCList[T]) Find(f func(T) bool) *T {
-	return Find(l.l, f)
+	return Find(l, f)
 }
 
 func (l ISCList[T]) FindLast(f func(T) bool) *T {
-	return FindLast(l.l, f)
+	return FindLast(l, f)
 }
 
 func (l ISCList[T]) First() T {
-	return First(l.l)
+	return First(l)
 }
 
 func (l ISCList[T]) Last() T {
-	return Last(l.l)
+	return Last(l)
 }
 
 func (l ISCList[T]) FirstOrNull() *T {
-	return FirstOrNull(l.l)
+	return FirstOrNull(l)
 }
 
 func (l ISCList[T]) LastOrNull() *T {
-	return LastOrNull(l.l)
+	return LastOrNull(l)
 }
 
 func (l ISCList[T]) IndexOf(item T) int {
-	return IndexOf(l.l, item)
+	return IndexOf(l, item)
 }
 
 func (l ISCList[T]) LastIndexOf(item T) int {
-	return LastIndexOf(l.l, item)
+	return LastIndexOf(l, item)
 }
 
 func (l ISCList[T]) IndexOfCondition(f func(T) bool) int {
-	return IndexOfCondition(l.l, f)
+	return IndexOfCondition(l, f)
 }
 
 func (l ISCList[T]) LastIndexOfCondition(f func(T) bool) int {
-	return LastIndexOfCondition(l.l, f)
+	return LastIndexOfCondition(l, f)
 }
 
 func (l ISCList[T]) JoinToString(f func(T) string) string {
-	return ListJoinToString(l.l, f)
+	return ListJoinToString(l, f)
 }
 
 func (l ISCList[T]) JoinToStringFull(sep string, prefix string, postfix string, f func(T) string) string {
-	return ListJoinToStringFull(l.l, sep, prefix, postfix, f)
+	return ListJoinToStringFull(l, sep, prefix, postfix, f)
 }
 
 func (l ISCList[T]) All(f func(T) bool) bool {
-	return ListAll(l.l, f)
+	return ListAll(l, f)
 }
 
 func (l ISCList[T]) Any(f func(T) bool) bool {
-	return ListAny(l.l, f)
+	return ListAny(l, f)
 }
 
 func (l ISCList[T]) None(f func(T) bool) bool {
-	return ListNone(l.l, f)
+	return ListNone(l, f)
 }
 
 func (l ISCList[T]) Count(f func(T) bool) int {
-	return ListCount(l.l, f)
+	return ListCount(l, f)
 }
 
 func (l ISCList[T]) SubList(fromIndex int, toIndex int) ISCList[T] {
-	r := SubList(l.l, fromIndex, toIndex)
-	return NewList(r)
+	r := SubList(l, fromIndex, toIndex)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) Slice(r IntRange) ISCList[T] {
-	rr := Slice(l.l, r)
-	return NewList(rr)
+	rr := Slice(l, r)
+	return NewListWithList(rr)
 }
 
 func (l ISCList[T]) SliceBy(r []int) ISCList[T] {
-	rr := SliceBy(l.l, r)
-	return NewList(rr)
+	rr := SliceBy(l, r)
+	return NewListWithList(rr)
 }
 
 func (l ISCList[T]) Take(n int) ISCList[T] {
-	r := Take(l.l, n)
-	return NewList(r)
+	r := Take(l, n)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) TakeLast(n int) ISCList[T] {
-	r := TakeLast(l.l, n)
-	return NewList(r)
+	r := TakeLast(l, n)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) TakeWhile(n int, f func(T) bool) ISCList[T] {
-	r := TakeWhile(l.l, n, f)
-	return NewList(r)
+	r := TakeWhile(l, n, f)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) TakeLastWhile(n int, f func(T) bool) ISCList[T] {
-	r := TakeLastWhile(l.l, n, f)
-	return NewList(r)
+	r := TakeLastWhile(l, n, f)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) Drop(n int) ISCList[T] {
-	r := Drop(l.l, n)
-	return NewList(r)
+	r := Drop(l, n)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) DropLast(n int) ISCList[T] {
-	r := DropLast(l.l, n)
-	return NewList(r)
+	r := DropLast(l, n)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) DropWhile(n int, f func(T) bool) ISCList[T] {
-	r := DropWhile(l.l, n, f)
-	return NewList(r)
+	r := DropWhile(l, n, f)
+	return NewListWithList(r)
 }
 
 func (l ISCList[T]) DropLastWhile(n int, f func(T) bool) ISCList[T] {
-	r := DropLastWhile(l.l, n, f)
-	return NewList(r)
+	r := DropLastWhile(l, n, f)
+	return NewListWithList(r)
 }

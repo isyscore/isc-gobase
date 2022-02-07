@@ -107,6 +107,16 @@ func ListContains[T comparable](list []T, item T) bool {
 	return ret
 }
 
+func ListDistinct[T comparable](list []T) []T {
+	var n []T = make([]T, 0)
+	for _, e := range list {
+		if !ListContains(n, e) {
+			n = append(n, e)
+		}
+	}
+	return n
+}
+
 /// functions for map
 
 func MapFilter[K comparable, V any](m map[K]V, f func(K, V) bool) map[K]V {

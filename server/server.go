@@ -71,6 +71,12 @@ func Engine() *gin.Engine {
 	return engine
 }
 
+func RegisterHealthCheck(apiBase string) {
+	RegisterRoute(apiBase+"/system/status", HmAll, healthSystemStatus)
+	RegisterRoute(apiBase+"/system/init", HmAll, healthSystemInit)
+	RegisterRoute(apiBase+"/system/destroy", HmAll, healthSystemDestroy)
+}
+
 func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 	if engine == nil {
 		logger.Error("服务没有初始化，请先调用 InitServer")
