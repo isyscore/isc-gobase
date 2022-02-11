@@ -48,8 +48,8 @@ func (m ISCMap[K, V]) Delete(k K) {
 	delete(m, k)
 }
 
-func (m ISCMap[K, V]) Clear() {
-	m = make(ISCMap[K, V])
+func (m *ISCMap[K, V]) Clear() {
+	*m = make(ISCMap[K, V])
 }
 
 func (m ISCMap[K, V]) ForEach(f func(K, V)) {

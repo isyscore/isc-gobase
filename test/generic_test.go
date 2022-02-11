@@ -1,11 +1,6 @@
 package test
 
-import (
-	"testing"
-
-	"github.com/isyscore/isc-gobase/isc"
-)
-
+/*
 func TestGeneric(t *testing.T) {
 	list := isc.NewListWithItems(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 	i := list.IndexOf(5)
@@ -27,3 +22,5 @@ func TestGeneric(t *testing.T) {
 	})
 	t.Logf("grouped = %v\n", mg)
 }
+
+*/

@@ -14,29 +14,29 @@ func NewListWithItems[T comparable](items ...T) ISCList[T] {
 	return items
 }
 
-func (l ISCList[T]) Add(item T) int {
-	idx := len(l)
-	l = append(l, item)
+func (l *ISCList[T]) Add(item T) int {
+	idx := len(*l)
+	*l = append(*l, item)
 	return idx
 }
 
-func (l ISCList[T]) AddAll(item ...T) {
-	l = append(l, item...)
+func (l *ISCList[T]) AddAll(item ...T) {
+	*l = append(*l, item...)
 }
 
-func (l ISCList[T]) Insert(index int, item T) int {
-	l = append(l[:index], append([]T{item}, l[index:]...)...)
+func (l *ISCList[T]) Insert(index int, item T) int {
+	*l = append((*l)[:index], append([]T{item}, (*l)[index:]...)...)
 	return index
 }
 
-func (l ISCList[T]) Delete(index int) T {
-	item := l[index]
-	l = append(l[:index], l[index+1:]...)
+func (l *ISCList[T]) Delete(index int) T {
+	item := (*l)[index]
+	*l = append((*l)[:index], (*l)[index+1:]...)
 	return item
 }
 
-func (l ISCList[T]) Clear() {
-	l = []T{}
+func (l *ISCList[T]) Clear() {
+	*l = []T{}
 }
 
 func (l ISCList[T]) IsEmpty() bool {
