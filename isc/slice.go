@@ -29,3 +29,11 @@ func SliceBy[T comparable](list []T, r []int) []T {
 	}
 	return n
 }
+
+func IsInSlice[T comparable](list []T, val T) bool {
+	of := IndexOf[T](list, val)
+	if of < 0 {
+		return false
+	}
+	return true
+}
