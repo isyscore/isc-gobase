@@ -213,3 +213,12 @@ func (l ISCList[T]) DropLastWhile(n int, f func(T) bool) ISCList[T] {
 	r := DropLastWhile(l, n, f)
 	return NewListWithList(r)
 }
+
+//AssociateBy 根据keySelector 分组
+func AssociateBy[T any](list ISCList[T], keySelector func(T) interface{}) map[interface{}]T {
+	r := make(map[any]T)
+	for _, e := range list {
+		r[keySelector(e)] = e
+	}
+	return r
+}
