@@ -37,3 +37,40 @@ func IsInSlice[T comparable](list []T, val T) bool {
 	}
 	return true
 }
+
+func SliceToMap[T comparable](list []T) map[T]T {
+	m := make(map[T]T)
+	for _, e := range list {
+		m[e] = e
+	}
+	return m
+}
+
+func SliceTo[T any, V comparable](list []T, valueTransform func(T) V) map[V]T {
+	m := make(map[V]T)
+	for _, e := range list {
+		m[valueTransform(e)] = e
+	}
+	return m
+}
+
+func SliceDistinct[T comparable](list []T) []T {
+	m := SliceToMap(list)
+	var result []T
+	for k, _ := range m {
+		result = append(result, k)
+	}
+	return result
+}
+
+//SliceDistinctTo Returns a list containing only distinct elements from the given collection.
+//Among equal elements of the given collection, only the last one will be present in the resulting list.
+//The elements in the resulting list are not in the same order as they were in the source collection.
+func SliceDistinctTo[T any, V comparable](list []T, valueTransform func(T) V) []T {
+	m := SliceTo(list, valueTransform)
+	var result []T
+	for _, v := range m {
+		result = append(result, v)
+	}
+	return result
+}
