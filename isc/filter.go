@@ -109,13 +109,6 @@ func ListContains[T comparable](list []T, item T) bool {
 
 func ListDistinct[T comparable](list []T) []T {
 	return SliceDistinct(list)
-	//n := make([]T, 0)
-	//for _, e := range list {
-	//	if !ListContains(n, e) {
-	//		n = append(n, e)
-	//	}
-	//}
-	//return n
 }
 
 /// functions for map

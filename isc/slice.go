@@ -33,17 +33,14 @@ func SliceBy[T comparable](list []T, r []int) []T {
 //Contains Returns true if element is found in the collection.
 //predicate keySelector
 //if you want to check item in list, please use ListContains
-func Contains[T any, K comparable](list []T, predicate func(T) K, key K) bool {
+func SliceContains[T any, K comparable](list []T, predicate func(T) K, key K) bool {
 	m := SliceTo(list, predicate)
 	_, ok := m[key]
 	return ok
 }
+
 func IsInSlice[T comparable](list []T, val T) bool {
-	of := IndexOf[T](list, val)
-	if of < 0 {
-		return false
-	}
-	return true
+	return IndexOf(list, val) >= 0
 }
 
 func SliceToMap[T comparable](list []T) map[T]T {

@@ -50,30 +50,70 @@ func (l ISCListToMap[T, R]) ReduceIndexed(init func(int, T) R, f func(int, R, T)
 	return ReduceIndexed(l.ISCList, init, f)
 }
 
-type ISCListToGroup[T comparable, K comparable, V comparable] struct {
+func (l ISCListToMap[T, R]) SliceContains(predicate func(T) R, key R) bool {
+	return SliceContains(l.ISCList, predicate, key)
+}
+
+func (l ISCListToMap[T, R]) SliceTo(valueTransform func(T) R) ISCMap[R, T] {
+	return SliceTo(l.ISCList, valueTransform)
+}
+
+type ISCListToTriple[T comparable, K comparable, V comparable] struct {
 	ISCList[T]
 }
 
-func ListToGroupFrom[T comparable, K comparable, V comparable](list ISCList[T]) ISCListToGroup[T, K, V] {
-	return ISCListToGroup[T, K, V]{
+func ListToGroupFrom[T comparable, K comparable, V comparable](list ISCList[T]) ISCListToTriple[T, K, V] {
+	return ISCListToTriple[T, K, V]{
 		list,
 	}
 }
 
-func (l ISCListToGroup[T, K, V]) GroupBy(f func(T) K) map[K][]T {
+func (l ISCListToTriple[T, K, V]) GroupBy(f func(T) K) map[K][]T {
 	return GroupBy(l.ISCList, f)
 }
 
-func (l ISCListToGroup[T, K, V]) GroupByTransform(f func(T) K, trans func(T) V) map[K][]V {
+func (l ISCListToTriple[T, K, V]) GroupByTransform(f func(T) K, trans func(T) V) map[K][]V {
 	return GroupByTransform(l.ISCList, f, trans)
 }
 
-func (l ISCListToGroup[T, K, V]) GroupByTo(dest *map[K][]T, f func(T) K) map[K][]T {
+func (l ISCListToTriple[T, K, V]) GroupByTo(dest *map[K][]T, f func(T) K) map[K][]T {
 	return GroupByTo(l.ISCList, dest, f)
 }
 
-func (l ISCListToGroup[T, K, V]) GroupByTransformTo(dest *map[K][]V, f func(T) K, trans func(T) V) map[K][]V {
+func (l ISCListToTriple[T, K, V]) GroupByTransformTo(dest *map[K][]V, f func(T) K, trans func(T) V) map[K][]V {
 	return GroupByTransformTo(l.ISCList, dest, f, trans)
+}
+
+func (l ISCListToTriple[T, K, V]) Associate(transform func(T) Pair[K, V]) ISCMap[K, V] {
+	return Associate(l.ISCList, transform)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateTo(destination *map[K]V, transform func(T) Pair[K, V]) ISCMap[K, V] {
+	return AssociateTo(l.ISCList, destination, transform)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateBy(keySelector func(T) K) ISCMap[K, T] {
+	return AssociateBy(l.ISCList, keySelector)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateByAndValue(keySelector func(T) K, valueTransform func(T) V) ISCMap[K, V] {
+	return AssociateByAndValue(l.ISCList, keySelector, valueTransform)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateByTo(destination *map[K]T, keySelector func(T) K) ISCMap[K, T] {
+	return AssociateByTo(l.ISCList, destination, keySelector)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateByAndValueTo(destination *map[K]V, keySelector func(T) K, valueTransform func(T) V) ISCMap[K, V] {
+	return AssociateByAndValueTo(l.ISCList, destination, keySelector, valueTransform)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateWith(valueSelector func(T) V) ISCMap[T, V] {
+	return AssociateWith(l.ISCList, valueSelector)
+}
+
+func (l ISCListToTriple[T, K, V]) AssociateWithTo(destination *map[T]V, valueSelector func(T) V) ISCMap[T, V] {
+	return AssociateWithTo(l.ISCList, destination, valueSelector)
 }
 
 type ISCListToPair[K comparable, V comparable] struct {

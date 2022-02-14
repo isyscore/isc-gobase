@@ -1,7 +1,9 @@
-package isc
+package test
 
 import (
 	"testing"
+
+	"github.com/isyscore/isc-gobase/isc"
 )
 
 type MyStruct struct {
@@ -10,7 +12,7 @@ type MyStruct struct {
 }
 
 func TestISCList_associateBy(t *testing.T) {
-	var testList ISCList[MyStruct]
+	var testList isc.ISCList[MyStruct]
 	s1 := MyStruct{
 		Name: "K",
 		Age:  1,
@@ -24,8 +26,8 @@ func TestISCList_associateBy(t *testing.T) {
 		Name: "K3",
 		Age:  3,
 	})
-	l := AssociateBy[MyStruct](testList, func(t MyStruct) interface{} {
+	l := isc.AssociateBy(testList, func(t MyStruct) interface{} {
 		return t.Name
 	})
-	println(ToString(l))
+	t.Logf("%v\n", isc.ToString(l))
 }

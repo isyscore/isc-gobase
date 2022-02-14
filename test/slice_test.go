@@ -1,7 +1,9 @@
-package isc
+package test
 
 import (
 	"testing"
+
+	"github.com/isyscore/isc-gobase/isc"
 )
 
 type sliceTestStruct struct {
@@ -23,12 +25,12 @@ func TestSliceDistinctTo(t *testing.T) {
 		Age:  28,
 	}
 	list := []sliceTestStruct{s1, s2, s3}
-	l := SliceDistinctTo[sliceTestStruct](list, func(s sliceTestStruct) string {
+	l := isc.SliceDistinctTo(list, func(s sliceTestStruct) string {
 		return s.Name
 	})
-	println(ToString(l))
-	b := Contains[sliceTestStruct](list, func(s sliceTestStruct) string {
+	t.Logf("%s\n", isc.ToString(l))
+	b := isc.SliceContains(list, func(s sliceTestStruct) string {
 		return s.Name
 	}, "库陈胜")
-	println(b)
+	t.Logf("%v\n", b)
 }
