@@ -267,9 +267,9 @@ func AssociateWith[T comparable, V any](list []T, valueSelector func(T) V) map[T
 
 //AssociateWithTo Populates and returns the destination mutable map with key-value pairs for each element of the given collection, where key is the element itself and value is provided by the valueSelector function applied to that key.
 //If any two elements are equal, the last one overwrites the former value in the map.
-func AssociateWithTo[T comparable, V any](list []T, destination map[T]V, valueSelector func(T) V) map[T]V {
+func AssociateWithTo[T comparable, V any](list []T, destination *map[T]V, valueSelector func(T) V) *map[T]V {
 	for _, e := range list {
-		destination[e] = valueSelector(e)
+		(*destination)[e] = valueSelector(e)
 	}
 	return destination
 }
