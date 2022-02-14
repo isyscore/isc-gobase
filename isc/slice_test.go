@@ -27,4 +27,8 @@ func TestSliceDistinctTo(t *testing.T) {
 		return s.Name
 	})
 	println(ToString(l))
+	b := Contains[sliceTestStruct](list, func(s sliceTestStruct) string {
+		return s.Name
+	}, "库陈胜")
+	println(b)
 }
