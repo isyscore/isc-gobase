@@ -19,9 +19,9 @@ func healthSystemStatus(c *gin.Context) {
 }
 
 func healthSystemInit(c *gin.Context) {
-	c.Data(http.StatusOK, h2.ContentTypeText, []byte("ok"))
+	c.Data(http.StatusOK, h2.ContentTypeText, []byte(`{"status":"ok"}`))
 }
 
 func healthSystemDestroy(c *gin.Context) {
-	c.Data(http.StatusOK, h2.ContentTypeText, []byte("ok"))
+	c.Data(http.StatusOK, h2.ContentTypeText, []byte(`{"status":"ok"}`))
 }

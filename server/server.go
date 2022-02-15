@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
+	"net/http"
 
+	h2 "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
@@ -75,6 +77,18 @@ func RegisterHealthCheck(apiBase string) {
 	RegisterRoute(apiBase+"/system/status", HmAll, healthSystemStatus)
 	RegisterRoute(apiBase+"/system/init", HmAll, healthSystemInit)
 	RegisterRoute(apiBase+"/system/destroy", HmAll, healthSystemDestroy)
+}
+
+func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {
+	RegisterRoute(apiBase+"/system/status", HmAll, func(c *gin.Context) {
+		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(status()))
+	})
+	RegisterRoute(apiBase+"/system/init", HmAll, func(c *gin.Context) {
+		c.Data(http.StatusOK, h2.ContentTypeText, []byte(init()))
+	})
+	RegisterRoute(apiBase+"/system/destroy", HmAll, func(c *gin.Context) {
+		c.Data(http.StatusOK, h2.ContentTypeText, []byte(destroy()))
+	})
 }
 
 func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
