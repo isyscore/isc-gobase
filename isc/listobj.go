@@ -213,3 +213,19 @@ func (l ISCList[T]) DropLastWhile(n int, f func(T) bool) ISCList[T] {
 	r := DropLastWhile(l, n, f)
 	return NewListWithList(r)
 }
+
+func (l ISCList[T]) Partition(partition int) [][]T {
+	return Partition(l, partition)
+}
+
+func (l ISCList[T]) PartitionWithCal(f func(int) int) [][]T {
+	return PartitionWithCal(l, f)
+}
+
+func (l ISCList[T]) Plus(n []T) ISCList[T] {
+	return ListPlus(l, n)
+}
+
+func (l ISCList[T]) Minus(n []T) ISCList[T] {
+	return ListMinus(l, n)
+}

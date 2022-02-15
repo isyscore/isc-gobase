@@ -62,7 +62,7 @@ func SliceTo[T any, K comparable](list []T, valueTransform func(T) K) map[K]T {
 func SliceDistinct[T comparable](list []T) []T {
 	m := SliceToMap(list)
 	var result []T
-	for k, _ := range m {
+	for k := range m {
 		result = append(result, k)
 	}
 	return result

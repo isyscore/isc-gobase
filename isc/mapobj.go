@@ -157,3 +157,11 @@ func (m ISCMap[K, V]) ToList() []Pair[K, V] {
 	}
 	return n
 }
+
+func (m ISCMap[K, V]) Plus(n map[K]V) ISCMap[K, V] {
+	return MapPlus(m, n)
+}
+
+func (m ISCMap[K, V]) Minus(n map[K]V) ISCMap[K, V] {
+	return MapMinus(m, n)
+}
