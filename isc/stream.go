@@ -145,6 +145,17 @@ func (s Stream) Last(valueSelector func(any) bool) Stream {
 	return Range(source)
 }
 
+func (s Stream) Filter(selector func(any) bool) Stream {
+	source := make(chan any)
+	for item := range s.source {
+		if selector(item) {
+			source <- item
+		}
+	}
+	defer close(source)
+	return Range(source)
+}
+
 func New(source <-chan any) Stream {
 	return Stream{
 		source: source,
