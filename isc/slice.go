@@ -9,7 +9,10 @@ func SubList[T any](list []T, fromIndex int, toIndex int) []T {
 	}
 	end := m[start]
 
-	if start == end || start < 0 {
+	if start < 0 {
+		start = 0
+	}
+	if start == end {
 		return []T{}
 	}
 	if end > len(list) {
