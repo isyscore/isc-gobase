@@ -3,15 +3,10 @@ package isc
 import "sort"
 
 type T any
-type C comparable
 
 // A Stream is a stream that can be used to do stream processing.
 type Stream struct {
 	source <-chan any
-}
-
-type ComparableStream struct {
-	source <-chan C
 }
 
 // Just converts the given arbitrary items to a Stream.
@@ -86,9 +81,9 @@ func (s Stream) Sort(less func(T, T) bool) Stream {
 }
 
 // Distinct removes the duplicated items base on the given keySelector.
-func (s Stream) Distinct(keySelector func(T) C) Stream {
+func (s Stream) Distinct(keySelector func(T) any) Stream {
 	source := make(chan any)
-	m := make(map[C]T)
+	m := make(map[any]T)
 	for item := range s.source {
 		m[keySelector(item)] = item
 	}
@@ -103,6 +98,15 @@ func (s Stream) Foreach(fn func(T)) {
 	for item := range s.source {
 		fn(item)
 	}
+}
+
+//FirsVal returns the first element,channel is FIFO,so first goroutine will get head element or nil
+func (s Stream) FirsVal() any {
+	for item := range s.source {
+		go drain(s.source)
+		return item
+	}
+	return nil
 }
 
 //First returns the first element,channel is FIFO,so first goroutine will get head element
@@ -120,11 +124,21 @@ func (s Stream) First(valueSelector func(any) bool) Stream {
 	return Range(source)
 }
 
+// LastVal returns the last item, or nil if no items.
+func (s Stream) LastVal() (item any) {
+	for item = range s.source {
+	}
+	return
+}
+
 // Last returns the last item, or nil if no items.
 func (s Stream) Last(valueSelector func(any) bool) Stream {
 	source := make(chan any)
 	var lastValue any
-	for lastValue = range s.source {
+	for item := range s.source {
+		if valueSelector(item) {
+			lastValue = item
+		}
 	}
 	source <- lastValue
 	close(source)
