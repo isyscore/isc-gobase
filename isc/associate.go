@@ -1,14 +1,15 @@
 package isc
 
+//Associate Returns a Map containing key-value map provided by transform function applied to elements of the given collection.
+//If any of two map would have the same key the last one gets added to the map.
+//The returned map preserves the entry iteration order of the original collection.
 func Associate[T any, K comparable, V any](list []T, transform func(T) Pair[K, V]) map[K]V {
 	r := make(map[K]V)
-	for _, e := range list {
-		item := transform(e)
-		r[item.First] = item.Second
-	}
-	return r
+	return AssociateTo[T, K, V](list, &r, transform)
 }
 
+//AssociateTo Populates and returns the destination map with key-value pairs provided by transform function applied to each element of the given collection.
+//If any of two pairs would have the same key the last one gets added to the map.
 func AssociateTo[T any, K comparable, V any](list []T, destination *map[K]V, transform func(T) Pair[K, V]) map[K]V {
 	for _, e := range list {
 		item := transform(e)
@@ -31,7 +32,7 @@ func AssociateBy[T any, K comparable](list []T, keySelector func(T) K) map[K]T {
 //AssociateByAndValue Returns a Map containing the values provided by valueTransform and indexed by keySelector functions applied to elements of the given collection.
 //If any two elements would have the same key returned by keySelector the last one gets added to the map.
 //The returned map preserves the entry iteration order of the original collection.
-func AssociateByAndValue[T, V any, K comparable](list []T, keySelector func(T) K, valueTransform func(T) V) map[K]V {
+func AssociateByAndValue[T any, V any, K comparable](list []T, keySelector func(T) K, valueTransform func(T) V) map[K]V {
 	r := make(map[K]V)
 	for _, e := range list {
 		r[keySelector(e)] = valueTransform(e)
