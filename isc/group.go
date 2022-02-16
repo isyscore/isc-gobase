@@ -11,7 +11,7 @@ func GroupBy[T any, K comparable](list []T, keySelector func(T) K) (destination 
 //by the key returned by the given keySelector function applied to the element and puts to a map
 //each group key associated with a list of corresponding values.
 func GroupByTransform[T any, K comparable, V any](list []T, keySelector func(T) K, trans func(T) V) map[K][]V {
-	var dest = make(map[K][]T)
+	var dest = make(map[K][]V)
 	return GroupByTransformTo[T, K, V](list, &dest, keySelector, trans)
 	//var r = make(map[K][]V)
 	//for _, e := range list {
