@@ -1,6 +1,7 @@
-package isc
+package test
 
 import (
+	"github.com/isyscore/isc-gobase/isc"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func TestGroupBy(t *testing.T) {
 		{Key: "K1", Name: "库陈胜2", Age: 2},
 		{Key: "K2", Name: "库陈胜3", Age: 1},
 	}
-	m := GroupBy[GroupStruct](list, func(t GroupStruct) string {
+	m := isc.GroupBy[GroupStruct](list, func(t GroupStruct) string {
 		return t.Key
 	})
 	t.Logf("%v", m)
@@ -34,7 +35,7 @@ func TestGroupByTransform(t *testing.T) {
 		{Key: "K1", Name: "库陈胜2", Age: 2},
 		{Key: "K2", Name: "库陈胜3", Age: 1},
 	}
-	m := GroupByTransform[GroupStruct](list, func(t GroupStruct) string {
+	m := isc.GroupByTransform[GroupStruct](list, func(t GroupStruct) string {
 		return t.Key
 	}, func(t GroupStruct) int {
 		return t.Age
