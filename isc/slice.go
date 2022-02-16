@@ -1,23 +1,26 @@
 package isc
 
+//SubList 分片截取
 func SubList[T any](list []T, fromIndex int, toIndex int) []T {
-	var n []T
-	for i := 0; i < len(list); i++ {
-		if i >= fromIndex && i < toIndex {
-			n = append(n, list[i])
-		}
+	m := map[int]int{fromIndex: toIndex, toIndex: fromIndex}
+	start := fromIndex
+	if fromIndex < start {
+		start = toIndex
 	}
-	return n
+	end := m[start]
+
+	if start == end || start < 0 {
+		return []T{}
+	}
+	if end > len(list) {
+		return list[start:]
+	}
+	return list[start:end]
 }
 
+//Slice 分片截取,参数详情见 IntRange ,返回新分片
 func Slice[T any](list []T, r IntRange) []T {
-	var n []T
-	for i := 0; i < len(list); i++ {
-		if i >= r.Start && i < r.End {
-			n = append(n, list[i])
-		}
-	}
-	return n
+	return SubList[T](list, r.Start, r.End)
 }
 
 func SliceBy[T comparable](list []T, r []int) []T {
