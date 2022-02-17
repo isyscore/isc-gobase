@@ -15,20 +15,24 @@ import (
 var appProperty *ApplicationProperty
 
 func LoadConfig() {
-	LoadConfigWithRelativePath("")
+	LoadConfigFromRelativePath("")
 }
 
-// LoadConfigWithRelativePath 加载相对文件路径
-func LoadConfigWithRelativePath(resourceAbsPath string) {
+// LoadConfigFromRelativePath 加载相对文件路径
+func LoadConfigFromRelativePath(resourceAbsPath string) {
 	dir, _ := os.Getwd()
 	pkg := strings.Replace(dir, "\\", "/", -1)
 
-	LoadConfigWithAbsPath(path.Join(pkg, "", resourceAbsPath))
+	LoadConfigFromAbsPath(path.Join(pkg, "", resourceAbsPath))
 }
 
-// LoadConfigWithAbsPath 加载绝对文件路径
-func LoadConfigWithAbsPath(resourceAbsPath string) {
-	doLoadConfigWithAbsPath(resourceAbsPath)
+// LoadConfigFromAbsPath 加载绝对文件路径
+func LoadConfigFromAbsPath(resourceAbsPath string) {
+	doLoadConfigFromAbsPath(resourceAbsPath)
+
+	// 读取cm文件
+	//AppendConfigFromAbsPath("/home/" + GetValueString("base.application.name") + "/config/application-default.yml")
+	AppendConfigFromRelativePath("./config/application-default.yml")
 
 	// 加载内部配置
 	err := GetValueObject("server", &ServerCfg)
@@ -48,7 +52,7 @@ func LoadConfigWithAbsPath(resourceAbsPath string) {
 }
 
 // 多种格式优先级：json > properties > yaml > yml
-func doLoadConfigWithAbsPath(resourceAbsPath string) {
+func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	if !strings.HasSuffix(resourceAbsPath, "/") {
 		resourceAbsPath += "/"
 	}
@@ -139,29 +143,29 @@ func AppendConfigFromRelativePath(fileName string) {
 	}
 }
 
-// AppendConfigWithAbsPath 追加配置：绝对路径的配置文件
-func AppendConfigWithAbsPath(fileName string) {
+// AppendConfigFromAbsPath 追加配置：绝对路径的配置文件
+func AppendConfigFromAbsPath(fileName string) {
 	extend := getFileExtension(fileName)
 	extend = strings.ToLower(extend)
 	switch extend {
 	case "yaml":
 		{
-			AppendYamlFile(fileName + fileName)
+			AppendYamlFile(fileName)
 			return
 		}
 	case "yml":
 		{
-			AppendYamlFile(fileName + fileName)
+			AppendYamlFile(fileName)
 			return
 		}
 	case "properties":
 		{
-			AppendPropertyFile(fileName + fileName)
+			AppendPropertyFile(fileName)
 			return
 		}
 	case "json":
 		{
-			AppendJsonFile(fileName + fileName)
+			AppendJsonFile(fileName)
 			return
 		}
 	}

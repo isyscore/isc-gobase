@@ -8,4 +8,13 @@ server:
   port: 31100
 base:
   application:
-    name: "sdf"
+    name: "test"
+
+
+one:
+  name: "haode"
+
+
+
+
+

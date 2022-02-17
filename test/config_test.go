@@ -10,7 +10,7 @@ import (
 
 func TestReadDefault(t *testing.T) {
 	//config.LoadConfig()
-	config.LoadConfigWithRelativePath("./resources/")
+	config.LoadConfigFromRelativePath("./resources/")
 
 	err := config.GetValueObject("server", &config.BaseCfg)
 	if err != nil {
@@ -20,4 +20,11 @@ func TestReadDefault(t *testing.T) {
 	fmt.Println(isc.ObjectToJson(config.BaseCfg))
 
 	fmt.Println(os.Environ())
+}
+
+func TestReadDefault2(t *testing.T) {
+	config.LoadConfig()
+
+	fmt.Println(config.GetValueString("one.name"))
+	fmt.Println("xxx")
 }

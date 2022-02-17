@@ -73,18 +73,18 @@ config.getValueObject("base", &ServerCfg)
 配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学
 ```go
 // 相对路径
-config.LoadConfigWithRelativePath(xx)
+config.LoadConfigFromRelativePath(xx)
 
 // 绝对路径
-config.LoadConfigWithAbsPath(xx)
+config.LoadConfigFromAbsPath(xx)
 ```
 
 #### 7. 支持配置的叠加，相对路径和绝对路径
 在配置已经加载完毕后，需要对一些配置进行覆盖，比如运维这边有相关的需求时候
 ```go
 // 相对路径
-config.AppendConfigWithRelativePath(xx)
+config.AppendConfigFromRelativePath(xx)
 
 // 绝对路径
-config.AppendConfigWithAbsPath(xx)
+config.AppendConfigFromAbsPath(xx)
 ```
