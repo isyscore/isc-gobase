@@ -145,10 +145,11 @@ func (s Stream) Last(valueSelector func(any) bool) Stream {
 	return Range(source)
 }
 
-func (s Stream) Filter(selector func(any) bool) Stream {
+//Filter Returns a list containing only elements matching the given predicate.
+func (s Stream) Filter(predicate func(any) bool) Stream {
 	source := make(chan any)
 	for item := range s.source {
-		if selector(item) {
+		if predicate(item) {
 			source <- item
 		}
 	}
@@ -156,11 +157,6 @@ func (s Stream) Filter(selector func(any) bool) Stream {
 	return Range(source)
 }
 
-func New(source <-chan any) Stream {
-	return Stream{
-		source: source,
-	}
-}
 func Range(source <-chan any) Stream {
 	return Stream{
 		source: source,
