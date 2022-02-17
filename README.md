@@ -78,3 +78,13 @@ config.LoadConfigWithRelativePath(xx)
 // 绝对路径
 config.LoadConfigWithAbsPath(xx)
 ```
+
+#### 7. 支持配置的叠加，相对路径和绝对路径
+在配置已经加载完毕后，需要对一些配置进行覆盖，比如运维这边有相关的需求时候
+```go
+// 相对路径
+config.AppendConfigWithRelativePath(xx)
+
+// 绝对路径
+config.AppendConfigWithAbsPath(xx)
+```
