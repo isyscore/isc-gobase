@@ -23,13 +23,16 @@ func (error *ChangeError) Error() string {
 }
 
 func ToMap(data any) map[string]any {
+	if nil == data {
+		return nil
+	}
 	if reflect.TypeOf(data).Kind() == reflect.Map {
 		resultMap := map[string]any{}
 		dataValue := reflect.ValueOf(data)
 		for mapR := dataValue.MapRange(); mapR.Next(); {
 			mapKey := mapR.Key()
 			mapValue := mapR.Value()
-			resultMap[mapKey.String()] = mapValue
+			resultMap[ToString(mapKey.Interface())] = mapValue.Interface()
 		}
 		return resultMap
 	} else if reflect.TypeOf(data).Kind() == reflect.Struct {
@@ -50,16 +53,27 @@ func ToMap(data any) map[string]any {
 func IsNumber(fieldKing reflect.Kind) bool {
 	switch fieldKing {
 	case reflect.Int:
+		return true
 	case reflect.Int8:
+		return true
 	case reflect.Int16:
+		return true
 	case reflect.Int32:
+		return true
 	case reflect.Int64:
+		return true
 	case reflect.Uint:
+		return true
 	case reflect.Uint8:
+		return true
 	case reflect.Uint16:
+		return true
 	case reflect.Uint32:
+		return true
 	case reflect.Uint64:
+		return true
 	case reflect.Float32:
+		return true
 	case reflect.Float64:
 		return true
 	default:
@@ -77,18 +91,31 @@ func IsBaseType(fieldType reflect.Type) bool {
 
 	switch fieldKind {
 	case reflect.Int:
+		return true
 	case reflect.Int8:
+		return true
 	case reflect.Int16:
+		return true
 	case reflect.Int32:
+		return true
 	case reflect.Int64:
+		return true
 	case reflect.Uint:
+		return true
 	case reflect.Uint8:
+		return true
 	case reflect.Uint16:
+		return true
 	case reflect.Uint32:
+		return true
 	case reflect.Uint64:
+		return true
 	case reflect.Float32:
+		return true
 	case reflect.Float64:
+		return true
 	case reflect.Bool:
+		return true
 	case reflect.String:
 		return true
 	default:
@@ -97,7 +124,6 @@ func IsBaseType(fieldType reflect.Type) bool {
 		}
 		return false
 	}
-	return false
 }
 
 func ToJsonString(value any) string {

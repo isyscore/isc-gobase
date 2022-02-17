@@ -1,8 +1,6 @@
 package test
 
 import (
-	"fmt"
-	"github.com/isyscore/isc-gobase/config"
 	"testing"
 
 	"github.com/isyscore/isc-gobase/server"
@@ -22,6 +20,6 @@ func TestServer(t *testing.T) {
 		},
 	)
 
-	fmt.Println(config.GetValueString("base.application.name"))
+	server.RegisterConfigEndpoint("/api/test")
 	server.StartServer()
 }

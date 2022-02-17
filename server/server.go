@@ -84,6 +84,12 @@ func RegisterHealthCheck(apiBase string) {
 	RegisterRoute(apiBase+"/system/destroy", HmAll, healthSystemDestroy)
 }
 
+func RegisterConfigEndpoint(apiBase string) {
+	RegisterRoute(apiBase+"/config/values", HmGet, config.GetConfigValues)
+	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
+	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
+}
+
 func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {
 	RegisterRoute(apiBase+"/system/status", HmAll, func(c *gin.Context) {
 		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(status()))

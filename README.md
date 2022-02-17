@@ -1,10 +1,11 @@
 # isc-gobase
 
+大道至简，让使用者最简化使用
 
 ## config包
 config包主要用于加载和管理项目中配置文件中的内容，配置文件为"application"开头的格式
 
-#### 1. 配置文件路径
+### 1. 配置文件路径
 默认该文件与main函数所在的类同目录
 ```go
 // 示例
@@ -13,11 +14,11 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 - application-local.yml
 ```
 
-#### 2. 配置文件格式
+### 2. 配置文件格式
 支持yaml、yml、json、properties配置文件
 优先级: json > properties > yaml > yml
 
-#### 3. 支持profile加载不同配置文件
+### 3. 支持profile加载不同配置文件
 格式：application-{profile}.yyy
 其中profile对应的变量为：base.profiles.active
 变量的设置可以有如下
@@ -27,8 +28,22 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 
 优先级：本地配置 > 启动参数 > 环境变量
 
+### 4. 内置的配置文件自动加载
+目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
+```yaml
+server:
+  port: 8080
+  lookup: true/false
+  
+base:
+  application:
+    name: isc-demo-service
+  profiles:
+    active: local
+```
 
-#### 5. 支持直接获取配置值
+
+### 5. 支持直接获取配置值
 config包中提供了各种类型的api，方便实时获取
 ```go
 // 基本类型
@@ -69,7 +84,7 @@ base:
 config.getValueObject("base", &ServerCfg)
 ```
 
-#### 6. 支持文件的绝对和相对路径读取
+### 6. 支持文件的绝对和相对路径读取
 配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学
 ```go
 // 相对路径
@@ -79,7 +94,7 @@ config.LoadConfigFromRelativePath(xx)
 config.LoadConfigFromAbsPath(xx)
 ```
 
-#### 7. 支持配置的叠加，相对路径和绝对路径
+### 7. 支持配置的叠加，相对路径和绝对路径
 在配置已经加载完毕后，需要对一些配置进行覆盖，比如运维这边有相关的需求时候
 ```go
 // 相对路径
@@ -88,3 +103,33 @@ config.AppendConfigFromRelativePath(xx)
 // 绝对路径
 config.AppendConfigFromAbsPath(xx)
 ```
+
+### 8. 支持自动读取cm文件
+应用启动会默认读取/home/{base.application.name}/config/application-default.yml对应的内容并覆盖应用的配置中
+
+### 9. 支持配置的在线查看以及实时变更
+
+如下配置配置的endpoint后，就可以在线查看应用的所有配置了
+```go
+// 注册配置的endpoint
+server.RegisterConfigEndpoint("/api/test")
+
+```
+
+```shell
+// 查看应用所有配置
+curl http://localhost:xxx/{api-module}config/values
+
+// 查看应用的某个配置
+curl http://localhost:xxx/{api-module}config/value/{key}
+
+// 修改某个应用的配置
+curl -X PUT http://localhost:xxx/{api-module}config/update -d '{"key":"xxx", "value":"yyyy"}'
+```
+
+##### 注意
+该配置的修改只对`config.getValueXXX()` 这种实时调用的配置有效，配置使用方式有两种
+- 实体化：在对应文件中直接将配置实体化起来
+- api实时调用：代码中使用时候直接调用config.getValueXXX()
+
+其中动态变更只对api实时调用的方式有效

@@ -5,7 +5,7 @@ a:
   e: true
 
 server:
-  port: 31100
+  port: 31000
 base:
   application:
     name: "test"

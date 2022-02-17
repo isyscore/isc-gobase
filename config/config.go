@@ -3,9 +3,12 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	h2 "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"reflect"
@@ -48,67 +51,6 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 	err = GetValueObject("log", &LogCfg)
 	if err != nil {
 		return
-	}
-}
-
-// 多种格式优先级：json > properties > yaml > yml
-func doLoadConfigFromAbsPath(resourceAbsPath string) {
-	if !strings.HasSuffix(resourceAbsPath, "/") {
-		resourceAbsPath += "/"
-	}
-	files, err := ioutil.ReadDir(resourceAbsPath)
-	if err != nil {
-		logger.Warn("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
-		return
-	}
-
-	profile := getActiveProfile()
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		fileName := file.Name()
-		if !strings.HasPrefix(fileName, "application") {
-			continue
-		}
-
-		// 默认配置
-		if "application.yaml" == fileName {
-			LoadYamlFile(resourceAbsPath + "application.yaml")
-			return
-		} else if "application.yml" == fileName {
-			LoadYamlFile(resourceAbsPath + "application.yml")
-			return
-		} else if "application.properties" == fileName {
-			LoadPropertyFile(resourceAbsPath + "application.properties")
-			return
-		} else if "application.json" == fileName {
-			LoadJsonFile(resourceAbsPath + "application.json")
-			return
-		}
-
-		if "" != profile {
-			currentProfile := getProfileFromFileName(fileName)
-			if currentProfile == profile {
-				extend := getFileExtension(fileName)
-				extend = strings.ToLower(extend)
-				if "yaml" == extend {
-					LoadYamlFile(resourceAbsPath + fileName)
-					return
-				} else if "yml" == extend {
-					LoadYamlFile(resourceAbsPath + fileName)
-					return
-				} else if "properties" == extend {
-					LoadPropertyFile(resourceAbsPath + fileName)
-					return
-				} else if "json" == extend {
-					LoadJsonFile(resourceAbsPath + fileName)
-					return
-				}
-			}
-		}
 	}
 }
 
@@ -171,6 +113,113 @@ func AppendConfigFromAbsPath(fileName string) {
 	}
 }
 
+type EnvProperty struct {
+	Key   string
+	Value string
+}
+
+func GetConfigValues(c *gin.Context) {
+	if nil != appProperty {
+		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(appProperty.ValueMap)))
+	} else {
+		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+	}
+}
+
+func GetConfigValue(c *gin.Context) {
+	if nil != appProperty {
+		value := GetValue(c.Param("key"))
+		if nil == value {
+			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(""))
+			return
+		}
+		if isc.IsBaseType(reflect.TypeOf(value)) {
+			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ToString(value)))
+		} else {
+			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(value)))
+		}
+	} else {
+		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+	}
+}
+
+func UpdateConfig(c *gin.Context) {
+	envProperty := EnvProperty{}
+	err := isc.DataToObject(c.Request.Body, &envProperty)
+	if err != nil {
+		logger.Warn("解析失败，%v", err.Error())
+		return
+	}
+
+	SetValue(envProperty.Key, envProperty.Value)
+}
+
+// 多种格式优先级：json > properties > yaml > yml
+func doLoadConfigFromAbsPath(resourceAbsPath string) {
+	if !strings.HasSuffix(resourceAbsPath, "/") {
+		resourceAbsPath += "/"
+	}
+	files, err := ioutil.ReadDir(resourceAbsPath)
+	if err != nil {
+		logger.Warn("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
+		return
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	profile := getActiveProfile()
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		fileName := file.Name()
+		if !strings.HasPrefix(fileName, "application") {
+			continue
+		}
+
+		// 默认配置
+		if "application.yaml" == fileName {
+			LoadYamlFile(resourceAbsPath + "application.yaml")
+			break
+		} else if "application.yml" == fileName {
+			LoadYamlFile(resourceAbsPath + "application.yml")
+			break
+		} else if "application.properties" == fileName {
+			LoadPropertyFile(resourceAbsPath + "application.properties")
+			break
+		} else if "application.json" == fileName {
+			LoadJsonFile(resourceAbsPath + "application.json")
+			break
+		}
+
+		if "" != profile {
+			currentProfile := getProfileFromFileName(fileName)
+			if currentProfile == profile {
+				extend := getFileExtension(fileName)
+				extend = strings.ToLower(extend)
+				if "yaml" == extend {
+					LoadYamlFile(resourceAbsPath + fileName)
+					break
+				} else if "yml" == extend {
+					LoadYamlFile(resourceAbsPath + fileName)
+					break
+				} else if "properties" == extend {
+					LoadPropertyFile(resourceAbsPath + fileName)
+					break
+				} else if "json" == extend {
+					LoadJsonFile(resourceAbsPath + fileName)
+					break
+				}
+			}
+		}
+	}
+	SetValue("base.actives.profile", profile)
+}
+
 // 临时写死
 // 优先级：本地配置 > 启动参数 > 环境变量
 func getActiveProfile() string {
@@ -182,13 +231,11 @@ func getActiveProfile() string {
 	flag.StringVar(&profile, "base.actives.profile", "", "环境变量")
 	flag.Parse()
 	if "" != profile {
-		SetValue("base.actives.profile", profile)
 		return profile
 	}
 
 	profile = os.Getenv("base.actives.profile")
 	if "" != profile {
-		SetValue("base.actives.profile", profile)
 		return profile
 	}
 	return ""
@@ -343,11 +390,46 @@ func AppendJsonFile(filePath string) {
 }
 
 func SetValue(key string, value interface{}) {
+	if nil == value {
+		return
+	}
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
 		appProperty.ValueMap = map[string]interface{}{}
 	}
-	appProperty.ValueMap[key] = value
+
+	if oldValue, exist := appProperty.ValueMap[key]; exist {
+		if reflect.TypeOf(oldValue) != reflect.TypeOf(oldValue) {
+			return
+		}
+		appProperty.ValueMap[key] = value
+	}
+	doPutValue(key, value)
+}
+
+func doPutValue(key string, value interface{}) {
+	if strings.Contains(key, ".") {
+		oldValue := GetValue(key)
+		if nil == oldValue {
+			return
+		}
+		if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
+			return
+		}
+
+		lastIndex := strings.LastIndex(key, ".")
+		startKey := key[:lastIndex]
+		endKey := key[lastIndex+1:]
+
+		data := GetValue(startKey)
+		startValue := isc.ToMap(data)
+		if nil != startValue {
+			startValue[endKey] = value
+		}
+
+		doPutValue(startKey, startValue)
+	}
+	appProperty.ValueDeepMap[key] = value
 }
 
 func GetValueString(key string) string {
