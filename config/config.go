@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 	"io/ioutil"
 	"os"
 	"path"
@@ -17,7 +18,7 @@ func LoadConfig() {
 	LoadConfigWithRelativePath("")
 }
 
-// LoadConfigWithRelativePath 加载相对文件路径，相对路径是相对系统启动的位置部分
+// LoadConfigWithRelativePath 加载相对文件路径
 func LoadConfigWithRelativePath(resourceAbsPath string) {
 	dir, _ := os.Getwd()
 	pkg := strings.Replace(dir, "\\", "/", -1)
@@ -25,6 +26,7 @@ func LoadConfigWithRelativePath(resourceAbsPath string) {
 	LoadConfigWithAbsPath(path.Join(pkg, "", resourceAbsPath))
 }
 
+// LoadConfigWithAbsPath 加载绝对文件路径
 func LoadConfigWithAbsPath(resourceAbsPath string) {
 	doLoadConfigWithAbsPath(resourceAbsPath)
 
@@ -52,7 +54,7 @@ func doLoadConfigWithAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		fmt.Printf("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
+		logger.Warn("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
 		return
 	}
 
@@ -106,6 +108,65 @@ func doLoadConfigWithAbsPath(resourceAbsPath string) {
 	}
 }
 
+// AppendConfigFromRelativePath 追加配置：相对路径的配置文件
+func AppendConfigFromRelativePath(fileName string) {
+	dir, _ := os.Getwd()
+	pkg := strings.Replace(dir, "\\", "/", -1)
+	fileName = path.Join(pkg, "", fileName)
+	extend := getFileExtension(fileName)
+	extend = strings.ToLower(extend)
+	switch extend {
+	case "yaml":
+		{
+			AppendYamlFile(fileName)
+			return
+		}
+	case "yml":
+		{
+			AppendYamlFile(fileName)
+			return
+		}
+	case "properties":
+		{
+			AppendPropertyFile(fileName)
+			return
+		}
+	case "json":
+		{
+			AppendJsonFile(fileName)
+			return
+		}
+	}
+}
+
+// AppendConfigWithAbsPath 追加配置：绝对路径的配置文件
+func AppendConfigWithAbsPath(fileName string) {
+	extend := getFileExtension(fileName)
+	extend = strings.ToLower(extend)
+	switch extend {
+	case "yaml":
+		{
+			AppendYamlFile(fileName + fileName)
+			return
+		}
+	case "yml":
+		{
+			AppendYamlFile(fileName + fileName)
+			return
+		}
+	case "properties":
+		{
+			AppendPropertyFile(fileName + fileName)
+			return
+		}
+	case "json":
+		{
+			AppendJsonFile(fileName + fileName)
+			return
+		}
+	}
+}
+
 // 临时写死
 // 优先级：本地配置 > 启动参数 > 环境变量
 func getActiveProfile() string {
@@ -121,8 +182,6 @@ func getActiveProfile() string {
 		return profile
 	}
 
-	fmt.Println(os.Environ())
-	fmt.Println(os.LookupEnv("base.actives.profile"))
 	profile = os.Getenv("base.actives.profile")
 	if "" != profile {
 		SetValue("base.actives.profile", profile)
@@ -153,7 +212,8 @@ func getFileExtension(fileName string) string {
 func LoadYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("fail to read file:", err)
+		logger.Warn("fail to read file:", err)
+		return
 	}
 
 	if appProperty == nil {
@@ -168,10 +228,34 @@ func LoadYamlFile(filePath string) {
 	appProperty.ValueDeepMap = yamlMap
 }
 
+func AppendYamlFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		logger.Warn("fail to read file:", err)
+		return
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	property, err := isc.YamlToProperties(string(content))
+	valueMap, _ := isc.PropertiesToMap(property)
+	for k, v := range valueMap {
+		appProperty.ValueMap[k] = v
+	}
+
+	yamlMap, err := isc.YamlToMap(string(content))
+	for k, v := range yamlMap {
+		appProperty.ValueDeepMap[k] = v
+	}
+}
+
 func LoadPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("fail to read file:", err)
+		logger.Warn("fail to read file:", err)
+		return
 	}
 
 	if appProperty == nil {
@@ -186,10 +270,34 @@ func LoadPropertyFile(filePath string) {
 	appProperty.ValueDeepMap = yamlMap
 }
 
+func AppendPropertyFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		logger.Warn("fail to read file:", err)
+		return
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	valueMap, _ := isc.PropertiesToMap(string(content))
+	for k, v := range valueMap {
+		appProperty.ValueMap[k] = v
+	}
+
+	yamlStr, _ := isc.PropertiesToYaml(string(content))
+	yamlMap, _ := isc.YamlToMap(yamlStr)
+	for k, v := range yamlMap {
+		appProperty.ValueDeepMap[k] = v
+	}
+}
+
 func LoadJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("fail to read file:", err)
+		logger.Warn("fail to read file:", err)
+		return
 	}
 
 	if appProperty == nil {
@@ -203,6 +311,31 @@ func LoadJsonFile(filePath string) {
 
 	yamlMap, _ := isc.YamlToMap(yamlStr)
 	appProperty.ValueDeepMap = yamlMap
+}
+
+func AppendJsonFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		logger.Warn("fail to read file:", err)
+		return
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	yamlStr, err := isc.JsonToYaml(string(content))
+	property, err := isc.YamlToProperties(yamlStr)
+	valueMap, _ := isc.PropertiesToMap(property)
+	for k, v := range valueMap {
+		appProperty.ValueMap[k] = v
+	}
+
+	yamlMap, _ := isc.YamlToMap(yamlStr)
+	appProperty.ValueDeepMap = yamlMap
+	for k, v := range yamlMap {
+		appProperty.ValueDeepMap[k] = v
+	}
 }
 
 func SetValue(key string, value interface{}) {
