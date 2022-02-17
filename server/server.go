@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"io/ioutil"
 	"net/http"
 
 	h2 "github.com/isyscore/isc-gobase/http"
@@ -24,21 +25,23 @@ const (
 	HmGetPost
 )
 
-var serverPort = 8080
 var engine *gin.Engine = nil
 
-func InitServer(port int) {
-	serverPort = port
-	gin.SetMode(gin.ReleaseMode)
+func InitServer() {
+	config.LoadConfig()
+	if "" != config.GetValueString("base.profiles.active") {
+		gin.DefaultWriter = ioutil.Discard
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	engine = gin.Default()
 	engine.Use(Cors())
-	config.LoadConfig()
 }
 
 func StartServer() {
 	if engine != nil {
 		logger.Info("启动服务 ...")
-		err := engine.Run(fmt.Sprintf(":%d", serverPort))
+		err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
 		if err != nil {
 			logger.Error("启动服务异常 (%v)", err)
 		}

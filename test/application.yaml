@@ -1,0 +1,11 @@
+a:
+  b: 12
+  b1:
+    c1: 32
+  e: true
+
+server:
+  port: 31100
+base:
+  application:
+    name: "sdf"

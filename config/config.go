@@ -13,9 +13,6 @@ import (
 
 var appProperty *ApplicationProperty
 
-// LoadConfig 默认读取下面的配置文件
-// 支持yml、yaml、json、properties格式
-// 优先级yaml > yml > properties > json
 func LoadConfig() {
 	LoadConfigWithRelativePath("")
 }
@@ -28,10 +25,6 @@ func LoadConfigWithRelativePath(resourceAbsPath string) {
 	LoadConfigWithAbsPath(path.Join(pkg, "", resourceAbsPath))
 }
 
-// LoadConfigWithAbsPath 加载资源文件目录的绝对路径内容，比如：/user/xxx/mmm-biz-service/resources/
-// 支持yml、yaml、json、properties格式
-// 优先级yaml > yml > properties > json
-// 支持命令行：--app.profile xxx
 func LoadConfigWithAbsPath(resourceAbsPath string) {
 	doLoadConfigWithAbsPath(resourceAbsPath)
 
@@ -52,6 +45,7 @@ func LoadConfigWithAbsPath(resourceAbsPath string) {
 	}
 }
 
+// 多种格式优先级：json > properties > yaml > yml
 func doLoadConfigWithAbsPath(resourceAbsPath string) {
 	if !strings.HasSuffix(resourceAbsPath, "/") {
 		resourceAbsPath += "/"
@@ -62,71 +56,79 @@ func doLoadConfigWithAbsPath(resourceAbsPath string) {
 		return
 	}
 
-	var profile string
-	// 临时读取
-	flag.StringVar(&profile, "base.actives.profile", "local", "环境变量")
-	flag.Parse()
+	profile := getActiveProfile()
+
 	for _, file := range files {
 		if file.IsDir() {
 			continue
 		}
 
+		fileName := file.Name()
+		if !strings.HasPrefix(fileName, "application") {
+			continue
+		}
+
 		// 默认配置
-		if profile == "" {
-			fileName := file.Name()
-			switch fileName {
-			case "application.yaml":
-				{
-					LoadYamlFile(resourceAbsPath + "application.yaml")
-					return
-				}
-			case "application.yml":
-				{
-					LoadYamlFile(resourceAbsPath + "application.yml")
-					return
-				}
-			case "application.properties":
-				{
-					LoadYamlFile(resourceAbsPath + "application.properties")
-					return
-				}
-			case "application.json":
-				{
-					LoadYamlFile(resourceAbsPath + "application.json")
-					return
-				}
-			}
-		} else {
-			fileName := file.Name()
+		if "application.yaml" == fileName {
+			LoadYamlFile(resourceAbsPath + "application.yaml")
+			return
+		} else if "application.yml" == fileName {
+			LoadYamlFile(resourceAbsPath + "application.yml")
+			return
+		} else if "application.properties" == fileName {
+			LoadPropertyFile(resourceAbsPath + "application.properties")
+			return
+		} else if "application.json" == fileName {
+			LoadJsonFile(resourceAbsPath + "application.json")
+			return
+		}
+
+		if "" != profile {
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
 				extend := getFileExtension(fileName)
 				extend = strings.ToLower(extend)
-				switch extend {
-				case "yaml":
-					{
-						LoadYamlFile(resourceAbsPath + fileName)
-						return
-					}
-				case "yml":
-					{
-						LoadYamlFile(resourceAbsPath + fileName)
-						return
-					}
-				case "properties":
-					{
-						LoadPropertyFile(resourceAbsPath + fileName)
-						return
-					}
-				case "json":
-					{
-						LoadJsonFile(resourceAbsPath + fileName)
-						return
-					}
+				if "yaml" == extend {
+					LoadYamlFile(resourceAbsPath + fileName)
+					return
+				} else if "yml" == extend {
+					LoadYamlFile(resourceAbsPath + fileName)
+					return
+				} else if "properties" == extend {
+					LoadPropertyFile(resourceAbsPath + fileName)
+					return
+				} else if "json" == extend {
+					LoadJsonFile(resourceAbsPath + fileName)
+					return
 				}
 			}
 		}
 	}
+}
+
+// 临时写死
+// 优先级：本地配置 > 启动参数 > 环境变量
+func getActiveProfile() string {
+	profile := GetValueString("base.actives.profile")
+	if "" != profile {
+		return profile
+	}
+
+	flag.StringVar(&profile, "base.actives.profile", "", "环境变量")
+	flag.Parse()
+	if "" != profile {
+		SetValue("base.actives.profile", profile)
+		return profile
+	}
+
+	fmt.Println(os.Environ())
+	fmt.Println(os.LookupEnv("base.actives.profile"))
+	profile = os.Getenv("base.actives.profile")
+	if "" != profile {
+		SetValue("base.actives.profile", profile)
+		return profile
+	}
+	return ""
 }
 
 func getProfileFromFileName(fileName string) string {
@@ -212,6 +214,9 @@ func SetValue(key string, value interface{}) {
 }
 
 func GetValueString(key string) string {
+	if nil == appProperty {
+		return ""
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToString(value)
 	}
@@ -219,6 +224,9 @@ func GetValueString(key string) string {
 }
 
 func GetValueInt(key string) int {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt(value)
 	}
@@ -226,6 +234,9 @@ func GetValueInt(key string) int {
 }
 
 func GetValueInt8(key string) int8 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt8(value)
 	}
@@ -233,6 +244,9 @@ func GetValueInt8(key string) int8 {
 }
 
 func GetValueInt16(key string) int16 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt16(value)
 	}
@@ -240,6 +254,9 @@ func GetValueInt16(key string) int16 {
 }
 
 func GetValueInt32(key string) int32 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt32(value)
 	}
@@ -247,6 +264,9 @@ func GetValueInt32(key string) int32 {
 }
 
 func GetValueInt64(key string) int64 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt64(value)
 	}
@@ -254,6 +274,9 @@ func GetValueInt64(key string) int64 {
 }
 
 func GetValueUInt(key string) uint {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt(value)
 	}
@@ -261,6 +284,9 @@ func GetValueUInt(key string) uint {
 }
 
 func GetValueUInt8(key string) uint8 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt8(value)
 	}
@@ -268,6 +294,9 @@ func GetValueUInt8(key string) uint8 {
 }
 
 func GetValueUInt16(key string) uint16 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt16(value)
 	}
@@ -275,6 +304,9 @@ func GetValueUInt16(key string) uint16 {
 }
 
 func GetValueUInt32(key string) uint32 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt32(value)
 	}
@@ -282,6 +314,9 @@ func GetValueUInt32(key string) uint32 {
 }
 
 func GetValueUInt64(key string) uint64 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt64(value)
 	}
@@ -289,6 +324,9 @@ func GetValueUInt64(key string) uint64 {
 }
 
 func GetValueFloat32(key string) float32 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToFloat32(value)
 	}
@@ -296,6 +334,9 @@ func GetValueFloat32(key string) float32 {
 }
 
 func GetValueFloat64(key string) float64 {
+	if nil == appProperty {
+		return 0
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToFloat64(value)
 	}
@@ -303,6 +344,9 @@ func GetValueFloat64(key string) float64 {
 }
 
 func GetValueBool(key string) bool {
+	if nil == appProperty {
+		return false
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToBool(value)
 	}
@@ -310,6 +354,9 @@ func GetValueBool(key string) bool {
 }
 
 func GetValueStringDefault(key, defaultValue string) string {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToString(value)
 	}
@@ -317,6 +364,9 @@ func GetValueStringDefault(key, defaultValue string) string {
 }
 
 func GetValueIntDefault(key string, defaultValue int) int {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt(value)
 	}
@@ -324,6 +374,9 @@ func GetValueIntDefault(key string, defaultValue int) int {
 }
 
 func GetValueInt8Default(key string, defaultValue int8) int8 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt8(value)
 	}
@@ -331,6 +384,9 @@ func GetValueInt8Default(key string, defaultValue int8) int8 {
 }
 
 func GetValueInt16Default(key string, defaultValue int16) int16 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt16(value)
 	}
@@ -338,6 +394,9 @@ func GetValueInt16Default(key string, defaultValue int16) int16 {
 }
 
 func GetValueInt32Default(key string, defaultValue int32) int32 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt32(value)
 	}
@@ -345,6 +404,9 @@ func GetValueInt32Default(key string, defaultValue int32) int32 {
 }
 
 func GetValueInt64Default(key string, defaultValue int64) int64 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToInt64(value)
 	}
@@ -352,6 +414,9 @@ func GetValueInt64Default(key string, defaultValue int64) int64 {
 }
 
 func GetValueUIntDefault(key string, defaultValue uint) uint {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt(value)
 	}
@@ -359,6 +424,9 @@ func GetValueUIntDefault(key string, defaultValue uint) uint {
 }
 
 func GetValueUInt8Default(key string, defaultValue uint8) uint8 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt8(value)
 	}
@@ -366,6 +434,9 @@ func GetValueUInt8Default(key string, defaultValue uint8) uint8 {
 }
 
 func GetValueUInt16Default(key string, defaultValue uint16) uint16 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt16(value)
 	}
@@ -373,6 +444,9 @@ func GetValueUInt16Default(key string, defaultValue uint16) uint16 {
 }
 
 func GetValueUInt32Default(key string, defaultValue uint32) uint32 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt32(value)
 	}
@@ -380,6 +454,9 @@ func GetValueUInt32Default(key string, defaultValue uint32) uint32 {
 }
 
 func GetValueUInt64Default(key string, defaultValue uint64) uint64 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToUInt64(value)
 	}
@@ -387,6 +464,9 @@ func GetValueUInt64Default(key string, defaultValue uint64) uint64 {
 }
 
 func GetValueFloat32Default(key string, defaultValue float32) float32 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToFloat32(value)
 	}
@@ -394,6 +474,9 @@ func GetValueFloat32Default(key string, defaultValue float32) float32 {
 }
 
 func GetValueFloat64Default(key string, defaultValue float64) float64 {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToFloat64(value)
 	}
@@ -401,13 +484,19 @@ func GetValueFloat64Default(key string, defaultValue float64) float64 {
 }
 
 func GetValueBoolDefault(key string, defaultValue bool) bool {
+	if nil == appProperty {
+		return defaultValue
+	}
 	if value, exist := appProperty.ValueMap[key]; exist {
 		return isc.ToBool(value)
 	}
-	return false
+	return defaultValue
 }
 
 func GetValueObject(key string, targetPtrObj interface{}) error {
+	if nil == appProperty {
+		return nil
+	}
 	data := doGetValue(appProperty.ValueDeepMap, key)
 	err := isc.DataToObject(data, targetPtrObj)
 	if err != nil {
@@ -417,6 +506,9 @@ func GetValueObject(key string, targetPtrObj interface{}) error {
 }
 
 func GetValue(key string) interface{} {
+	if nil == appProperty {
+		return nil
+	}
 	return doGetValue(appProperty.ValueDeepMap, key)
 }
 

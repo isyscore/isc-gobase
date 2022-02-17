@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/isyscore/isc-gobase/logger"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
@@ -105,7 +106,7 @@ func ToJsonString(value any) string {
 	}
 	bytes, err := json.Marshal(value)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 	}
 	return string(bytes)
 }
@@ -123,7 +124,7 @@ func ToInt(value any) int {
 	}
 	result, err := ToValue(value, reflect.Int)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(int)
@@ -135,7 +136,7 @@ func ToInt8(value any) int8 {
 	}
 	result, err := ToValue(value, reflect.Int8)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(int8)
@@ -147,7 +148,7 @@ func ToInt16(value any) int16 {
 	}
 	result, err := ToValue(value, reflect.Int16)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(int16)
@@ -159,7 +160,7 @@ func ToInt32(value any) int32 {
 	}
 	result, err := ToValue(value, reflect.Int32)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(int32)
@@ -171,7 +172,7 @@ func ToInt64(value any) int64 {
 	}
 	result, err := ToValue(value, reflect.Int64)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(int64)
@@ -183,7 +184,7 @@ func ToUInt(value any) uint {
 	}
 	result, err := ToValue(value, reflect.Uint)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(uint)
@@ -195,7 +196,7 @@ func ToUInt8(value any) uint8 {
 	}
 	result, err := ToValue(value, reflect.Uint8)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(uint8)
@@ -207,7 +208,7 @@ func ToUInt16(value any) uint16 {
 	}
 	result, err := ToValue(value, reflect.Uint16)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(uint16)
@@ -219,7 +220,7 @@ func ToUInt32(value any) uint32 {
 	}
 	result, err := ToValue(value, reflect.Uint32)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(uint32)
@@ -231,7 +232,7 @@ func ToUInt64(value any) uint64 {
 	}
 	result, err := ToValue(value, reflect.Uint64)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(uint64)
@@ -243,7 +244,7 @@ func ToFloat32(value any) float32 {
 	}
 	result, err := ToValue(value, reflect.Float32)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(float32)
@@ -255,7 +256,7 @@ func ToFloat64(value any) float64 {
 	}
 	result, err := ToValue(value, reflect.Float64)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(float64)
@@ -267,7 +268,7 @@ func ToBool(value any) bool {
 	}
 	result, err := ToValue(value, reflect.Bool)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return false
 	}
 	return result.(bool)
@@ -279,7 +280,7 @@ func ToComplex64(value any) complex64 {
 	}
 	result, err := ToValue(value, reflect.Complex64)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(complex64)
@@ -291,7 +292,7 @@ func ToComplex128(value any) complex128 {
 	}
 	result, err := ToValue(value, reflect.Complex128)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		logger.Warn("%v", err.Error())
 		return 0
 	}
 	return result.(complex128)
@@ -389,12 +390,10 @@ func Cast(fieldKind reflect.Kind, valueStr string) (any, error) {
 //  - 字符串类型：如果是json，则按照json进行转换
 func DataToObject(data interface{}, targetPtrObj interface{}) error {
 	if data == nil {
-		fmt.Printf("data is nil")
 		return nil
 	}
 	targetType := reflect.TypeOf(targetPtrObj)
 	if targetType.Kind() != reflect.Ptr {
-		fmt.Printf("targetPtrObj type is not ptr")
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 
@@ -429,7 +428,7 @@ func ReaderToObject(reader io.Reader, targetPtrObj interface{}) error {
 	}
 	targetType := reflect.TypeOf(targetPtrObj)
 	if targetType.Kind() != reflect.Ptr {
-		fmt.Printf("targetPtrObj type is not ptr")
+		logger.Warn("targetPtrObj type is not ptr")
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 	data, err := ioutil.ReadAll(reader)
@@ -446,7 +445,7 @@ func StrToObject(contentOfJson string, targetPtrObj interface{}) error {
 
 	targetType := reflect.TypeOf(targetPtrObj)
 	if targetType.Kind() != reflect.Ptr {
-		fmt.Printf("targetPtrObj type is not ptr")
+		logger.Warn("targetPtrObj type is not ptr")
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 
@@ -495,12 +494,12 @@ func ArrayToObject(dataArray interface{}, targetPtrObj interface{}) error {
 
 	targetType := reflect.TypeOf(targetPtrObj)
 	if targetType.Kind() != reflect.Ptr {
-		fmt.Printf("targetPtrObj type is not ptr")
+		logger.Warn("targetPtrObj type is not ptr")
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 
 	if targetType.Elem().Kind() != reflect.Slice && targetType.Elem().Kind() != reflect.Array {
-		fmt.Printf("item of targetPtrObj type is not slice")
+		logger.Warn("item of targetPtrObj type is not slice")
 		return &ChangeError{ErrMsg: "item of targetPtrObj type is not slice"}
 	}
 
@@ -533,12 +532,12 @@ func MapToObject(dataMap interface{}, targetPtrObj interface{}) error {
 	}
 	targetType := reflect.TypeOf(targetPtrObj)
 	if targetType.Kind() != reflect.Ptr {
-		fmt.Printf("targetPtrObj type is not ptr")
+		logger.Warn("targetPtrObj type is not ptr")
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 
 	if targetType.Elem().Kind() != reflect.Map && targetType.Elem().Kind() != reflect.Struct {
-		fmt.Printf("item of targetPtrObj type is not Map or Struct")
+		logger.Warn("item of targetPtrObj type is not Map or Struct")
 		return &ChangeError{ErrMsg: "item of targetPtrObj type is not slice"}
 	}
 
@@ -779,7 +778,7 @@ func ObjectToJson(object interface{}) string {
 	// 只接收 map、struct、array、slice进行解析
 	objKind := reflect.ValueOf(object).Kind()
 	if objKind != reflect.Map && objKind != reflect.Struct && objKind != reflect.Array && objKind != reflect.Slice {
-		fmt.Printf("not support the type %v change to json", objKind.String())
+		logger.Warn("not support the type %v change to json", objKind.String())
 		return "{}"
 	}
 

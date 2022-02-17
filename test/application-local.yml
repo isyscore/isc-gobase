@@ -1,0 +1,16 @@
+a:
+  b: 33
+  b1:
+    c1: 32
+
+one:
+  name: "haode"
+
+
+server:
+  port: 31100
+base:
+  application:
+    name: "sdf-local"
+
+

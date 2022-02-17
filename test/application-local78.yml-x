@@ -1,0 +1,14 @@
+a:
+  b: 33
+  b1:
+    c1: 32
+
+one:
+  name: "haode"
+
+
+server:
+  port: 31101
+base:
+  application:
+    name: "sdf-local78-yml"
