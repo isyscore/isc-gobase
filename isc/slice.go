@@ -26,27 +26,27 @@ func Slice[T any](list []T, r IntRange) []T {
 	return SubList[T](list, r.Start, r.End)
 }
 
-func SliceBy[T comparable](list []T, r []int) []T {
-	var n []T
-	for i := 0; i < len(list); i++ {
-		if ListContains(r, i) {
-			n = append(n, list[i])
-		}
-	}
-	return n
-}
+//func SliceBy[T comparable](list []T, r []int) []T {
+//	var n []T
+//	for i := 0; i < len(list); i++ {
+//		if ListContains[int](r, i) {
+//			n = append(n, list[i])
+//		}
+//	}
+//	return n
+//}
 
 //Contains Returns true if element is found in the collection.
 //predicate keySelector
 //if you want to check item in list, please use ListContains
 func SliceContains[T any, K comparable](list []T, predicate func(T) K, key K) bool {
-	m := SliceTo(list, predicate)
+	m := SliceTo[T, K](list, predicate)
 	_, ok := m[key]
 	return ok
 }
 
 func IsInSlice[T comparable](list []T, val T) bool {
-	return IndexOf(list, val) >= 0
+	return IndexOf[T](list, val) >= 0
 }
 
 func SliceToMap[T comparable](list []T) map[T]T {
@@ -66,7 +66,7 @@ func SliceTo[T any, K comparable](list []T, valueTransform func(T) K) map[K]T {
 }
 
 func SliceDistinct[T comparable](list []T) []T {
-	m := SliceToMap(list)
+	m := SliceToMap[T](list)
 	var result []T
 	for k := range m {
 		result = append(result, k)
@@ -78,7 +78,7 @@ func SliceDistinct[T comparable](list []T) []T {
 //Among equal elements of the given collection, only the last one will be present in the resulting list.
 //The elements in the resulting list are not in the same order as they were in the source collection.
 func SliceDistinctTo[T any, V comparable](list []T, valueTransform func(T) V) []T {
-	m := SliceTo(list, valueTransform)
+	m := SliceTo[T, V](list, valueTransform)
 	var result []T
 	for _, v := range m {
 		result = append(result, v)
