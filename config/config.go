@@ -1,63 +1,447 @@
 package config
 
 import (
+	"flag"
 	"fmt"
+	"github.com/isyscore/isc-gobase/isc"
 	"io/ioutil"
+	"os"
+	"path"
 	"reflect"
-
-	"github.com/isyscore/isc-gobase/logger"
-	"gopkg.in/yaml.v2"
+	"strings"
 )
 
-type AppServer struct {
-	Port   int  `yaml:"port"`
-	Lookup bool `yaml:"lookup"`
+var appProperty *ApplicationProperty
+
+// LoadConfig 默认读取下面的配置文件
+// 支持yml、yaml、json、properties格式
+// 优先级yaml > yml > properties > json
+func LoadConfig() {
+	LoadConfigWithRelativePath("")
 }
 
-type AppSpring struct {
-	Application AppApplication `yaml:"application"`
-	Profiles    AppProfile     `yaml:"profiles"`
+// LoadConfigWithRelativePath 加载相对文件路径，相对路径是相对系统启动的位置部分
+func LoadConfigWithRelativePath(resourceAbsPath string) {
+	dir, _ := os.Getwd()
+	pkg := strings.Replace(dir, "\\", "/", -1)
+
+	LoadConfigWithAbsPath(path.Join(pkg, "", resourceAbsPath))
 }
 
-type AppLogger struct {
-	Level string `yaml:"level"`
-}
+// LoadConfigWithAbsPath 加载资源文件目录的绝对路径内容，比如：/user/xxx/mmm-biz-service/resources/
+// 支持yml、yaml、json、properties格式
+// 优先级yaml > yml > properties > json
+// 支持命令行：--app.profile xxx
+func LoadConfigWithAbsPath(resourceAbsPath string) {
+	doLoadConfigWithAbsPath(resourceAbsPath)
 
-type AppProfile struct {
-	Active string `yaml:"active"`
-}
-
-type AppApplication struct {
-	Name string `yaml:"name"`
-}
-
-func LoadConfig(AConfig any) {
-	yamlFile, err := ioutil.ReadFile("./application.yml")
+	// 加载内部配置
+	err := GetValueObject("server", &ServerCfg)
 	if err != nil {
-		logger.Error("读取 application.yml 失败")
 		return
 	}
-	err = yaml.Unmarshal(yamlFile, AConfig)
+
+	err = GetValueObject("base", &BaseCfg)
 	if err != nil {
-		logger.Error("读取 application.yml 异常(%v)", err)
 		return
 	}
-	v1 := reflect.ValueOf(AConfig).Elem()
-	o1 := v1.FieldByName("Spring").Interface()
-	v2 := reflect.ValueOf(o1)
-	o2 := v2.FieldByName("Profiles").Interface()
-	v3 := reflect.ValueOf(o2)
-	act := v3.FieldByName("Active").String()
 
-	if act != "" && act != "default" {
-		yamlAdditional, err := ioutil.ReadFile(fmt.Sprintf("./application-%s.yml", act))
-		if err != nil {
-			logger.Error("读取 application-%s.yml 失败", act)
+	err = GetValueObject("log", &LogCfg)
+	if err != nil {
+		return
+	}
+}
+
+func doLoadConfigWithAbsPath(resourceAbsPath string) {
+	if !strings.HasSuffix(resourceAbsPath, "/") {
+		resourceAbsPath += "/"
+	}
+	files, err := ioutil.ReadDir(resourceAbsPath)
+	if err != nil {
+		fmt.Printf("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
+		return
+	}
+
+	var profile string
+	// 临时读取
+	flag.StringVar(&profile, "base.actives.profile", "local", "环境变量")
+	flag.Parse()
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		// 默认配置
+		if profile == "" {
+			fileName := file.Name()
+			switch fileName {
+			case "application.yaml":
+				{
+					LoadYamlFile(resourceAbsPath + "application.yaml")
+					return
+				}
+			case "application.yml":
+				{
+					LoadYamlFile(resourceAbsPath + "application.yml")
+					return
+				}
+			case "application.properties":
+				{
+					LoadYamlFile(resourceAbsPath + "application.properties")
+					return
+				}
+			case "application.json":
+				{
+					LoadYamlFile(resourceAbsPath + "application.json")
+					return
+				}
+			}
 		} else {
-			err = yaml.Unmarshal(yamlAdditional, AConfig)
-			if err != nil {
-				logger.Error("读取 application-%s.yml 异常", act)
+			fileName := file.Name()
+			currentProfile := getProfileFromFileName(fileName)
+			if currentProfile == profile {
+				extend := getFileExtension(fileName)
+				extend = strings.ToLower(extend)
+				switch extend {
+				case "yaml":
+					{
+						LoadYamlFile(resourceAbsPath + fileName)
+						return
+					}
+				case "yml":
+					{
+						LoadYamlFile(resourceAbsPath + fileName)
+						return
+					}
+				case "properties":
+					{
+						LoadPropertyFile(resourceAbsPath + fileName)
+						return
+					}
+				case "json":
+					{
+						LoadJsonFile(resourceAbsPath + fileName)
+						return
+					}
+				}
 			}
 		}
 	}
+}
+
+func getProfileFromFileName(fileName string) string {
+	if strings.HasPrefix(fileName, "application-") {
+		words := strings.SplitN(fileName, ".", 2)
+		appNames := words[0]
+
+		appNameAndProfile := strings.SplitN(appNames, "-", 2)
+		return appNameAndProfile[1]
+	}
+	return ""
+}
+
+func getFileExtension(fileName string) string {
+	if strings.Contains(fileName, ".") {
+		words := strings.SplitN(fileName, ".", 2)
+		return words[1]
+	}
+	return ""
+}
+
+func LoadYamlFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("fail to read file:", err)
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	property, err := isc.YamlToProperties(string(content))
+	valueMap, _ := isc.PropertiesToMap(property)
+	appProperty.ValueMap = valueMap
+
+	yamlMap, err := isc.YamlToMap(string(content))
+	appProperty.ValueDeepMap = yamlMap
+}
+
+func LoadPropertyFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("fail to read file:", err)
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	valueMap, _ := isc.PropertiesToMap(string(content))
+	appProperty.ValueMap = valueMap
+
+	yamlStr, _ := isc.PropertiesToYaml(string(content))
+	yamlMap, _ := isc.YamlToMap(yamlStr)
+	appProperty.ValueDeepMap = yamlMap
+}
+
+func LoadJsonFile(filePath string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("fail to read file:", err)
+	}
+
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+	}
+
+	yamlStr, err := isc.JsonToYaml(string(content))
+	property, err := isc.YamlToProperties(yamlStr)
+	valueMap, _ := isc.PropertiesToMap(property)
+	appProperty.ValueMap = valueMap
+
+	yamlMap, _ := isc.YamlToMap(yamlStr)
+	appProperty.ValueDeepMap = yamlMap
+}
+
+func SetValue(key string, value interface{}) {
+	if appProperty == nil {
+		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = map[string]interface{}{}
+	}
+	appProperty.ValueMap[key] = value
+}
+
+func GetValueString(key string) string {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToString(value)
+	}
+	return ""
+}
+
+func GetValueInt(key string) int {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt(value)
+	}
+	return 0
+}
+
+func GetValueInt8(key string) int8 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt8(value)
+	}
+	return 0
+}
+
+func GetValueInt16(key string) int16 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt16(value)
+	}
+	return 0
+}
+
+func GetValueInt32(key string) int32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt32(value)
+	}
+	return 0
+}
+
+func GetValueInt64(key string) int64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt64(value)
+	}
+	return 0
+}
+
+func GetValueUInt(key string) uint {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt(value)
+	}
+	return 0
+}
+
+func GetValueUInt8(key string) uint8 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt8(value)
+	}
+	return 0
+}
+
+func GetValueUInt16(key string) uint16 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt16(value)
+	}
+	return 0
+}
+
+func GetValueUInt32(key string) uint32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt32(value)
+	}
+	return 0
+}
+
+func GetValueUInt64(key string) uint64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt64(value)
+	}
+	return 0
+}
+
+func GetValueFloat32(key string) float32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToFloat32(value)
+	}
+	return 0
+}
+
+func GetValueFloat64(key string) float64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToFloat64(value)
+	}
+	return 0
+}
+
+func GetValueBool(key string) bool {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToBool(value)
+	}
+	return false
+}
+
+func GetValueStringDefault(key, defaultValue string) string {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToString(value)
+	}
+	return defaultValue
+}
+
+func GetValueIntDefault(key string, defaultValue int) int {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt(value)
+	}
+	return defaultValue
+}
+
+func GetValueInt8Default(key string, defaultValue int8) int8 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt8(value)
+	}
+	return defaultValue
+}
+
+func GetValueInt16Default(key string, defaultValue int16) int16 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt16(value)
+	}
+	return defaultValue
+}
+
+func GetValueInt32Default(key string, defaultValue int32) int32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt32(value)
+	}
+	return defaultValue
+}
+
+func GetValueInt64Default(key string, defaultValue int64) int64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToInt64(value)
+	}
+	return defaultValue
+}
+
+func GetValueUIntDefault(key string, defaultValue uint) uint {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt(value)
+	}
+	return defaultValue
+}
+
+func GetValueUInt8Default(key string, defaultValue uint8) uint8 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt8(value)
+	}
+	return defaultValue
+}
+
+func GetValueUInt16Default(key string, defaultValue uint16) uint16 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt16(value)
+	}
+	return defaultValue
+}
+
+func GetValueUInt32Default(key string, defaultValue uint32) uint32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt32(value)
+	}
+	return defaultValue
+}
+
+func GetValueUInt64Default(key string, defaultValue uint64) uint64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToUInt64(value)
+	}
+	return defaultValue
+}
+
+func GetValueFloat32Default(key string, defaultValue float32) float32 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToFloat32(value)
+	}
+	return defaultValue
+}
+
+func GetValueFloat64Default(key string, defaultValue float64) float64 {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToFloat64(value)
+	}
+	return defaultValue
+}
+
+func GetValueBoolDefault(key string, defaultValue bool) bool {
+	if value, exist := appProperty.ValueMap[key]; exist {
+		return isc.ToBool(value)
+	}
+	return false
+}
+
+func GetValueObject(key string, targetPtrObj interface{}) error {
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, targetPtrObj)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetValue(key string) interface{} {
+	return doGetValue(appProperty.ValueDeepMap, key)
+}
+
+func doGetValue(parentValue interface{}, key string) interface{} {
+	if key == "" {
+		return parentValue
+	}
+	parentValueKind := reflect.ValueOf(parentValue).Kind()
+	if parentValueKind == reflect.Map {
+		keys := strings.SplitN(key, ".", 2)
+		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(keys[0]))
+		emptyValue := reflect.Value{}
+		if v1 == emptyValue {
+			return nil
+		}
+		if len(keys) == 1 {
+			return doGetValue(v1.Interface(), "")
+		} else {
+			return doGetValue(v1.Interface(), fmt.Sprintf("%v", keys[1]))
+		}
+	}
+	return nil
+}
+
+type ApplicationProperty struct {
+	ValueMap     map[string]interface{}
+	ValueDeepMap map[string]interface{}
 }

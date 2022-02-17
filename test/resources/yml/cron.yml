@@ -1,0 +1,19 @@
+clean:
+  a:
+    enabled: true
+    days: 3
+    rows: 300
+    interval: 1000
+    cron: 0 0 1 * * ?
+  b:
+    enabled: true
+    days: 2
+    rows: 100
+    interval: 800
+    cron: 0 0 1 * * ?
+  c:
+    enabled: true
+    days: 3
+    rows: 300
+    interval: 1000
+    cron: 0 0 1 * * ?

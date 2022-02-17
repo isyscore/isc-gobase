@@ -387,7 +387,7 @@ func Cast(fieldKind reflect.Kind, valueStr string) (any, error) {
 //  - map类型
 //  - 集合/分片类型
 //  - 字符串类型：如果是json，则按照json进行转换
-func DataToObject(data any, targetPtrObj any) error {
+func DataToObject(data interface{}, targetPtrObj interface{}) error {
 	if data == nil {
 		fmt.Printf("data is nil")
 		return nil
@@ -398,17 +398,20 @@ func DataToObject(data any, targetPtrObj any) error {
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
 
-	switch data.(type) {
-	case io.Reader:
-		return ReaderToObject(data.(io.Reader), targetPtrObj)
-	case string:
-		return StrToObject(data.(string), targetPtrObj)
-	case map[any]any:
-		return MapToObject(data.(map[any]any), targetPtrObj)
-	case []any:
-		return ArrayToObject(data.([]any), targetPtrObj)
-	case any:
-		return MapToObject(ToMap(data), targetPtrObj)
+	srcType := reflect.TypeOf(data)
+	if srcType.Kind() == reflect.Map {
+		return MapToObject(data, targetPtrObj)
+	} else if srcType.Kind() == reflect.Array || srcType.Kind() == reflect.Slice {
+		return ArrayToObject(data.([]interface{}), targetPtrObj)
+	} else {
+		switch data.(type) {
+		case io.Reader:
+			return ReaderToObject(data.(io.Reader), targetPtrObj)
+		case string:
+			return StrToObject(data.(string), targetPtrObj)
+		case interface{}:
+			return MapToObject(ToMap(data), targetPtrObj)
+		}
 	}
 
 	targetPtrValue := reflect.ValueOf(targetPtrObj)
@@ -767,7 +770,7 @@ func ObjectToData(object interface{}) interface{} {
 	return nil
 }
 
-// ObjectToJson 对象转化为json，其中map对应的key为小写
+// ObjectToJson 对象转化为json，其中map对应的key大小写均可
 func ObjectToJson(object interface{}) string {
 	if object == nil || reflect.ValueOf(object).Kind() == reflect.Ptr {
 		return "{}"
@@ -851,7 +854,9 @@ func doObjectChange(objType reflect.Type, object interface{}) interface{} {
 	}
 	objKind := objType.Kind()
 	if objKind == reflect.Ptr {
-		return nil
+		objKind = objType.Elem().Kind()
+		objValue := reflect.ValueOf(object)
+		return doObjectChange(objType.Elem(), objValue.Elem().Interface())
 	}
 	if objKind == reflect.Int || objKind == reflect.Int8 || objKind == reflect.Int16 || objKind == reflect.Int32 || objKind == reflect.Int64 {
 		return ToInt64(object)
