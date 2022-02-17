@@ -2,7 +2,6 @@ package test
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/isyscore/isc-gobase/isc"
 	"testing"
 )
@@ -572,7 +571,7 @@ func TestTtt(t *testing.T) {
 	str := "{\"configItemKey\":null}"
 	req := ConfigItemFromCommonReq{}
 	isc.StrToObject(str, &req)
-	fmt.Println(req)
+	t.Log(req)
 }
 
 // objectToJson
@@ -735,10 +734,10 @@ func TestObjectToJson9(t *testing.T) {
 	rp := PageRsp{}
 	isc.DataToObject(rel, &rp)
 
-	fmt.Println(isc.ToJsonString(rp))
+	t.Log(isc.ToJsonString(rp))
 
 	result := isc.ObjectToData(rp)
-	fmt.Println(isc.ToJsonString(result))
+	t.Log(isc.ToJsonString(result))
 
 	//Equal(t, isc.ObjectToJson(act), "[{\"age\":1,\"name\":\"zhou1\"},{\"age\":2,\"name\":\"zhou2\"}]")
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/config"
 	"net/http"
 
 	h2 "github.com/isyscore/isc-gobase/http"
@@ -31,6 +32,7 @@ func InitServer(port int) {
 	gin.SetMode(gin.ReleaseMode)
 	engine = gin.Default()
 	engine.Use(Cors())
+	config.LoadConfig()
 }
 
 func StartServer() {
