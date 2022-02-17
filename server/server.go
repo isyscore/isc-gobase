@@ -29,18 +29,35 @@ var engine *gin.Engine = nil
 
 func InitServer() {
 	config.LoadConfig()
-	if "" != config.GetValueString("base.profiles.active") {
-		gin.DefaultWriter = ioutil.Discard
+
+	mode := config.GetValueString("server.gin.mode")
+	if "debug" == mode {
 		gin.SetMode(gin.ReleaseMode)
+	} else if "test" == mode {
+		gin.SetMode(gin.ReleaseMode)
+	} else if "release" == mode {
+		gin.SetMode(gin.ReleaseMode)
+		gin.DefaultWriter = ioutil.Discard
 	}
 
 	engine = gin.Default()
 	engine.Use(Cors())
+
+	// 注册 健康检查endpoint
+	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
+		RegisterHealthCheckEndpoint(config.GetValueString("api-module"))
+	}
+
+	// 注册 配置检测endpoint
+	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
+		RegisterConfigWatchEndpoint(config.GetValueString("api-module"))
+	}
 }
 
 func StartServer() {
 	if engine != nil {
 		logger.Info("启动服务 ...")
+		fmt.Println(config.GetValueString("server.port"))
 		err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
 		if err != nil {
 			logger.Error("启动服务异常 (%v)", err)
@@ -78,16 +95,22 @@ func Engine() *gin.Engine {
 	return engine
 }
 
-func RegisterHealthCheck(apiBase string) {
-	RegisterRoute(apiBase+"/system/status", HmAll, healthSystemStatus)
-	RegisterRoute(apiBase+"/system/init", HmAll, healthSystemInit)
-	RegisterRoute(apiBase+"/system/destroy", HmAll, healthSystemDestroy)
+func RegisterHealthCheckEndpoint(apiBase string) {
+	if "" == apiBase {
+		return
+	}
+	RegisterRoute(apiBase+"/base/system/status", HmAll, healthSystemStatus)
+	RegisterRoute(apiBase+"/base/system/init", HmAll, healthSystemInit)
+	RegisterRoute(apiBase+"/base/system/destroy", HmAll, healthSystemDestroy)
 }
 
-func RegisterConfigEndpoint(apiBase string) {
-	RegisterRoute(apiBase+"/config/values", HmGet, config.GetConfigValues)
-	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
-	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
+func RegisterConfigWatchEndpoint(apiBase string) {
+	if "" == apiBase {
+		return
+	}
+	RegisterRoute(apiBase+"/base/config/values", HmGet, config.GetConfigValues)
+	RegisterRoute(apiBase+"/base/config/value/:key", HmGet, config.GetConfigValue)
+	RegisterRoute(apiBase+"/base/config/update", HmPut, config.UpdateConfig)
 }
 
 func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {

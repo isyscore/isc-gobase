@@ -1,18 +1,16 @@
-a:
-  b: 12
-  b1:
-    c1: 32
-  e: true
-
+api-module: api/test
 server:
   port: 31000
 base:
   application:
     name: "test"
-
-
-one:
-  name: "haode"
+  endpoint:
+    # 健康检查处理，默认关闭
+    health:
+      enable: false
+    # 配置的动态实时变更，默认关闭
+    config:
+      enable: true
 
 
 

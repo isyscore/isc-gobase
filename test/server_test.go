@@ -20,6 +20,5 @@ func TestServer(t *testing.T) {
 		},
 	)
 
-	server.RegisterConfigEndpoint("/api/test")
 	server.StartServer()
 }

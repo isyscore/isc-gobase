@@ -31,15 +31,26 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 ### 4. 内置的配置文件自动加载
 目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
 ```yaml
+api-module: api/xxx
 server:
-  port: 8080
+  port: xxx
   lookup: true/false
+  gin:
+    # gin运行的模式
+    mode: debug/release/test
   
 base:
   application:
     name: isc-demo-service
   profiles:
     active: local
+  endpoint:
+    # 健康检查处理，默认关闭
+    health: 
+      enable: true/false
+    # 配置的动态实时变更，默认关闭
+    config:
+      enable: true/false
 ```
 
 
@@ -109,22 +120,24 @@ config.AppendConfigFromAbsPath(xx)
 
 ### 9. 支持配置的在线查看以及实时变更
 
-如下配置配置的endpoint后，就可以在线查看应用的所有配置了
-```go
-// 注册配置的endpoint
-server.RegisterConfigEndpoint("/api/test")
-
+如下配置配置开启后，就可以在线查看应用的所有配置了
+```yaml
+base:
+  endpoint:
+    # 配置的动态实时变更，默认关闭
+    config:
+      enable: true/false
 ```
 
 ```shell
 // 查看应用所有配置
-curl http://localhost:xxx/{api-module}config/values
+curl http://localhost:xxx/{api-module}system/config/values
 
 // 查看应用的某个配置
-curl http://localhost:xxx/{api-module}config/value/{key}
+curl http://localhost:xxx/{api-module}system/config/value/{key}
 
 // 修改某个应用的配置
-curl -X PUT http://localhost:xxx/{api-module}config/update -d '{"key":"xxx", "value":"yyyy"}'
+curl -X PUT http://localhost:xxx/{api-module}system/config/update -d '{"key":"xxx", "value":"yyyy"}'
 ```
 
 ##### 注意
