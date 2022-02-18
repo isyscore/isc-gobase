@@ -32,9 +32,9 @@ func InitServer() {
 
 	mode := config.GetValueString("server.gin.mode")
 	if "debug" == mode {
-		gin.SetMode(gin.ReleaseMode)
+		gin.SetMode(gin.DebugMode)
 	} else if "test" == mode {
-		gin.SetMode(gin.ReleaseMode)
+		gin.SetMode(gin.TestMode)
 	} else if "release" == mode {
 		gin.SetMode(gin.ReleaseMode)
 		gin.DefaultWriter = ioutil.Discard
