@@ -1,37 +1,26 @@
 package isc
 
-// filter specificated item in a list
-
+//ListFilter filter specificated item in a list
 func ListFilter[T any](list []T, f func(T) bool) []T {
-	var n []T
-	for _, e := range list {
-		if f(e) {
-			n = append(n, e)
-		}
-	}
-	return n
+	var dest []T
+	return ListFilterTo(list, &dest, f)
 }
 
-func ListFilterNot[T any](list []T, f func(T) bool) []T {
+//ListFilterNot Returns a list containing all elements not matching the given predicate.
+func ListFilterNot[T any](list []T, predicate func(T) bool) []T {
 	var n []T
-	for _, e := range list {
-		if !f(e) {
-			n = append(n, e)
-		}
-	}
-	return n
+	return ListFilterNotTo(list, &n, predicate)
 }
 
-func ListFilterIndexed[T any](list []T, f func(int, T) bool) []T {
+//ListFilterIndexed Returns a list containing only elements matching the given predicate.
+//Params: predicate - function that takes the index of an element and the element itself and returns the result of predicate evaluation on the element.
+func ListFilterIndexed[T any](list []T, predicate func(int, T) bool) []T {
 	var n []T
-	for i, e := range list {
-		if f(i, e) {
-			n = append(n, e)
-		}
-	}
-	return n
+	return ListFilterIndexedTo(list, &n, predicate)
 }
 
+//ListFilterNotIndexed Appends all elements matching the given predicate to the given destination.
+//Params: predicate - function that takes the index of an element and the element itself and returns the result of predicate evaluation on the element.
 func ListFilterNotIndexed[T any](list []T, f func(int, T) bool) []T {
 	var n []T
 	for i, e := range list {
@@ -42,6 +31,7 @@ func ListFilterNotIndexed[T any](list []T, f func(int, T) bool) []T {
 	return n
 }
 
+//ListFilterNotNull Returns a list containing all elements that are not null.
 func ListFilterNotNull[T any](list []*T) []*T {
 	var n []*T
 	for _, e := range list {
@@ -52,6 +42,7 @@ func ListFilterNotNull[T any](list []*T) []*T {
 	return n
 }
 
+//ListFilterTo Appends all elements matching the given predicate to the given dest.
 func ListFilterTo[T any](list []T, dest *[]T, f func(T) bool) []T {
 	var n []T
 	for _, e := range list {
@@ -63,10 +54,11 @@ func ListFilterTo[T any](list []T, dest *[]T, f func(T) bool) []T {
 	return n
 }
 
-func ListFilterNotTo[T any](list []T, dest *[]T, f func(T) bool) []T {
+//ListFilterNotTo Appends all elements not matching the given predicate to the given destination.
+func ListFilterNotTo[T any](list []T, dest *[]T, predicate func(T) bool) []T {
 	var n []T
 	for _, e := range list {
-		if !f(e) {
+		if !predicate(e) {
 			*dest = append(*dest, e)
 			n = append(n, e)
 		}
@@ -74,10 +66,12 @@ func ListFilterNotTo[T any](list []T, dest *[]T, f func(T) bool) []T {
 	return n
 }
 
-func ListFilterIndexedTo[T any](list []T, dest *[]T, f func(int, T) bool) []T {
+//ListFilterIndexedTo Appends all elements matching the given predicate to the given destination.
+//Params: predicate - function that takes the index of an element and the element itself and returns the result of predicate evaluation on the element.
+func ListFilterIndexedTo[T any](list []T, dest *[]T, predicate func(int, T) bool) []T {
 	var n []T
 	for i, e := range list {
-		if f(i, e) {
+		if predicate(i, e) {
 			*dest = append(*dest, e)
 			n = append(n, e)
 		}
@@ -85,10 +79,12 @@ func ListFilterIndexedTo[T any](list []T, dest *[]T, f func(int, T) bool) []T {
 	return n
 }
 
-func ListFilterNotIndexedTo[T any](list []T, dest *[]T, f func(int, T) bool) []T {
+//ListFilterNotIndexedTo Appends all elements not matching the given predicate to the given destination.
+//Params: predicate - function that takes the index of an element and the element itself and returns the result of predicate evaluation on the element.
+func ListFilterNotIndexedTo[T any](list []T, dest *[]T, predicate func(int, T) bool) []T {
 	var n []T
 	for i, e := range list {
-		if !f(i, e) {
+		if !predicate(i, e) {
 			*dest = append(*dest, e)
 			n = append(n, e)
 		}
@@ -97,7 +93,7 @@ func ListFilterNotIndexedTo[T any](list []T, dest *[]T, f func(int, T) bool) []T
 }
 
 func ListContains[T comparable](list []T, item T) bool {
-	var ret = false
+	ret := false
 	for _, e := range list {
 		if e == item {
 			ret = true
@@ -114,7 +110,7 @@ func ListDistinct[T comparable](list []T) []T {
 /// functions for map
 
 func MapFilter[K comparable, V any](m map[K]V, f func(K, V) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if f(k, v) {
 			n[k] = v
@@ -124,7 +120,7 @@ func MapFilter[K comparable, V any](m map[K]V, f func(K, V) bool) map[K]V {
 }
 
 func MapFilterNot[K comparable, V any](m map[K]V, f func(K, V) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if !f(k, v) {
 			n[k] = v
@@ -134,7 +130,7 @@ func MapFilterNot[K comparable, V any](m map[K]V, f func(K, V) bool) map[K]V {
 }
 
 func MapFilterKeys[K comparable, V any](m map[K]V, f func(K) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if f(k) {
 			n[k] = v
@@ -144,7 +140,7 @@ func MapFilterKeys[K comparable, V any](m map[K]V, f func(K) bool) map[K]V {
 }
 
 func MapFilterValues[K comparable, V any](m map[K]V, f func(V) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if f(v) {
 			n[k] = v
@@ -154,7 +150,7 @@ func MapFilterValues[K comparable, V any](m map[K]V, f func(V) bool) map[K]V {
 }
 
 func MapFilterTo[K comparable, V any](m map[K]V, dest *map[K]V, f func(K, V) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if f(k, v) {
 			(*dest)[k] = v
@@ -165,7 +161,7 @@ func MapFilterTo[K comparable, V any](m map[K]V, dest *map[K]V, f func(K, V) boo
 }
 
 func MapFilterNotTo[K comparable, V any](m map[K]V, dest *map[K]V, f func(K, V) bool) map[K]V {
-	var n map[K]V = make(map[K]V)
+	n := make(map[K]V)
 	for k, v := range m {
 		if !f(k, v) {
 			(*dest)[k] = v
@@ -176,7 +172,7 @@ func MapFilterNotTo[K comparable, V any](m map[K]V, dest *map[K]V, f func(K, V) 
 }
 
 func MapContains[K comparable, V comparable](m map[K]V, k K, v V) bool {
-	var ret = false
+	ret := false
 	for t, u := range m {
 		if t == k && u == v {
 			ret = true
@@ -187,7 +183,7 @@ func MapContains[K comparable, V comparable](m map[K]V, k K, v V) bool {
 }
 
 func MapContainsKey[K comparable, V any](m map[K]V, k K) bool {
-	var ret = false
+	ret := false
 	for t := range m {
 		if t == k {
 			ret = true
@@ -198,7 +194,7 @@ func MapContainsKey[K comparable, V any](m map[K]V, k K) bool {
 }
 
 func MapContainsValue[K comparable, V comparable](m map[K]V, v V) bool {
-	var ret = false
+	ret := false
 	for _, u := range m {
 		if u == v {
 			ret = true

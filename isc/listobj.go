@@ -169,11 +169,6 @@ func (l ISCList[T]) Slice(r IntRange) ISCList[T] {
 	return NewListWithList(rr)
 }
 
-func (l ISCList[T]) SliceBy(r []int) ISCList[T] {
-	rr := SliceBy(l, r)
-	return NewListWithList(rr)
-}
-
 func (l ISCList[T]) Take(n int) ISCList[T] {
 	r := Take(l, n)
 	return NewListWithList(r)

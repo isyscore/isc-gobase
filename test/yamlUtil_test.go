@@ -2,12 +2,13 @@ package test
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/isc"
-	"github.com/magiconair/properties"
 	"io/ioutil"
 	"log"
 	"strings"
 	"testing"
+
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/magiconair/properties"
 )
 
 func TestMapToProperties1(t *testing.T) {

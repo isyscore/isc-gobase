@@ -6,10 +6,8 @@ func Partition[T any](list []T, partition int) [][]T {
 	})
 }
 
-/**
-计算partition数
-f: 入参为数组长度,返回partition数
-*/
+// PartitionWithCal 计算partition数
+// f: 入参为数组长度,返回partition数
 func PartitionWithCal[T any](list []T, f func(int) int) [][]T {
 	var array [][]T
 

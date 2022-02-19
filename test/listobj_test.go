@@ -31,3 +31,55 @@ func TestISCList_associateBy(t *testing.T) {
 	})
 	t.Logf("%v\n", isc.ToString(l))
 }
+
+func TestNewListWithList(t *testing.T) {
+	//list := []string{"1","2"}
+	l := isc.NewList[string]()
+	t.Logf("%v", l)
+}
+
+func TestISCList_Add(t *testing.T) {
+	l := isc.NewList[string]()
+	l.Add("3")
+	t.Logf("%v", l)
+}
+
+func TestISCList_AddAll(t *testing.T) {
+	l := isc.NewList[string]()
+	l.AddAll("4", "5", "6")
+	t.Logf("%v", l)
+}
+
+func TestISCList_Insert(t *testing.T) {
+	l := isc.NewListWithItems[string]("1", "2", "3")
+	l.Insert(2, "7")
+	t.Logf("%v", l)
+}
+
+func TestISCList_Delete(t *testing.T) {
+	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l.Delete(2)
+	t.Logf("%v", l)
+}
+
+func TestISCList_Clear(t *testing.T) {
+	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l.Clear()
+	t.Logf("%v", l)
+}
+
+func TestISCList_IsEmpty(t *testing.T) {
+	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	r := l.IsEmpty()
+	t.Logf("%v", r)
+	l.Clear()
+	r = l.IsEmpty()
+	t.Logf("%v", r)
+}
+
+func TestISCList_ForEach(t *testing.T) {
+	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l.ForEach(func(item string) {
+		t.Logf("%s", item)
+	})
+}

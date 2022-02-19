@@ -49,7 +49,7 @@ func LastOrNull[T any](list []T) *T {
 
 //IndexOf 判断元素item是否在分片中，示例res := IndexOf[int](list,item),使用时须指明类型
 func IndexOf[T comparable](list []T, item T) int {
-	var idx = -1
+	idx := -1
 	for i, e := range list {
 		if e == item {
 			idx = i
@@ -60,7 +60,7 @@ func IndexOf[T comparable](list []T, item T) int {
 }
 
 func LastIndexOf[T comparable](list []T, item T) int {
-	var idx = -1
+	idx := -1
 	for i := len(list) - 1; i >= 0; i-- {
 		e := list[i]
 		if e == item {
@@ -72,7 +72,7 @@ func LastIndexOf[T comparable](list []T, item T) int {
 }
 
 func IndexOfCondition[T comparable](list []T, f func(T) bool) int {
-	var idx = -1
+	idx := -1
 	for i, e := range list {
 		if f(e) {
 			idx = i
@@ -83,7 +83,7 @@ func IndexOfCondition[T comparable](list []T, f func(T) bool) int {
 }
 
 func LastIndexOfCondition[T comparable](list []T, f func(T) bool) int {
-	var idx = -1
+	idx := -1
 	for i := len(list) - 1; i >= 0; i-- {
 		e := list[i]
 		if f(e) {
