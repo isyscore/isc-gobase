@@ -99,18 +99,18 @@ func RegisterHealthCheckEndpoint(apiBase string) {
 	if "" == apiBase {
 		return
 	}
-	RegisterRoute(apiBase+"/base/system/status", HmAll, healthSystemStatus)
-	RegisterRoute(apiBase+"/base/system/init", HmAll, healthSystemInit)
-	RegisterRoute(apiBase+"/base/system/destroy", HmAll, healthSystemDestroy)
+	RegisterRoute(apiBase+"/system/status", HmAll, healthSystemStatus)
+	RegisterRoute(apiBase+"/system/init", HmAll, healthSystemInit)
+	RegisterRoute(apiBase+"/system/destroy", HmAll, healthSystemDestroy)
 }
 
 func RegisterConfigWatchEndpoint(apiBase string) {
 	if "" == apiBase {
 		return
 	}
-	RegisterRoute(apiBase+"/base/config/values", HmGet, config.GetConfigValues)
-	RegisterRoute(apiBase+"/base/config/value/:key", HmGet, config.GetConfigValue)
-	RegisterRoute(apiBase+"/base/config/update", HmPut, config.UpdateConfig)
+	RegisterRoute(apiBase+"/config/values", HmGet, config.GetConfigValues)
+	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
+	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
 }
 
 func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {

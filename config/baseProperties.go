@@ -4,19 +4,19 @@ var ServerCfg ServerConfig
 var BaseCfg BaseConfig
 var LogCfg LoggerConfig
 
-// server前缀
+// ServerConfig server前缀
 type ServerConfig struct {
 	Port   int
 	Lookup bool
 }
 
-// base前缀
+// BaseConfig base前缀
 type BaseConfig struct {
 	Application AppApplication
 	Profiles    AppProfile
 }
 
-// log 前缀
+// LoggerConfig log 前缀
 type LoggerConfig struct {
 	Level string
 	Path  string
@@ -28,4 +28,12 @@ type AppProfile struct {
 
 type AppApplication struct {
 	Name string
+}
+
+type StorageConnectionConfig struct {
+	Host       string
+	Port       int
+	User       string
+	Password   string
+	Parameters string
 }

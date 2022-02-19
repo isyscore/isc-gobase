@@ -38,19 +38,15 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 	AppendConfigFromRelativePath("./config/application-default.yml")
 
 	// 加载内部配置
-	err := GetValueObject("server", &ServerCfg)
-	if err != nil {
-		return
+	if err := GetValueObject("server", &ServerCfg); err != nil {
+		logger.Error("加载 Server 配置失败(%v)", err)
+	}
+	if err := GetValueObject("base", &BaseCfg); err != nil {
+		logger.Error("加载 Base 配置失败(%v)", err)
 	}
 
-	err = GetValueObject("base", &BaseCfg)
-	if err != nil {
-		return
-	}
-
-	err = GetValueObject("log", &LogCfg)
-	if err != nil {
-		return
+	if err := GetValueObject("log", &LogCfg); err != nil {
+		logger.Error("加载 Log 配置失败(%v)", err)
 	}
 }
 
@@ -63,25 +59,13 @@ func AppendConfigFromRelativePath(fileName string) {
 	extend = strings.ToLower(extend)
 	switch extend {
 	case "yaml":
-		{
-			AppendYamlFile(fileName)
-			return
-		}
+		AppendYamlFile(fileName)
 	case "yml":
-		{
-			AppendYamlFile(fileName)
-			return
-		}
+		AppendYamlFile(fileName)
 	case "properties":
-		{
-			AppendPropertyFile(fileName)
-			return
-		}
+		AppendPropertyFile(fileName)
 	case "json":
-		{
-			AppendJsonFile(fileName)
-			return
-		}
+		AppendJsonFile(fileName)
 	}
 }
 
@@ -91,25 +75,13 @@ func AppendConfigFromAbsPath(fileName string) {
 	extend = strings.ToLower(extend)
 	switch extend {
 	case "yaml":
-		{
-			AppendYamlFile(fileName)
-			return
-		}
+		AppendYamlFile(fileName)
 	case "yml":
-		{
-			AppendYamlFile(fileName)
-			return
-		}
+		AppendYamlFile(fileName)
 	case "properties":
-		{
-			AppendPropertyFile(fileName)
-			return
-		}
+		AppendPropertyFile(fileName)
 	case "json":
-		{
-			AppendJsonFile(fileName)
-			return
-		}
+		AppendJsonFile(fileName)
 	}
 }
 
@@ -161,7 +133,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		logger.Warn("read fail, resource: %v, err %v", resourceAbsPath, err.Error())
+		logger.Warn("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
 		return
 	}
 
@@ -263,7 +235,7 @@ func getFileExtension(fileName string) string {
 func LoadYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		logger.Warn("读取文件失败(%v)", err)
 		return
 	}
 
@@ -282,7 +254,7 @@ func LoadYamlFile(filePath string) {
 func AppendYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		logger.Warn("读取文件失败(%v)", err)
 		return
 	}
 
@@ -305,7 +277,7 @@ func AppendYamlFile(filePath string) {
 func LoadPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		logger.Warn("读取文件失败(%v)", err)
 		return
 	}
 
@@ -324,7 +296,7 @@ func LoadPropertyFile(filePath string) {
 func AppendPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		logger.Warn("读取文件失败(%v)", err)
 		return
 	}
 
@@ -347,7 +319,7 @@ func AppendPropertyFile(filePath string) {
 func LoadJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		logger.Warn("读取文件失败(%v)", err)
 		return
 	}
 
@@ -355,8 +327,8 @@ func LoadJsonFile(filePath string) {
 		appProperty = &ApplicationProperty{}
 	}
 
-	yamlStr, err := isc.JsonToYaml(string(content))
-	property, err := isc.YamlToProperties(yamlStr)
+	yamlStr, _ := isc.JsonToYaml(string(content))
+	property, _ := isc.YamlToProperties(yamlStr)
 	valueMap, _ := isc.PropertiesToMap(property)
 	appProperty.ValueMap = valueMap
 
