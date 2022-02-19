@@ -52,6 +52,7 @@ func InitServer() {
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
 		RegisterConfigWatchEndpoint(config.GetValueString("api-module"))
 	}
+	logger.InitLog()
 }
 
 func StartServer() {

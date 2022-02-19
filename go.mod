@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/magiconair/properties v1.8.5
+	github.com/rs/zerolog v1.26.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
