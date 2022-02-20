@@ -3,12 +3,24 @@ package logger
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/mattn/go-colorable"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
+
+var CustomizeFiles []string
+
+var loggerInfo zerolog.Logger
+var loggerDebug zerolog.Logger
+var loggerWarn zerolog.Logger
+var loggerError zerolog.Logger
+var loggerAssert zerolog.Logger
+var loggerTrace zerolog.Logger
 
 func InitLog() {
 	//日志级别设置，默认Info
@@ -23,42 +35,67 @@ func InitLog() {
 	zerolog.TimeFieldFormat = timeFieldFormat
 	//设置日志输出
 	out := zerolog.ConsoleWriter{Out: os.Stderr}
+	colorEnable := config.GetValueBoolDefault("server.logger.color.enable", false)
+	if colorEnable {
+		out = zerolog.ConsoleWriter{Out: colorable.NewColorableStdout()}
+	}
 	out.FormatLevel = func(i interface{}) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", config.GetValueStringDefault("base.application.name", "isc-gobase"), i))
 	}
-	log.Logger = log.Logger.Output(out).With().Caller().Logger()
+	log.Logger = log.Logger.Output(out).With().Caller().Timestamp().Logger()
+
 	//添加hook
-	//
-	//levelInfoHook := zerolog.HookFunc(func(e *zerolog.Event, l zerolog.Level, msg string){
-	//	levelName := l.String()
-	//	if l == zerolog.NoLevel {
-	//		e.Discard()
-	//	} else if l == zerolog.InfoLevel {
-	//		log.Logger.Output()
-	//	}
-	//}
+	levelInfoHook := zerolog.HookFunc(func(e *zerolog.Event, l zerolog.Level, msg string) {
+		//levelName := l.String()
+		e1 := e
+		if isc.ListAny[string](CustomizeFiles, func(t string) bool {
+			return zerolog.CallerFieldName == t
+		}) {
+			//日志修改日志级别为debug并输出日志
+			logger := log.With().Logger()
+			logger.Debug().Msg(msg)
+		}
+
+		switch l {
+		case zerolog.DebugLevel:
+			e1 = loggerDebug.Debug()
+		case zerolog.InfoLevel:
+			e1 = loggerInfo.Info()
+		case zerolog.WarnLevel:
+			e1 = loggerWarn.Warn()
+		case zerolog.ErrorLevel:
+			e1 = loggerError.Error()
+		case zerolog.TraceLevel:
+			e1 = loggerTrace.Trace()
+		default:
+			e1 = loggerAssert.Log()
+		}
+		e1.Msg(msg)
+	})
+	log.Hook(levelInfoHook)
 }
 
-//func initLoggerFile(logDir string, fileName string) *log.Logger {
-//	var l *log.Logger
-//	logFile := filepath.Join(logDir, fileName)
-//	if file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm); err == nil {
-//		l = log.New(file, "", log.LstdFlags|log.Llongfile)
-//	}
-//	return l
-//}
-//
-//func init() {
-//	// 创建日志目录
-//	logDir := filepath.Join(".", "logs")
-//	if _, err := os.Stat(logDir); os.IsNotExist(err) {
-//		_ = os.Mkdir(logDir, os.ModePerm)
-//	}
-//	// 创建日志文件
-//	loggerInfo = initLoggerFile(logDir, "app-info.log")
-//	loggerDebug = initLoggerFile(logDir, "app-debug.log")
-//	loggerWarn = initLoggerFile(logDir, "app-warn.log")
-//	loggerError = initLoggerFile(logDir, "app-error.log")
-//	loggerAssert = initLoggerFile(logDir, "app-assert.log")
-//
-//}
+func initLoggerFile(logDir string, fileName string) zerolog.Logger {
+	var l zerolog.Logger
+	logFile := filepath.Join(logDir, fileName)
+	if file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm); err == nil {
+		l = log.With().Logger()
+		l.Output(file)
+	}
+	return l
+}
+
+func init() {
+	// 创建日志目录
+	logDir := filepath.Join(".", "logs")
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		_ = os.Mkdir(logDir, os.ModePerm)
+	}
+	// 创建日志文件
+	loggerInfo = initLoggerFile(logDir, "app-info.log")
+	loggerDebug = initLoggerFile(logDir, "app-debug.log")
+	loggerWarn = initLoggerFile(logDir, "app-warn.log")
+	loggerError = initLoggerFile(logDir, "app-error.log")
+	loggerAssert = initLoggerFile(logDir, "app-assert.log")
+
+}
