@@ -267,12 +267,7 @@ func AppendYamlFile(filePath string) {
 	property, err := isc.YamlToProperties(string(content))
 	valueMap, _ := isc.PropertiesToMap(property)
 	for k, v := range valueMap {
-		appProperty.ValueMap[k] = v
-	}
-
-	yamlMap, err := isc.YamlToMap(string(content))
-	for k, v := range yamlMap {
-		appProperty.ValueDeepMap[k] = v
+		SetValue(k, v)
 	}
 }
 
@@ -308,13 +303,7 @@ func AppendPropertyFile(filePath string) {
 
 	valueMap, _ := isc.PropertiesToMap(string(content))
 	for k, v := range valueMap {
-		appProperty.ValueMap[k] = v
-	}
-
-	yamlStr, _ := isc.PropertiesToYaml(string(content))
-	yamlMap, _ := isc.YamlToMap(yamlStr)
-	for k, v := range yamlMap {
-		appProperty.ValueDeepMap[k] = v
+		SetValue(k, v)
 	}
 }
 
@@ -353,13 +342,7 @@ func AppendJsonFile(filePath string) {
 	property, err := isc.YamlToProperties(yamlStr)
 	valueMap, _ := isc.PropertiesToMap(property)
 	for k, v := range valueMap {
-		appProperty.ValueMap[k] = v
-	}
-
-	yamlMap, _ := isc.YamlToMap(yamlStr)
-	appProperty.ValueDeepMap = yamlMap
-	for k, v := range yamlMap {
-		appProperty.ValueDeepMap[k] = v
+		SetValue(k, v)
 	}
 }
 

@@ -40,8 +40,8 @@ func InitServer() {
 		gin.DefaultWriter = ioutil.Discard
 	}
 
-	engine = gin.Default()
-	engine.Use(Cors())
+	engine = gin.New()
+	engine.Use(Cors(), gin.Recovery())
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
