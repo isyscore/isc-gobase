@@ -8,6 +8,6 @@ type IntRange struct {
 func MakeIntRange(AStart int, AEnd int) IntRange {
 	return IntRange{
 		Start: AStart,
-		End: AEnd,
+		End:   AEnd,
 	}
 }

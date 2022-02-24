@@ -18,6 +18,10 @@ func NewMapWithPairs[K comparable, V comparable](pairs ...Pair[K, V]) ISCMap[K, 
 	return m
 }
 
+func (m ISCMap[K, V]) Size() int {
+	return len(m)
+}
+
 func (m ISCMap[K, V]) Put(k K, v V) {
 	m[k] = v
 }

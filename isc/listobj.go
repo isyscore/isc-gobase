@@ -43,6 +43,10 @@ func (l ISCList[T]) IsEmpty() bool {
 	return len(l) == 0
 }
 
+func (l ISCList[T]) Size() int {
+	return len(l)
+}
+
 func (l ISCList[T]) ForEach(f func(T)) {
 	for _, item := range l {
 		f(item)

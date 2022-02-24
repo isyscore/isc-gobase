@@ -1,18 +1,16 @@
-api-module: api/test
+api-module: test
 server:
   port: 31000
 base:
   application:
     name: "test"
+  api:
+    prefix: /api/core
   endpoint:
     # 健康检查处理，默认关闭
     health:
-      enable: false
+      enable: true
     # 配置的动态实时变更，默认关闭
     config:
       enable: true
-
-
-
-
 

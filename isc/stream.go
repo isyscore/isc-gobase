@@ -9,14 +9,14 @@ type Stream[T any] struct {
 	source <-chan T
 }
 
-// Just converts the given arbitrary items to a Stream.
-func Just[T any](items ...T) Stream[T] {
+// StreamJust converts the given arbitrary items to a Stream.
+func StreamJust[T any](items ...T) Stream[T] {
 	source := make(chan T, len(items))
 	for _, e := range items {
 		source <- e
 	}
 	close(source)
-	return Range(source)
+	return StreamRange(source)
 }
 
 // AllMatch returns whether all elements of this stream match the provided predicate.
@@ -26,7 +26,7 @@ func (s Stream[T]) AllMatch(predicate func(T) bool) bool {
 	for item := range s.source {
 		if !predicate(item) {
 			// make sure the former goroutine not block, and current func returns fast.
-			go drain(s.source)
+			go StreamDrain(s.source)
 			return false
 		}
 	}
@@ -40,7 +40,7 @@ func (s Stream[T]) AnyMatch(predicate func(T) bool) bool {
 	for item := range s.source {
 		if predicate(item) {
 			// make sure the former goroutine not block, and current func returns fast.
-			go drain(s.source)
+			go StreamDrain(s.source)
 			return true
 		}
 	}
@@ -53,7 +53,7 @@ func (s Stream[T]) AnyMatch(predicate func(T) bool) bool {
 func (s Stream[T]) NoneMatch(predicate func(T) bool) bool {
 	for item := range s.source {
 		if predicate(item) {
-			go drain(s.source)
+			go StreamDrain(s.source)
 			return false
 		}
 	}
@@ -65,7 +65,7 @@ func (s Stream[T]) Map(fn func(T) T) Stream[T] {
 	for item := range s.source {
 		source <- fn(item)
 	}
-	return Range(source)
+	return StreamRange(source)
 }
 
 // Sort sorts the items from the underlying source.
@@ -77,7 +77,7 @@ func (s Stream[T]) Sort(less func(T, T) bool) Stream[T] {
 	sort.Slice(items, func(i, j int) bool {
 		return less(items[i], items[j])
 	})
-	return Just(items...)
+	return StreamJust(items...)
 }
 
 // Distinct removes the duplicated items base on the given keySelector.
@@ -90,11 +90,11 @@ func (s Stream[T]) Distinct(keySelector func(T) T) Stream[T] {
 	for _, v := range m {
 		source <- v
 	}
-	return Range(source)
+	return StreamRange(source)
 }
 
-// Foreach seals the Stream with the fn on each item, no successive operations.
-func (s Stream[T]) Foreach(fn func(T)) {
+// ForEach seals the Stream with the fn on each item, no successive operations.
+func (s Stream[T]) ForEach(fn func(T)) {
 	for item := range s.source {
 		fn(item)
 	}
@@ -103,7 +103,7 @@ func (s Stream[T]) Foreach(fn func(T)) {
 //FirsVal returns the first element,channel is FIFO,so first goroutine will get head element or nil
 func (s Stream[T]) FirsVal() any {
 	for item := range s.source {
-		go drain(s.source)
+		go StreamDrain(s.source)
 		return item
 	}
 	return nil
@@ -121,7 +121,7 @@ func (s Stream[T]) First(valueSelector func(T) bool) Stream[T] {
 		}
 	}()
 	close(source)
-	return Range(source)
+	return StreamRange(source)
 }
 
 // LastVal returns the last item, or nil if no items.
@@ -142,7 +142,7 @@ func (s Stream[T]) Last(valueSelector func(any) bool) Stream[T] {
 	}
 	source <- lastValue
 	close(source)
-	return Range(source)
+	return StreamRange(source)
 }
 
 //Filter Returns a list containing only elements matching the given predicate.
@@ -154,22 +154,22 @@ func (s Stream[T]) Filter(predicate func(T) bool) Stream[T] {
 		}
 	}
 	defer close(source)
-	return Range(source)
+	return StreamRange(source)
 }
 
-func Range[T any](source <-chan T) Stream[T] {
+func StreamRange[T any](source <-chan T) Stream[T] {
 	return Stream[T]{
 		source: source,
 	}
 }
 
-// drain drains the given channel.
-func drain[T any](ch <-chan T) {
+// StreamDrain drains the given channel.
+func StreamDrain[T any](ch <-chan T) {
 	for range ch {
 	}
 }
 
 // Done waits all upstreaming operations to be done.
 func (s Stream[T]) Done() {
-	drain(s.source)
+	StreamDrain(s.source)
 }

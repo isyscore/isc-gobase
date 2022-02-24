@@ -25,6 +25,8 @@ const (
 	HmGetPost
 )
 
+var ApiPrefix = "/api"
+
 var engine *gin.Engine = nil
 
 func InitServer() {
@@ -43,21 +45,25 @@ func InitServer() {
 	engine = gin.New()
 	engine.Use(Cors(), gin.Recovery())
 
+	ap := config.GetValueStringDefault("base.api.prefix", "")
+	if ap != "" {
+		ApiPrefix = ap
+	}
+
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
-		RegisterHealthCheckEndpoint(config.GetValueString("api-module"))
+		RegisterHealthCheckEndpoint(ApiPrefix + "/" + config.GetValueString("api-module"))
 	}
 
 	// 注册 配置检测endpoint
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
-		RegisterConfigWatchEndpoint(config.GetValueString("api-module"))
+		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.GetValueString("api-module"))
 	}
 }
 
 func StartServer() {
 	if engine != nil {
 		logger.Info("启动服务 ...")
-		fmt.Println(config.GetValueString("server.port"))
 		err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
 		if err != nil {
 			logger.Error("启动服务异常 (%v)", err)
