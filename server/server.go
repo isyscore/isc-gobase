@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 
@@ -56,37 +57,33 @@ func InitServer() {
 }
 
 func StartServer() {
-	if engine != nil {
-		logger.Info("启动服务 ...")
-		fmt.Println(config.GetValueString("server.port"))
-		err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
-		if err != nil {
-			logger.Error("启动服务异常 (%v)", err)
-		}
-	} else {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
+		return
+	}
+	log.Info().Msg("启动服务 ...")
+	fmt.Println(config.GetValueString("server.port"))
+	err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
+	if err != nil {
+		log.Error().Msgf("启动服务异常 (%v)", err)
 	}
 }
 
 func RegisterStatic(relativePath string, rootPath string) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.Static(relativePath, rootPath)
 }
 
 func RegisterStaticFile(relativePath string, filePath string) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.StaticFile(relativePath, filePath)
 }
 
 func RegisterPlugin(plugin gin.HandlerFunc) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.Use(plugin)
@@ -125,10 +122,15 @@ func RegisterCustomHealthCheck(apiBase string, status func() string, init func()
 		c.Data(http.StatusOK, h2.ContentTypeText, []byte(destroy()))
 	})
 }
-
-func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
+func checkEngine() bool {
 	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+		log.Error().Msg("服务没有初始化，请先调用 InitServer")
+		return false
+	}
+	return true
+}
+func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
+	if !checkEngine() {
 		return
 	}
 	switch method {

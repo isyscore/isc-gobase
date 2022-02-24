@@ -13,6 +13,26 @@ import (
 	"time"
 )
 
+func Info(format string, v ...any) {
+	log.Info().Msgf(format, v...)
+}
+
+func Warn(format string, v ...any) {
+	log.Warn().Msgf(format, v...)
+}
+
+func Error(format string, v ...any) {
+	log.Error().Msgf(format, v...)
+}
+
+func Debug(format string, v ...any) {
+	log.Debug().Msgf(format, v...)
+}
+
+func Assert(format string, v ...any) {
+	log.Printf(format, v...)
+}
+
 var CustomizeFiles []string
 
 var loggerInfo zerolog.Logger
