@@ -17,7 +17,7 @@ var (
 	FmtYMdH      = "2006-01-02 15"
 	FmtYMd       = "2006-01-02"
 	FmtYM        = "2006-01"
-	FmtY        = "2006"
+	FmtY         = "2006"
 	FmtYYYYMMdd  = "20060102"
 
 	FmtHmsSSSMore = "15:04:05.000000000"

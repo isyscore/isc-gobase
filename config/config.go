@@ -3,18 +3,17 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	h2 "github.com/isyscore/isc-gobase/http"
-	"github.com/isyscore/isc-gobase/isc"
-	"github.com/isyscore/isc-gobase/logger"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v2"
 )
 
 var appProperty *ApplicationProperty
@@ -41,14 +40,14 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 
 	// 加载内部配置
 	if err := GetValueObject("server", &ServerCfg); err != nil {
-		logger.Error("加载 Server 配置失败(%v)", err)
+		log.Error().Msgf("加载 Server 配置失败(%v)", err)
 	}
 	if err := GetValueObject("base", &BaseCfg); err != nil {
-		logger.Error("加载 Base 配置失败(%v)", err)
+		log.Error().Msgf("加载 Base 配置失败(%v)", err)
 	}
 
 	if err := GetValueObject("log", &LogCfg); err != nil {
-		logger.Error("加载 Log 配置失败(%v)", err)
+		log.Error().Msgf("加载 Log 配置失败(%v)", err)
 	}
 }
 
@@ -94,9 +93,9 @@ type EnvProperty struct {
 
 func GetConfigValues(c *gin.Context) {
 	if nil != appProperty {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(appProperty.ValueMap)))
+		c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(appProperty.ValueMap)))
 	} else {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
 	}
 }
 
@@ -104,16 +103,16 @@ func GetConfigValue(c *gin.Context) {
 	if nil != appProperty {
 		value := GetValue(c.Param("key"))
 		if nil == value {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(""))
+			c.Data(200, "application/json; charset=utf-8", []byte(""))
 			return
 		}
 		if isc.IsBaseType(reflect.TypeOf(value)) {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ToString(value)))
+			c.Data(200, "application/json; charset=utf-8", []byte(isc.ToString(value)))
 		} else {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(value)))
+			c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(value)))
 		}
 	} else {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
 	}
 }
 
@@ -121,7 +120,7 @@ func UpdateConfig(c *gin.Context) {
 	envProperty := EnvProperty{}
 	err := isc.DataToObject(c.Request.Body, &envProperty)
 	if err != nil {
-		logger.Warn("解析失败，%v", err.Error())
+		log.Warn().Msgf("解析失败，%v", err.Error())
 		return
 	}
 
@@ -135,7 +134,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		logger.Warn("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
+		log.Warn().Msgf("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
 		return
 	}
 
@@ -237,7 +236,7 @@ func getFileExtension(fileName string) string {
 func LoadYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("读取文件失败(%v)", err)
+		log.Warn().Msgf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -256,7 +255,7 @@ func LoadYamlFile(filePath string) {
 func AppendYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("读取文件失败(%v)", err)
+		log.Warn().Msgf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -274,7 +273,7 @@ func AppendYamlFile(filePath string) {
 func LoadPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("读取文件失败(%v)", err)
+		log.Warn().Msgf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -293,7 +292,7 @@ func LoadPropertyFile(filePath string) {
 func AppendPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("读取文件失败(%v)", err)
+		log.Warn().Msgf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -310,7 +309,7 @@ func AppendPropertyFile(filePath string) {
 func LoadJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("读取文件失败(%v)", err)
+		log.Warn().Msgf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -330,7 +329,7 @@ func LoadJsonFile(filePath string) {
 func AppendJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Warn("fail to read file:", err)
+		log.Warn().Msgf("fail to read file:", err)
 		return
 	}
 
@@ -727,7 +726,7 @@ func LoadYamlConfig(fileName string, AConfig any, handler func(data []byte, ACon
 func LoadYamlConfigByAbsolutPath(path string, AConfig any, handler func(data []byte, AConfig any) error) error {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		logger.Error("读取文件异常(%v)", err)
+		log.Error().Msgf("读取文件异常(%v)", err)
 	}
 	return handler(data, AConfig)
 }
@@ -741,7 +740,7 @@ func LoadSpringConfig(AConfig any) {
 	_ = LoadYamlConfig("application.yml", AConfig, func(data []byte, AConfig any) error {
 		err := yaml.Unmarshal(data, AConfig)
 		if err != nil {
-			logger.Error("读取 application.yml 异常(%v)", err)
+			log.Error().Msgf("读取 application.yml 异常(%v)", err)
 			return err
 		}
 		v1 := reflect.ValueOf(AConfig).Elem()
@@ -753,12 +752,12 @@ func LoadSpringConfig(AConfig any) {
 		if act != "" && act != "default" {
 			yamlAdditional, err := ioutil.ReadFile(fmt.Sprintf("./application-%s.yml", act))
 			if err != nil {
-				logger.Error("读取 application-%s.yml 失败", act)
+				log.Error().Msgf("读取 application-%s.yml 失败", act)
 				return err
 			} else {
 				err = yaml.Unmarshal(yamlAdditional, AConfig)
 				if err != nil {
-					logger.Error("读取 application-%s.yml 异常", act)
+					log.Error().Msgf("读取 application-%s.yml 异常", act)
 					return err
 				}
 			}

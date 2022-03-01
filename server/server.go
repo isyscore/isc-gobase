@@ -2,11 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/config"
 	"io/ioutil"
-	"net/http"
+	"time"
 
-	h2 "github.com/isyscore/isc-gobase/http"
+	"github.com/isyscore/isc-gobase/config"
+
 	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
@@ -59,39 +59,42 @@ func InitServer() {
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
 		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.GetValueString("api-module"))
 	}
+	level := config.GetValueStringDefault("server.logger.level", "info")
+	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
+	colored := config.GetValueBoolDefault("server.logger.color.enable", false)
+	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
+	logger.InitLog(level, timeFieldFormat, colored, appName)
 }
 
 func StartServer() {
-	if engine != nil {
-		logger.Info("启动服务 ...")
-		err := engine.Run(fmt.Sprintf(":%d", config.GetValueIntDefault("server.port", 8080)))
-		if err != nil {
-			logger.Error("启动服务异常 (%v)", err)
-		}
-	} else {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
+		return
+	}
+	logger.Info("开始启动服务")
+	port := config.GetValueIntDefault("server.port", 8080)
+	logger.Info("服务端口号: %d", port)
+	err := engine.Run(fmt.Sprintf(":%d", port))
+	if err != nil {
+		logger.Error("启动服务异常 (%v)", err)
 	}
 }
 
 func RegisterStatic(relativePath string, rootPath string) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.Static(relativePath, rootPath)
 }
 
 func RegisterStaticFile(relativePath string, filePath string) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.StaticFile(relativePath, filePath)
 }
 
 func RegisterPlugin(plugin gin.HandlerFunc) {
-	if engine == nil {
-		logger.Error("服务没有初始化，请先调用 InitServer")
+	if !checkEngine() {
 		return
 	}
 	engine.Use(plugin)
@@ -121,19 +124,24 @@ func RegisterConfigWatchEndpoint(apiBase string) {
 
 func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {
 	RegisterRoute(apiBase+"/system/status", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(status()))
+		c.Data(200, "application/json; charset=utf-8", []byte(status()))
 	})
 	RegisterRoute(apiBase+"/system/init", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeText, []byte(init()))
+		c.Data(200, "application/json; charset=utf-8", []byte(init()))
 	})
 	RegisterRoute(apiBase+"/system/destroy", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeText, []byte(destroy()))
+		c.Data(200, "application/json; charset=utf-8", []byte(destroy()))
 	})
 }
-
-func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
+func checkEngine() bool {
 	if engine == nil {
 		logger.Error("服务没有初始化，请先调用 InitServer")
+		return false
+	}
+	return true
+}
+func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
+	if !checkEngine() {
 		return
 	}
 	switch method {

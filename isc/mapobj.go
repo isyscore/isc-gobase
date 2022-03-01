@@ -169,3 +169,7 @@ func (m ISCMap[K, V]) Plus(n map[K]V) ISCMap[K, V] {
 func (m ISCMap[K, V]) Minus(n map[K]V) ISCMap[K, V] {
 	return MapMinus(m, n)
 }
+
+func (m ISCMap[K, V]) Equals(n map[K]V) bool {
+	return MapEquals(m, n)
+}
