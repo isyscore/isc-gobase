@@ -27,14 +27,13 @@ package logger
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/config"
-	"github.com/isyscore/isc-gobase/isc"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
+
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func Info(format string, v ...any) {
@@ -85,19 +84,18 @@ func SetGlobalLevel(strLevel string) {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog() {
+func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	//日志级别设置，默认Info
-	level := config.GetValueStringDefault("server.logger.level", "info")
-	SetGlobalLevel(level)
+
+	SetGlobalLevel(logLevel)
 
 	zerolog.CallerSkipFrameCount = 2
 	//时间格式设置
-	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
-	zerolog.TimeFieldFormat = timeFieldFormat
+	zerolog.TimeFieldFormat = timeFmt
 	//设置日志输出
-	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: config.GetValueBoolDefault("server.logger.color.enable", false)}
+	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored}
 	out.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", config.GetValueStringDefault("base.application.name", "isc-gobase"), i))
+		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	log.Logger = log.Logger.Output(out).With().Caller().Timestamp().Logger()
 
@@ -106,7 +104,7 @@ func InitLog() {
 		//levelName := l.String()
 		ll := l
 		e1 := e
-		if isc.ListAny[string](CustomizeFiles, func(t string) bool {
+		if isc.ListAny(CustomizeFiles, func(t string) bool {
 			return zerolog.CallerFieldName == t
 		}) {
 			//日志修改日志级别为debug并输出日志
@@ -130,18 +128,18 @@ func InitLog() {
 		e1.Msg(msg)
 	})
 	log.Logger = log.Logger.Hook(levelInfoHook)
-	initLogDir()
+	initLogDir(appName)
 }
 
 //initLoggerFile open or create and open log file
-func initLoggerFile(logDir string, fileName string) *zerolog.Logger {
+func initLoggerFile(logDir string, fileName string, appName string) *zerolog.Logger {
 	var l zerolog.Logger
 	logFile := filepath.Join(logDir, fileName)
 	if file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm); err == nil {
 		l = log.Logger.With().Logger()
 		out := zerolog.ConsoleWriter{Out: file, TimeFormat: "2006-01-02 15:04:05.000", NoColor: true}
 		out.FormatLevel = func(i interface{}) string {
-			return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", config.GetValueStringDefault("server.application.name", "isc-gobase"), i))
+			return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 		}
 		l = l.Output(out).With().Caller().Logger()
 	}
@@ -149,17 +147,17 @@ func initLoggerFile(logDir string, fileName string) *zerolog.Logger {
 }
 
 //initLogDir create log dir and file
-func initLogDir() {
+func initLogDir(appName string) {
 	// 创建日志目录
 	logDir := filepath.Join(".", "logs")
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		_ = os.Mkdir(logDir, os.ModePerm)
 	}
 	// 创建日志文件
-	loggerInfo = initLoggerFile(logDir, "app-info.log")
-	loggerDebug = initLoggerFile(logDir, "app-debug.log")
-	loggerWarn = initLoggerFile(logDir, "app-warn.log")
-	loggerError = initLoggerFile(logDir, "app-error.log")
-	loggerAssert = initLoggerFile(logDir, "app-assert.log")
-	loggerTrace = initLoggerFile(logDir, "app-trace.log")
+	loggerInfo = initLoggerFile(logDir, "app-info.log", appName)
+	loggerDebug = initLoggerFile(logDir, "app-debug.log", appName)
+	loggerWarn = initLoggerFile(logDir, "app-warn.log", appName)
+	loggerError = initLoggerFile(logDir, "app-error.log", appName)
+	loggerAssert = initLoggerFile(logDir, "app-assert.log", appName)
+	loggerTrace = initLoggerFile(logDir, "app-trace.log", appName)
 }

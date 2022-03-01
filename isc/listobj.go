@@ -224,3 +224,7 @@ func (l ISCList[T]) Plus(n []T) ISCList[T] {
 func (l ISCList[T]) Minus(n []T) ISCList[T] {
 	return ListMinus(l, n)
 }
+
+func (l ISCList[T]) Equals(n ISCList[T]) bool {
+	return ListEquals(l, n)
+}

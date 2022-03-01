@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
+	"time"
+
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/rs/zerolog/log"
-	"io/ioutil"
-	"net/http"
 
-	h2 "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
@@ -53,7 +53,11 @@ func InitServer() {
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
 		RegisterConfigWatchEndpoint(config.GetValueString("api-module"))
 	}
-	logger.InitLog()
+	level := config.GetValueStringDefault("server.logger.level", "info")
+	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
+	colored := config.GetValueBoolDefault("server.logger.color.enable", false)
+	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
+	logger.InitLog(level, timeFieldFormat, colored, appName)
 }
 
 func StartServer() {
@@ -113,13 +117,13 @@ func RegisterConfigWatchEndpoint(apiBase string) {
 
 func RegisterCustomHealthCheck(apiBase string, status func() string, init func() string, destroy func() string) {
 	RegisterRoute(apiBase+"/system/status", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(status()))
+		c.Data(200, "application/json; charset=utf-8", []byte(status()))
 	})
 	RegisterRoute(apiBase+"/system/init", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeText, []byte(init()))
+		c.Data(200, "application/json; charset=utf-8", []byte(init()))
 	})
 	RegisterRoute(apiBase+"/system/destroy", HmAll, func(c *gin.Context) {
-		c.Data(http.StatusOK, h2.ContentTypeText, []byte(destroy()))
+		c.Data(200, "application/json; charset=utf-8", []byte(destroy()))
 	})
 }
 func checkEngine() bool {

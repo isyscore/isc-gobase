@@ -3,18 +3,17 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	h2 "github.com/isyscore/isc-gobase/http"
-	"github.com/isyscore/isc-gobase/isc"
-	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v2"
 )
 
 var appProperty *ApplicationProperty
@@ -94,9 +93,9 @@ type EnvProperty struct {
 
 func GetConfigValues(c *gin.Context) {
 	if nil != appProperty {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(appProperty.ValueMap)))
+		c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(appProperty.ValueMap)))
 	} else {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
 	}
 }
 
@@ -104,16 +103,16 @@ func GetConfigValue(c *gin.Context) {
 	if nil != appProperty {
 		value := GetValue(c.Param("key"))
 		if nil == value {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(""))
+			c.Data(200, "application/json; charset=utf-8", []byte(""))
 			return
 		}
 		if isc.IsBaseType(reflect.TypeOf(value)) {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ToString(value)))
+			c.Data(200, "application/json; charset=utf-8", []byte(isc.ToString(value)))
 		} else {
-			c.Data(http.StatusOK, h2.ContentTypeJson, []byte(isc.ObjectToJson(value)))
+			c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(value)))
 		}
 	} else {
-		c.Data(http.StatusOK, h2.ContentTypeJson, []byte("{}"))
+		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
 	}
 }
 
