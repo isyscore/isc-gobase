@@ -1,10 +1,10 @@
 package isc
 
-type ISCListToMap[T comparable, R comparable] struct {
+type ISCListToMap[T any, R any] struct {
 	ISCList[T]
 }
 
-func ListToMapFrom[T comparable, R comparable](list ISCList[T]) ISCListToMap[T, R] {
+func ListToMapFrom[T any, R any](list ISCList[T]) ISCListToMap[T, R] {
 	return ISCListToMap[T, R]{
 		list,
 	}
@@ -50,19 +50,29 @@ func (l ISCListToMap[T, R]) ReduceIndexed(init func(int, T) R, f func(int, R, T)
 	return ReduceIndexed(l.ISCList, init, f)
 }
 
-func (l ISCListToMap[T, R]) SliceContains(predicate func(T) R, key R) bool {
-	return SliceContains(l.ISCList, predicate, key)
-}
-
-func (l ISCListToMap[T, R]) SliceTo(valueTransform func(T) R) ISCMap[R, T] {
-	return SliceTo(l.ISCList, valueTransform)
-}
-
-type ISCListToTriple[T comparable, K comparable, V comparable] struct {
+type ISCListToSlice[T any, R comparable] struct {
 	ISCList[T]
 }
 
-func ListToGroupFrom[T comparable, K comparable, V comparable](list ISCList[T]) ISCListToTriple[T, K, V] {
+func ListToSliceFrom[T any, R comparable](list ISCList[T]) ISCListToSlice[T, R] {
+	return ISCListToSlice[T, R]{
+		list,
+	}
+}
+
+func (l ISCListToSlice[T, R]) SliceContains(predicate func(T) R, key R) bool {
+	return SliceContains(l.ISCList, predicate, key)
+}
+
+func (l ISCListToSlice[T, R]) SliceTo(valueTransform func(T) R) ISCMap[R, T] {
+	return SliceTo(l.ISCList, valueTransform)
+}
+
+type ISCListToTriple[T comparable, K comparable, V any] struct {
+	ISCList[T]
+}
+
+func ListToTripleFrom[T comparable, K comparable, V any](list ISCList[T]) ISCListToTriple[T, K, V] {
 	return ISCListToTriple[T, K, V]{
 		list,
 	}

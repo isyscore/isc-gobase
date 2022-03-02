@@ -1,6 +1,6 @@
 package isc
 
-func ListPlus[T comparable](list []T, n []T) []T {
+func ListPlus[T any](list []T, n []T) []T {
 	t := []T{}
 	for _, e := range list {
 		t = append(t, e)
@@ -13,7 +13,7 @@ func ListPlus[T comparable](list []T, n []T) []T {
 	return t
 }
 
-func ListMinus[T comparable](list []T, n []T) []T {
+func ListMinus[T any](list []T, n []T) []T {
 	t := []T{}
 	for _, e := range list {
 		if !ListContains(n, e) {

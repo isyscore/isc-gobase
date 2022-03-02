@@ -1,16 +1,16 @@
 package isc
 
-type ISCMap[K comparable, V comparable] map[K]V
+type ISCMap[K comparable, V any] map[K]V
 
-func NewMap[K comparable, V comparable]() ISCMap[K, V] {
+func NewMap[K comparable, V any]() ISCMap[K, V] {
 	return make(ISCMap[K, V])
 }
 
-func NewMapWithMap[K comparable, V comparable](ma map[K]V) ISCMap[K, V] {
+func NewMapWithMap[K comparable, V any](ma map[K]V) ISCMap[K, V] {
 	return ma
 }
 
-func NewMapWithPairs[K comparable, V comparable](pairs ...Pair[K, V]) ISCMap[K, V] {
+func NewMapWithPairs[K comparable, V any](pairs ...Pair[K, V]) ISCMap[K, V] {
 	m := make(map[K]V)
 	for _, item := range pairs {
 		m[item.First] = item.Second

@@ -21,3 +21,29 @@ func TestFilter(t *testing.T) {
 		t.Logf("%v\n", item)
 	})
 }
+
+type FS struct {
+	Name  string
+	Count int
+}
+
+func TestStructFilter(t *testing.T) {
+	list := isc.NewListWithItems(
+		FS{Name: "a", Count: 1},
+		FS{Name: "b", Count: 2},
+		FS{Name: "c", Count: 3},
+		FS{Name: "d", Count: 4},
+		FS{Name: "e", Count: 5},
+	)
+
+	l2 := list.Filter(func(item FS) bool {
+		return item.Count%2 == 0
+	})
+	l2.ForEach(func(item FS) {
+		t.Logf("%v\n", item)
+	})
+
+	b1 := list.Contains(FS{Name: "a", Count: 1})
+	b2 := list.Contains(FS{Name: "x", Count: 66})
+	t.Logf("%v %v\n", b1, b2)
+}

@@ -1,16 +1,16 @@
 package isc
 
-type ISCList[T comparable] []T
+type ISCList[T any] []T
 
-func NewList[T comparable]() ISCList[T] {
+func NewList[T any]() ISCList[T] {
 	return []T{}
 }
 
-func NewListWithList[T comparable](list []T) ISCList[T] {
+func NewListWithList[T any](list []T) ISCList[T] {
 	return list
 }
 
-func NewListWithItems[T comparable](items ...T) ISCList[T] {
+func NewListWithItems[T any](items ...T) ISCList[T] {
 	return items
 }
 

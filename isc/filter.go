@@ -1,5 +1,9 @@
 package isc
 
+import (
+	"reflect"
+)
+
 //ListFilter filter specificated item in a list
 func ListFilter[T any](list []T, f func(T) bool) []T {
 	var dest []T
@@ -92,10 +96,10 @@ func ListFilterNotIndexedTo[T any](list []T, dest *[]T, predicate func(int, T) b
 	return n
 }
 
-func ListContains[T comparable](list []T, item T) bool {
+func ListContains[T any](list []T, item T) bool {
 	ret := false
 	for _, e := range list {
-		if e == item {
+		if reflect.DeepEqual(e, item) {
 			ret = true
 			break
 		}
@@ -103,7 +107,7 @@ func ListContains[T comparable](list []T, item T) bool {
 	return ret
 }
 
-func ListDistinct[T comparable](list []T) []T {
+func ListDistinct[T any](list []T) []T {
 	return SliceDistinct(list)
 }
 
@@ -171,10 +175,10 @@ func MapFilterNotTo[K comparable, V any](m map[K]V, dest *map[K]V, f func(K, V) 
 	return n
 }
 
-func MapContains[K comparable, V comparable](m map[K]V, k K, v V) bool {
+func MapContains[K comparable, V any](m map[K]V, k K, v V) bool {
 	ret := false
 	for t, u := range m {
-		if t == k && u == v {
+		if t == k && reflect.DeepEqual(u, v) {
 			ret = true
 			break
 		}
@@ -193,10 +197,10 @@ func MapContainsKey[K comparable, V any](m map[K]V, k K) bool {
 	return ret
 }
 
-func MapContainsValue[K comparable, V comparable](m map[K]V, v V) bool {
+func MapContainsValue[K comparable, V any](m map[K]V, v V) bool {
 	ret := false
 	for _, u := range m {
-		if u == v {
+		if reflect.DeepEqual(u, v) {
 			ret = true
 			break
 		}

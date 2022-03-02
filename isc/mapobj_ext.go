@@ -1,10 +1,10 @@
 package isc
 
-type ISCMapToMap[K comparable, V comparable, R comparable] struct {
+type ISCMapToMap[K comparable, V any, R any] struct {
 	ISCMap[K, V]
 }
 
-func MapToMapFrom[K comparable, V comparable, R comparable](m ISCMap[K, V]) ISCMapToMap[K, V, R] {
+func MapToMapFrom[K comparable, V any, R any](m ISCMap[K, V]) ISCMapToMap[K, V, R] {
 	return ISCMapToMap[K, V, R]{
 		m,
 	}

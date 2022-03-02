@@ -55,11 +55,12 @@ func SliceTo[T any, K comparable](list []T, valueTransform func(T) K) map[K]T {
 	return m
 }
 
-func SliceDistinct[T comparable](list []T) []T {
-	m := SliceToMap(list)
-	var result []T
-	for k := range m {
-		result = append(result, k)
+func SliceDistinct[T any](list []T) []T {
+	result := NewList[T]()
+	for _, k := range list {
+		if !result.Contains(k) {
+			result.Add(k)
+		}
 	}
 	return result
 }

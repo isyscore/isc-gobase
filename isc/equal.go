@@ -1,7 +1,9 @@
 package isc
 
+import "reflect"
+
 // ListEquals 比较两个数组是否相同
-func ListEquals[T comparable](leftList []T, rightList []T) bool {
+func ListEquals[T any](leftList []T, rightList []T) bool {
 	if leftList == nil && rightList == nil {
 		return true
 	}
@@ -16,7 +18,7 @@ func ListEquals[T comparable](leftList []T, rightList []T) bool {
 }
 
 // MapEquals 比较两个map是否相同
-func MapEquals[K comparable, V comparable](leftMap map[K]V, rightMap map[K]V) bool {
+func MapEquals[K comparable, V any](leftMap map[K]V, rightMap map[K]V) bool {
 	if leftMap == nil && rightMap == nil {
 		return true
 	}
@@ -29,7 +31,7 @@ func MapEquals[K comparable, V comparable](leftMap map[K]V, rightMap map[K]V) bo
 
 	for key, leftValue := range leftMap {
 		rightValue, exist := rightMap[key]
-		if !exist || rightValue != leftValue {
+		if !exist || !reflect.DeepEqual(rightValue, leftValue) {
 			return false
 		}
 	}

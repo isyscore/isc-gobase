@@ -42,7 +42,7 @@ func AssociateByAndValue[T any, V any, K comparable](list []T, keySelector func(
 
 // AssociateByTo Populates and returns the destination mutable map with key-value pairs, where key is provided by the keySelector function applied to each element of the given collection and value is the element itself.
 //If any two elements would have the same key returned by keySelector the last one gets added to the map
-func AssociateByTo[T, K comparable](list []T, destination *map[K]T, keySelector func(T) K) map[K]T {
+func AssociateByTo[T any, K comparable](list []T, destination *map[K]T, keySelector func(T) K) map[K]T {
 	for _, e := range list {
 		(*destination)[keySelector(e)] = e
 	}
