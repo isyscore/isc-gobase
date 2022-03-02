@@ -51,25 +51,25 @@ func TestISCList_AddAll(t *testing.T) {
 }
 
 func TestISCList_Insert(t *testing.T) {
-	l := isc.NewListWithItems[string]("1", "2", "3")
+	l := isc.NewListWithItems("1", "2", "3")
 	l.Insert(2, "7")
 	t.Logf("%v", l)
 }
 
 func TestISCList_Delete(t *testing.T) {
-	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l := isc.NewListWithItems("1", "2", "3", "4")
 	l.Delete(2)
 	t.Logf("%v", l)
 }
 
 func TestISCList_Clear(t *testing.T) {
-	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l := isc.NewListWithItems("1", "2", "3", "4")
 	l.Clear()
 	t.Logf("%v", l)
 }
 
 func TestISCList_IsEmpty(t *testing.T) {
-	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l := isc.NewListWithItems("1", "2", "3", "4")
 	r := l.IsEmpty()
 	t.Logf("%v", r)
 	l.Clear()
@@ -78,7 +78,7 @@ func TestISCList_IsEmpty(t *testing.T) {
 }
 
 func TestISCList_ForEach(t *testing.T) {
-	l := isc.NewListWithItems[string]("1", "2", "3", "4")
+	l := isc.NewListWithItems("1", "2", "3", "4")
 	l.ForEach(func(item string) {
 		t.Logf("%s", item)
 	})

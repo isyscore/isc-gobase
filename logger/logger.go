@@ -27,11 +27,13 @@ package logger
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
-	"github.com/isyscore/isc-gobase/isc"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -58,12 +60,12 @@ func Assert(format string, v ...any) {
 
 var CustomizeFiles []string
 
-var loggerInfo *zerolog.Logger
-var loggerDebug *zerolog.Logger
-var loggerWarn *zerolog.Logger
-var loggerError *zerolog.Logger
-var loggerAssert *zerolog.Logger
-var loggerTrace *zerolog.Logger
+var loggerInfo zerolog.LevelWriter
+var loggerDebug zerolog.LevelWriter
+var loggerWarn zerolog.LevelWriter
+var loggerError zerolog.LevelWriter
+var loggerAssert zerolog.LevelWriter
+var loggerTrace zerolog.LevelWriter
 
 // SetGlobalLevel sets the global override for log level. If this
 // values is raised, all Loggers will use at least this value.
@@ -89,6 +91,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 
 	SetGlobalLevel(logLevel)
 
+	initLogDir()
 	zerolog.CallerSkipFrameCount = 2
 	//时间格式设置
 	zerolog.TimeFieldFormat = timeFmt
@@ -97,67 +100,44 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	out.FormatLevel = func(i interface{}) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	log.Logger = log.Logger.Output(out).With().Caller().Timestamp().Logger()
+	writer := zerolog.MultiLevelWriter(out, loggerDebug, loggerInfo, loggerWarn, loggerError, loggerTrace, loggerAssert)
+	log.Logger = log.Logger.Output(writer).With().Caller().Timestamp().Logger()
 
-	//添加hook
-	levelInfoHook := zerolog.HookFunc(func(e *zerolog.Event, l zerolog.Level, msg string) {
-		//levelName := l.String()
-		ll := l
-		e1 := e
-		if isc.ListAny(CustomizeFiles, func(t string) bool {
-			return zerolog.CallerFieldName == t
-		}) {
-			//日志修改日志级别为debug并输出日志
-			ll = zerolog.DebugLevel
-		}
+}
 
-		switch ll {
-		case zerolog.DebugLevel:
-			e1 = loggerDebug.Debug().Stack()
-		case zerolog.InfoLevel:
-			e1 = loggerInfo.Info().Stack()
-		case zerolog.WarnLevel:
-			e1 = loggerWarn.Warn().Stack()
-		case zerolog.ErrorLevel:
-			e1 = loggerError.Error().Stack()
-		case zerolog.TraceLevel:
-			e1 = loggerTrace.Trace().Stack()
-		default:
-			e1 = loggerAssert.WithLevel(l).Stack()
-		}
-		e1.Msg(msg)
-	})
-	log.Logger = log.Logger.Hook(levelInfoHook)
-	initLogDir(appName)
+type fileLevelWriter struct {
+	io.Writer
+	level zerolog.Level
+}
+
+func (lw *fileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err error) {
+	if level.String() == lw.level.String() {
+		return lw.Write(p)
+	}
+	return 0, nil
 }
 
 //initLoggerFile open or create and open log file
-func initLoggerFile(logDir string, fileName string, appName string) *zerolog.Logger {
-	var l zerolog.Logger
-	logFile := filepath.Join(logDir, fileName)
-	if file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm); err == nil {
-		l = log.Logger.With().Logger()
-		out := zerolog.ConsoleWriter{Out: file, TimeFormat: "2006-01-02 15:04:05.000", NoColor: true}
-		out.FormatLevel = func(i interface{}) string {
-			return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
-		}
-		l = l.Output(out).With().Caller().Logger()
-	}
-	return &l
+func initLoggerFile(logDir string, fileName string, level zerolog.Level) zerolog.LevelWriter {
+	linkName := filepath.Join(logDir, fileName)
+	logFile := strings.ReplaceAll(linkName, ".log", "-%Y%m%d.log")
+	file, _ := rotatelogs.New(logFile, rotatelogs.WithLinkName(linkName), rotatelogs.WithMaxAge(24*time.Hour), rotatelogs.WithRotationTime(time.Hour))
+	//file, _ := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	return &fileLevelWriter{file, level}
 }
 
 //initLogDir create log dir and file
-func initLogDir(appName string) {
+func initLogDir() {
 	// 创建日志目录
 	logDir := filepath.Join(".", "logs")
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		_ = os.Mkdir(logDir, os.ModePerm)
 	}
 	// 创建日志文件
-	loggerInfo = initLoggerFile(logDir, "app-info.log", appName)
-	loggerDebug = initLoggerFile(logDir, "app-debug.log", appName)
-	loggerWarn = initLoggerFile(logDir, "app-warn.log", appName)
-	loggerError = initLoggerFile(logDir, "app-error.log", appName)
-	loggerAssert = initLoggerFile(logDir, "app-assert.log", appName)
-	loggerTrace = initLoggerFile(logDir, "app-trace.log", appName)
+	loggerInfo = initLoggerFile(logDir, "app-info.log", zerolog.InfoLevel)
+	loggerDebug = initLoggerFile(logDir, "app-debug.log", zerolog.DebugLevel)
+	loggerWarn = initLoggerFile(logDir, "app-warn.log", zerolog.WarnLevel)
+	loggerError = initLoggerFile(logDir, "app-error.log", zerolog.ErrorLevel)
+	loggerAssert = initLoggerFile(logDir, "app-assert.log", zerolog.NoLevel)
+	loggerTrace = initLoggerFile(logDir, "app-trace.log", zerolog.TraceLevel)
 }

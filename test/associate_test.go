@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/isyscore/isc-gobase/isc"
 	"testing"
+
+	"github.com/isyscore/isc-gobase/isc"
 )
 
 type AssociateStruct struct {
@@ -26,10 +27,7 @@ func initList() []AssociateStruct {
 }
 
 var transformFun = func(a AssociateStruct) isc.Pair[string, AssociateStruct] {
-	return isc.Pair[string, AssociateStruct]{
-		a.Key,
-		a,
-	}
+	return isc.NewPair(a.Key, a)
 }
 
 var transformFun1 = func(a AssociateStruct) int {
@@ -93,6 +91,6 @@ func TestAssociateWith(t *testing.T) {
 func TestAssociateWithTo(t *testing.T) {
 	list := initList()
 	m := make(map[AssociateStruct]int)
-	isc.AssociateWithTo[AssociateStruct, int](list, &m, transformFun1)
+	isc.AssociateWithTo(list, &m, transformFun1)
 	t.Logf("%v", m)
 }
