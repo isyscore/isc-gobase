@@ -265,3 +265,26 @@ func (s ISCString) ToFloat() float32 {
 func (s ISCString) ToFloat64() float64 {
 	return ToFloat64(s)
 }
+
+func (s ISCString) ToJSONEncoded() ISCString {
+	return s.ReplaceAll("\\", "\\\\").ReplaceAll("\n", "\\n").ReplaceAll("\"", "\\\"")
+}
+
+func (s ISCString) ToMap() ISCMap[ISCString, ISCString] {
+	return ListToTripleFrom[ISCString, ISCString, ISCString](s.Split("&")).Associate(func(item ISCString) Pair[ISCString, ISCString] {
+		sa := item.Split("=")
+		return NewPair(sa[0], sa[1])
+	})
+}
+
+func (s ISCString) ToCookieMap() ISCMap[ISCString, ISCString] {
+	return ListToTripleFrom[ISCString, ISCString, ISCString](s.Split(";")).Associate(func(item ISCString) Pair[ISCString, ISCString] {
+		sa := item.TrimSpace().Split("=")
+		return NewPair(sa[0].TrimSpace(), sa[1].TrimSpace())
+	})
+}
+
+func (s ISCString) ToPair() Pair[ISCString, ISCString] {
+	sa := s.TrimSpace().Split("=")
+	return NewPair(sa[0].TrimSpace(), sa[1].TrimSpace())
+}
