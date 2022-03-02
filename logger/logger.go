@@ -88,6 +88,9 @@ func SetGlobalLevel(strLevel string) {
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
 func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	//日志级别设置，默认Info
+	zerolog.ErrorHandler = func(err error) {
+		// do nothing
+	}
 
 	SetGlobalLevel(logLevel)
 

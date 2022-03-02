@@ -1,6 +1,9 @@
 api-module: test
 server:
   port: 31000
+  gin:
+    mode: release
+
 base:
   application:
     name: "test"
