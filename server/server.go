@@ -29,7 +29,7 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 
-func InitServer() {
+func init() {
 	config.LoadConfig()
 
 	mode := config.GetValueString("server.gin.mode")
