@@ -10,6 +10,7 @@ import (
 	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/isyscore/isc-gobase/websocket"
 )
 
 type HttpMethod int
@@ -169,4 +170,11 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 		engine.POST(path, handler)
 	}
 
+}
+
+func RegisterWebSocketRoute(path string, svr *websocket.Server) {
+	if !checkEngine() {
+		return
+	}
+	engine.GET(path, svr.Handler())
 }
