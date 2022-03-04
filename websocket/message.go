@@ -76,42 +76,42 @@ var (
 	boolFalseB = []byte("false")
 )
 
-func (ms *messageSerializer) serialize(event string, data interface{}) ([]byte, error) {
+func (ms *messageSerializer) serialize(event string, data any) ([]byte, error) {
 	b := ms.buf.Get()
-	b.Write(ms.prefix)
-	b.WriteString(event)
-	b.WriteByte(messageSeparatorByte)
+	_, _ = b.Write(ms.prefix)
+	_, _ = b.WriteString(event)
+	_ = b.WriteByte(messageSeparatorByte)
 
 	switch v := data.(type) {
 	case string:
-		b.WriteString(messageTypeString.String())
-		b.WriteByte(messageSeparatorByte)
-		b.WriteString(v)
+		_, _ = b.WriteString(messageTypeString.String())
+		_ = b.WriteByte(messageSeparatorByte)
+		_, _ = b.WriteString(v)
 	case int:
-		b.WriteString(messageTypeInt.String())
-		b.WriteByte(messageSeparatorByte)
-		binary.Write(b, binary.LittleEndian, v)
+		_, _ = b.WriteString(messageTypeInt.String())
+		_ = b.WriteByte(messageSeparatorByte)
+		_ = binary.Write(b, binary.LittleEndian, v)
 	case bool:
-		b.WriteString(messageTypeBool.String())
-		b.WriteByte(messageSeparatorByte)
+		_, _ = b.WriteString(messageTypeBool.String())
+		_ = b.WriteByte(messageSeparatorByte)
 		if v {
-			b.Write(boolTrueB)
+			_, _ = b.Write(boolTrueB)
 		} else {
-			b.Write(boolFalseB)
+			_, _ = b.Write(boolFalseB)
 		}
 	case []byte:
-		b.WriteString(messageTypeBytes.String())
-		b.WriteByte(messageSeparatorByte)
-		b.Write(v)
+		_, _ = b.WriteString(messageTypeBytes.String())
+		_ = b.WriteByte(messageSeparatorByte)
+		_, _ = b.Write(v)
 	default:
 		//we suppose is json
 		res, err := json.Marshal(data)
 		if err != nil {
 			return nil, err
 		}
-		b.WriteString(messageTypeJSON.String())
-		b.WriteByte(messageSeparatorByte)
-		b.Write(res)
+		_, _ = b.WriteString(messageTypeJSON.String())
+		_ = b.WriteByte(messageSeparatorByte)
+		_, _ = b.Write(res)
 	}
 
 	message := b.Bytes()
@@ -122,7 +122,7 @@ func (ms *messageSerializer) serialize(event string, data interface{}) ([]byte, 
 
 var errInvalidTypeMessage = "Type %s is invalid for message: %s"
 
-func (ms *messageSerializer) deserialize(event []byte, websocketMessage []byte) (interface{}, error) {
+func (ms *messageSerializer) deserialize(event []byte, websocketMessage []byte) (any, error) {
 	dataStartIdx := ms.prefixAndSepIdx + len(event) + 3
 	if len(websocketMessage) <= dataStartIdx {
 		return nil, errors.New("websocket invalid message: " + string(websocketMessage))
@@ -152,7 +152,7 @@ func (ms *messageSerializer) deserialize(event []byte, websocketMessage []byte) 
 	case messageTypeBytes:
 		return data, nil
 	case messageTypeJSON:
-		var msg interface{}
+		var msg any
 		err := json.Unmarshal(data, &msg)
 		return msg, err
 	default:

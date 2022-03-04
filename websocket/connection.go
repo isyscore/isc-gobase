@@ -15,12 +15,12 @@ import (
 
 type connectionValue struct {
 	key   []byte
-	value interface{}
+	value any
 }
 
 type ConnectionValues []connectionValue
 
-func (r *ConnectionValues) Set(key string, value interface{}) {
+func (r *ConnectionValues) Set(key string, value any) {
 	args := *r
 	n := len(args)
 	for i := 0; i < n; i++ {
@@ -47,7 +47,7 @@ func (r *ConnectionValues) Set(key string, value interface{}) {
 	*r = append(args, kv)
 }
 
-func (r *ConnectionValues) Get(key string) interface{} {
+func (r *ConnectionValues) Get(key string) any {
 	args := *r
 	n := len(args)
 	for i := 0; i < n; i++ {
@@ -78,9 +78,9 @@ type UnderlineConnection interface {
 
 type DisconnectFunc func()
 type LeaveRoomFunc func(roomName string)
-type ErrorFunc (func(error))
+type ErrorFunc func(error)
 type NativeMessageFunc func([]byte)
-type MessageFunc interface{}
+type MessageFunc any
 type PingFunc func()
 type PongFunc func()
 
@@ -106,8 +106,8 @@ type Connection interface {
 	OnLeave(roomLeaveCb LeaveRoomFunc)
 	Wait()
 	Disconnect() error
-	SetValue(key string, value interface{})
-	GetValue(key string) interface{}
+	SetValue(key string, value any)
+	GetValue(key string) any
 	GetValueArrString(key string) []string
 	GetValueString(key string) string
 	GetValueInt(key string) int
@@ -175,19 +175,19 @@ func (c *connection) Err() error {
 func (c *connection) Write(websocketMessageType int, data []byte) error {
 	c.writerMu.Lock()
 	if writeTimeout := c.server.config.WriteTimeout; writeTimeout > 0 {
-		c.underline.SetWriteDeadline(time.Now().Add(writeTimeout))
+		_ = c.underline.SetWriteDeadline(time.Now().Add(writeTimeout))
 	}
 
 	err := c.underline.WriteMessage(websocketMessageType, data)
 	c.writerMu.Unlock()
 	if err != nil {
-		c.Disconnect()
+		_ = c.Disconnect()
 	}
 	return err
 }
 
 func (c *connection) writeDefault(data []byte) {
-	c.Write(c.messageType, data)
+	_ = c.Write(c.messageType, data)
 }
 
 const WriteWait = 1 * time.Second
@@ -197,7 +197,7 @@ func (c *connection) startPinger() {
 		err := c.underline.WriteControl(websocket.PongMessage, []byte(message), time.Now().Add(WriteWait))
 		if err == websocket.ErrCloseSent {
 			return nil
-		} else if e, ok := err.(net.Error); ok && e.Temporary() {
+		} else if _, ok := err.(net.Error); ok {
 			return nil
 		}
 		return err
@@ -239,22 +239,18 @@ func (c *connection) startReader() {
 	conn.SetReadLimit(c.server.config.MaxMessageSize)
 	conn.SetPongHandler(func(s string) error {
 		if hasReadTimeout {
-			conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
+			_ = conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
 		}
 		go c.fireOnPong()
-
 		return nil
 	})
 
-	defer func() {
-		c.Disconnect()
-	}()
+	defer func() { _ = c.Disconnect() }()
 
 	for {
 		if hasReadTimeout {
-			conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
+			_ = conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
 		}
-
 		_, data, err := conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
@@ -264,9 +260,7 @@ func (c *connection) startReader() {
 		} else {
 			c.messageReceived(data)
 		}
-
 	}
-
 }
 
 func (c *connection) messageReceived(data []byte) {
@@ -301,7 +295,7 @@ func (c *connection) messageReceived(data []byte) {
 			} else if fnBytes, ok := listeners[i].(func([]byte)); ok {
 				fnBytes(customMessage.([]byte))
 			} else {
-				listeners[i].(func(interface{}))(customMessage)
+				listeners[i].(func(any))(customMessage)
 			}
 
 		}
@@ -373,7 +367,7 @@ func (c *connection) EmitMessage(nativeMessage []byte) error {
 	return c.self.EmitMessage(nativeMessage)
 }
 
-func (c *connection) Emit(event string, message interface{}) error {
+func (c *connection) Emit(event string, message any) error {
 	return c.self.Emit(event, message)
 }
 
@@ -432,11 +426,11 @@ func (c *connection) Disconnect() error {
 	return c.server.Disconnect(c.ID())
 }
 
-func (c *connection) SetValue(key string, value interface{}) {
+func (c *connection) SetValue(key string, value any) {
 	c.values.Set(key, value)
 }
 
-func (c *connection) GetValue(key string) interface{} {
+func (c *connection) GetValue(key string) any {
 	return c.values.Get(key)
 }
 

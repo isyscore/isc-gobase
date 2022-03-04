@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/isc"
 
 	"github.com/isyscore/isc-gobase/logger"
 
@@ -31,6 +32,9 @@ var ApiPrefix = "/api"
 var engine *gin.Engine = nil
 
 func InitServer() {
+
+	isc.PrintBanner()
+
 	config.LoadConfig()
 
 	mode := config.GetValueString("server.gin.mode")

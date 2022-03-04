@@ -5,24 +5,32 @@ import (
 	"io/ioutil"
 )
 
-func DefaultBanner1() {
-	fmt.Printf("%s\n", defaultBanner)
+var Banner = DefaultBanner
+
+func PrintBanner() {
+	fmt.Printf("%s\n", Banner)
 }
 
-func DefaultBanner2() {
-	fmt.Printf("%s\n", BindDwenDwen)
-}
-
-func Banner(filePath string) {
+func LoadBanner(filePath string) {
 	if b, err := ioutil.ReadFile(filePath); err == nil {
 		str := string(b)
 		fmt.Printf("%s\n", str)
 	} else {
-		fmt.Printf("%s\n", defaultBanner)
+		fmt.Printf("%s\n", Banner)
 	}
 }
 
-var defaultBanner = `
+var DefaultBanner = `
+______   ____     __    __  ____     ____     _____    ____     ____      
+/\__  _\ /\  _` + "`" + `\  /\ \  /\ \/\  _` + "`" + `\  /\  _` + "`" + `\  /\  __` + "`" + `\ /\  _` + "`" + `\  /\  _` + "`" + `\    
+\/_/\ \/ \ \,\L\_\\ ` + "`" + `\` + "`" + `\\/'/\ \,\L\_\\ \ \/\_\\ \ \/\ \\ \ \L\ \\ \ \L\_\  
+   \ \ \  \/_\__ \ ` + "`" + `\ ` + "`" + `\ /'  \/_\__ \ \ \ \/_/_\ \ \ \ \\ \ ,  / \ \  _\L  
+    \_\ \__ /\ \L\ \ ` + "`" + `\ \ \    /\ \L\ \\ \ \L\ \\ \ \_\ \\ \ \\ \ \ \ \L\ \
+    /\_____\\ ` + "`" + `\____\  \ \_\   \ ` + "`" + `\____\\ \____/ \ \_____\\ \_\ \_\\ \____/
+    \/_____/ \/_____/   \/_/    \/_____/ \/___/   \/_____/ \/_/\/ / \/___/ 
+`
+
+var BannerMiku = `
                #########
               ############
               #############
@@ -51,7 +59,7 @@ var defaultBanner = `
 
 `
 
-var BindDwenDwen = `
+var BannerBinDwenDwen = `
         .:          :j        
          i.,,......:Ei:       
         KWG        .,#        

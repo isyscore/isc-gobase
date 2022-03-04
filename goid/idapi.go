@@ -1,7 +1,7 @@
 package goid
 
 import (
-	"fmt"
+	"github.com/rs/zerolog/log"
 	"runtime"
 	"sync"
 )
@@ -13,7 +13,7 @@ const (
 var (
 	anchor       = []byte("goroutine ")
 	stackBufPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			buf := make([]byte, 64)
 			return &buf
 		},
@@ -102,7 +102,7 @@ func findNextGoid(buf []byte, off int) (goid int64, next int) {
 			break
 		default:
 			goid = 0
-			fmt.Println("should never be here, any bug happens")
+			log.Printf("should never be here, any bug happens\n")
 		}
 	}
 	next = i

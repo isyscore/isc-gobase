@@ -7,7 +7,7 @@ const (
 
 type Emitter interface {
 	EmitMessage([]byte) error
-	Emit(string, interface{}) error
+	Emit(string, any) error
 }
 
 type emitter struct {
@@ -26,11 +26,11 @@ func (e *emitter) EmitMessage(nativeMessage []byte) error {
 	return nil
 }
 
-func (e *emitter) Emit(event string, data interface{}) error {
+func (e *emitter) Emit(event string, data any) error {
 	message, err := e.conn.server.messageSerializer.serialize(event, data)
 	if err != nil {
 		return err
 	}
-	e.EmitMessage(message)
+	_ = e.EmitMessage(message)
 	return nil
 }

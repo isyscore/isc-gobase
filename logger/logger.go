@@ -58,7 +58,7 @@ func Assert(format string, v ...any) {
 	log.WithLevel(zerolog.NoLevel).Msgf(format, v)
 }
 
-var CustomizeFiles []string
+// var CustomizeFiles []string
 
 var loggerInfo zerolog.LevelWriter
 var loggerDebug zerolog.LevelWriter
@@ -100,7 +100,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	zerolog.TimeFieldFormat = timeFmt
 	//设置日志输出
 	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored}
-	out.FormatLevel = func(i interface{}) string {
+	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	writer := zerolog.MultiLevelWriter(out, loggerDebug, loggerInfo, loggerWarn, loggerError, loggerTrace, loggerAssert)

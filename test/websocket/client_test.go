@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"testing"
@@ -29,7 +28,7 @@ func TestWebSocketClient(t *testing.T) {
 		log.Fatal("dial:", err)
 		return
 	}
-	defer ws.Close()
+	defer func(ws *websocket.Conn) { _ = ws.Close() }(ws)
 
 	done := make(chan bool)
 
@@ -51,12 +50,12 @@ func TestWebSocketClient(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Send: %s\n", message)
+	log.Printf("Send: %s\n", message)
 
 	time.Sleep(time.Second * 30)
 	done <- true
 
-	fmt.Println("over")
+	log.Println("over")
 }
 
 func ping(ws *websocket.Conn, done chan bool) {
@@ -81,5 +80,4 @@ func ping(ws *websocket.Conn, done chan bool) {
 			}
 		}
 	}(ticker)
-
 }

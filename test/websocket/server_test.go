@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	"fmt"
+	"log"
 	"testing"
 
 	"github.com/isyscore/isc-gobase/server"
@@ -20,18 +20,18 @@ func TestWebSocketServer(t *testing.T) {
 }
 
 func handleConnection(c websocket.Connection) {
-	fmt.Println("client connected,id=", c.ID())
-	c.Write(1, []byte("welcome client"))
+	log.Println("client connected,id=", c.ID())
+	_ = c.Write(1, []byte("welcome client"))
 	c.On("chat", func(msg string) {
-		fmt.Printf("%s sent: %s\n", c.Context().ClientIP(), msg)
-		c.To(websocket.All).Emit("chat", msg)
+		log.Printf("%s sent: %s\n", c.Context().ClientIP(), msg)
+		_ = c.To(websocket.All).Emit("chat", msg)
 	})
 	c.OnMessage(func(msg []byte) {
-		fmt.Println("received msg:", string(msg))
-		c.Write(1, []byte("hello aa"))
-		c.To(websocket.All).Emit("chat", msg)
+		log.Println("received msg:", string(msg))
+		_ = c.Write(1, []byte("hello aa"))
+		_ = c.To(websocket.All).Emit("chat", msg)
 	})
 	c.OnDisconnect(func() {
-		fmt.Println("client Disconnect,id=", c.ID())
+		log.Println("client Disconnect,id=", c.ID())
 	})
 }

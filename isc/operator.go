@@ -1,7 +1,7 @@
 package isc
 
 func ListPlus[T any](list []T, n []T) []T {
-	t := []T{}
+	var t []T
 	for _, e := range list {
 		t = append(t, e)
 	}
@@ -14,7 +14,7 @@ func ListPlus[T any](list []T, n []T) []T {
 }
 
 func ListMinus[T any](list []T, n []T) []T {
-	t := []T{}
+	var t []T
 	for _, e := range list {
 		if !ListContains(n, e) {
 			t = append(t, e)

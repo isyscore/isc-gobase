@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"bytes"
-	"fmt"
+	"log"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -72,7 +72,7 @@ func (s *Server) Handler() func(ctx *gin.Context) {
 func (s *Server) Upgrade(ctx *gin.Context) Connection {
 	conn, err := s.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		fmt.Printf("websocket error: %v\n", err)
+		log.Printf("websocket error: %v\n", err)
 		ctx.AbortWithStatus(503)
 		return &connection{err: err}
 	}
@@ -180,7 +180,7 @@ func (s *Server) leave(roomName string, connID string) (left bool) {
 }
 
 func (s *Server) GetTotalConnections() (n int) {
-	s.connections.Range(func(k, v interface{}) bool {
+	s.connections.Range(func(k, v any) bool {
 		n++
 		return true
 	})
@@ -192,7 +192,7 @@ func (s *Server) GetConnections() []Connection {
 	length := s.GetTotalConnections()
 	conns := make([]Connection, length, length)
 	i := 0
-	s.connections.Range(func(k, v interface{}) bool {
+	s.connections.Range(func(k, v any) bool {
 		conn, ok := v.(*connection)
 		if !ok {
 			return false
@@ -251,7 +251,7 @@ func (s *Server) emitMessage(from, to string, data []byte) {
 			}
 		}
 	} else {
-		s.connections.Range(func(k, v interface{}) bool {
+		s.connections.Range(func(k, v any) bool {
 			connID, ok := k.(string)
 			if !ok {
 				return true

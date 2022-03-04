@@ -12,9 +12,9 @@ func TestMd5(t *testing.T) {
 	s1 := coder.MD5String(str)
 	t.Logf("%s md5 is %s", str, s1)
 
-	file := "/Users/rarnu/Code/isyscore/opensource/isc-gobase/go.mod"
-	s2, err := coder.MD5File(file)
-	t.Logf("%s md5 is %s (%v)", file, s2, err)
+	f := "/Users/rarnu/Code/isyscore/opensource/isc-gobase/go.mod"
+	s2, err := coder.MD5File(f)
+	t.Logf("%s md5 is %s (%v)", f, s2, err)
 }
 
 func TestSha1(t *testing.T) {
@@ -22,9 +22,9 @@ func TestSha1(t *testing.T) {
 	s1 := coder.Sha1String(str)
 	t.Logf("%s sha1 is %s", str, s1)
 
-	file := "/Users/rarnu/Code/isyscore/opensource/isc-gobase/go.mod"
-	s2, err := coder.Sha1File(file)
-	t.Logf("%s sha1 is %s (%v)", file, s2, err)
+	f := "/Users/rarnu/Code/isyscore/opensource/isc-gobase/go.mod"
+	s2, err := coder.Sha1File(f)
+	t.Logf("%s sha1 is %s (%v)", f, s2, err)
 }
 
 func TestHMac(t *testing.T) {

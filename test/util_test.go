@@ -2,8 +2,9 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/isyscore/isc-gobase/isc"
 	"testing"
+
+	"github.com/isyscore/isc-gobase/isc"
 )
 
 // 对以下的api进行测试
@@ -23,7 +24,7 @@ type ValueInnerEntity1 struct {
 }
 
 func TestMapToObject1(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
@@ -39,11 +40,11 @@ type ValueInnerEntity2 struct {
 }
 
 func TestMapToObject2(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 	inner2["name"] = "inner_2"
 	inner2["age"] = 2
 	inner2["inner1"] = inner1
@@ -60,16 +61,16 @@ type ValueInnerEntity3 struct {
 }
 
 func TestMapToObject3(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 	inner2["name"] = "inner_2"
 	inner2["age"] = 2
 	inner2["inner1"] = inner1
 
-	inner3 := map[string]interface{}{}
+	inner3 := map[string]any{}
 	inner3["name"] = "inner_3"
 	inner3["age"] = 3
 	inner3["inner2"] = inner2
@@ -86,11 +87,11 @@ type ValueInnerEntity4 struct {
 }
 
 func TestMapToObject4(t *testing.T) {
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = "name1"
 	kvMap["k2"] = "name2"
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -107,19 +108,19 @@ type ValueInnerEntity5 struct {
 }
 
 func TestMapToObject5(t *testing.T) {
-	v1 := map[string]interface{}{}
+	v1 := map[string]any{}
 	v1["name"] = "inner_1"
 	v1["age"] = 1
 
-	v2 := map[string]interface{}{}
+	v2 := map[string]any{}
 	v2["name"] = "inner_2"
 	v2["age"] = 2
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = v1
 	kvMap["k2"] = v2
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -140,11 +141,11 @@ func TestMapToObject6(t *testing.T) {
 	dataList = append(dataList, 12)
 	dataList = append(dataList, 13)
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -165,11 +166,11 @@ func TestMapToObject7(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity1{Name: "name1", Age: 1})
 	dataList = append(dataList, ValueInnerEntity1{Name: "name2", Age: 2})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -195,11 +196,11 @@ func TestMapToObject8(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity1{Name: "name1", Age: 1})
 	dataList = append(dataList, ValueInnerEntity1{Name: "name2", Age: 2})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -225,11 +226,11 @@ func TestMapToObject9(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name1", Age: "1"})
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name2", Age: "2"})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -259,11 +260,11 @@ func TestMapToObject10(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name1", Age: "1"})
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name2", Age: "2"})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -274,11 +275,11 @@ func TestMapToObject10(t *testing.T) {
 }
 
 func TestMapToObject11(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 12
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 
 	_ = isc.MapToObject(inner1, &inner2)
 	Equal(t, isc.ToJsonString(inner2), "{\"age\":12,\"name\":\"inner_1\"}")
@@ -289,14 +290,14 @@ func TestMapToObject12(t *testing.T) {
 	inner1["name"] = "inner_1"
 	inner1["age"] = "12"
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 
 	_ = isc.MapToObject(inner1, &inner2)
 	Equal(t, "{\"age\":\"12\",\"name\":\"inner_1\"}", isc.ToJsonString(inner2))
 }
 
 func TestMapToObject13(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["age"] = 12
 
 	inner2 := map[string]int{}
@@ -307,7 +308,7 @@ func TestMapToObject13(t *testing.T) {
 
 // dataToObject
 func TestDataToObject1(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
@@ -317,11 +318,11 @@ func TestDataToObject1(t *testing.T) {
 }
 
 func TestDataToObject2(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 	inner2["name"] = "inner_2"
 	inner2["age"] = 2
 	inner2["inner1"] = inner1
@@ -332,16 +333,16 @@ func TestDataToObject2(t *testing.T) {
 }
 
 func TestDataToObject3(t *testing.T) {
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 
-	inner2 := map[string]interface{}{}
+	inner2 := map[string]any{}
 	inner2["name"] = "inner_2"
 	inner2["age"] = 2
 	inner2["inner1"] = inner1
 
-	inner3 := map[string]interface{}{}
+	inner3 := map[string]any{}
 	inner3["name"] = "inner_3"
 	inner3["age"] = 3
 	inner3["inner2"] = inner2
@@ -352,11 +353,11 @@ func TestDataToObject3(t *testing.T) {
 }
 
 func TestDataToObject4(t *testing.T) {
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = "name1"
 	kvMap["k2"] = "name2"
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -367,19 +368,19 @@ func TestDataToObject4(t *testing.T) {
 }
 
 func TestDataToObject5(t *testing.T) {
-	v1 := map[string]interface{}{}
+	v1 := map[string]any{}
 	v1["name"] = "inner_1"
 	v1["age"] = 1
 
-	v2 := map[string]interface{}{}
+	v2 := map[string]any{}
 	v2["name"] = "inner_2"
 	v2["age"] = 2
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = v1
 	kvMap["k2"] = v2
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -394,11 +395,11 @@ func TestDataToObject6(t *testing.T) {
 	dataList = append(dataList, 12)
 	dataList = append(dataList, 13)
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -413,11 +414,11 @@ func TestDataToObject7(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity1{Name: "name1", Age: 1})
 	dataList = append(dataList, ValueInnerEntity1{Name: "name2", Age: 2})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -432,11 +433,11 @@ func TestDataToObject8(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity1{Name: "name1", Age: 1})
 	dataList = append(dataList, ValueInnerEntity1{Name: "name2", Age: 2})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -451,11 +452,11 @@ func TestDataToObject9(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name1", Age: "1"})
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name2", Age: "2"})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -470,11 +471,11 @@ func TestDataToObject10(t *testing.T) {
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name1", Age: "1"})
 	dataList = append(dataList, ValueInnerEntity9Tem{Name: "name2", Age: "2"})
 
-	kvMap := map[string]interface{}{}
+	kvMap := map[string]any{}
 	kvMap["k1"] = dataList
 	kvMap["k2"] = dataList
 
-	inner1 := map[string]interface{}{}
+	inner1 := map[string]any{}
 	inner1["name"] = "inner_1"
 	inner1["age"] = 1
 	inner1["dataMap"] = kvMap
@@ -516,7 +517,7 @@ func TestStrToObject5(t *testing.T) {
 }
 
 func TestStrToObject6(t *testing.T) {
-	targetObj := map[string]interface{}{}
+	targetObj := map[string]any{}
 	_ = isc.StrToObject("{\"age\": 12}", &targetObj)
 	Equal(t, isc.ToJsonString(targetObj), "{\"age\":12}")
 }
@@ -530,7 +531,7 @@ func TestStrToObject7(t *testing.T) {
 type ValueInnerEntityStr1 struct {
 	//Name    string
 	//Age     int
-	DataMap interface{}
+	DataMap any
 }
 
 func TestStrToObject8(t *testing.T) {
@@ -553,7 +554,7 @@ func TestArrayToObject1(t *testing.T) {
 
 //todo 这个暂时还有点问题
 //func TestArrayToObject2(t *testing.T) {
-//	var dstArray []map[string]interface{}
+//	var dstArray []map[string]any
 //	var srcArray []ValueInnerEntity1
 //	srcArray = append(srcArray, ValueInnerEntity1{Name: "zhou", Age: 1})
 //
@@ -630,7 +631,7 @@ func TestObjectToJson2(t *testing.T) {
 
 type ValueObjectTest3 struct {
 	AppName []string
-	Age1    map[string]interface{}
+	Age1    map[string]any
 }
 
 func TestObjectToJson3(t *testing.T) {
@@ -638,7 +639,7 @@ func TestObjectToJson3(t *testing.T) {
 	arrays = append(arrays, "zhou")
 	arrays = append(arrays, "wang")
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 1
 	dataMap["b"] = 2
 
@@ -659,7 +660,7 @@ func TestObjectToJson4(t *testing.T) {
 	arrays = append(arrays, "zhou")
 	arrays = append(arrays, "wang")
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 1
 	dataMap["b"] = 2
 
@@ -679,7 +680,7 @@ func TestObjectToJson5(t *testing.T) {
 	arrays = append(arrays, "zhou")
 	arrays = append(arrays, "wang")
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["A"] = 1
 	dataMap["B"] = 2
 
@@ -707,13 +708,13 @@ func TestObjectToJson7(t *testing.T) {
 }
 
 func TestObjectToJson8(t *testing.T) {
-	var act = []map[string]interface{}{}
+	var act = []map[string]any{}
 
-	map1 := map[string]interface{}{}
+	map1 := map[string]any{}
 	map1["name"] = "zhou1"
 	map1["age"] = 1
 
-	map2 := map[string]interface{}{}
+	map2 := map[string]any{}
 	map2["name"] = "zhou2"
 	map2["age"] = 2
 
@@ -725,7 +726,7 @@ func TestObjectToJson8(t *testing.T) {
 type PageRsp struct {
 
 	// 分页数据
-	Records []interface{}
+	Records []any
 }
 
 func TestObjectToJson9(t *testing.T) {
@@ -766,7 +767,7 @@ func TestObjectToJson11(t *testing.T) {
 		Name: "ok",
 	}
 
-	map1 := map[string]interface{}{}
+	map1 := map[string]any{}
 	map1["data"] = &inner
 
 	Equal(t, isc.ObjectToJson(map1), "{\"data\":{\"name\":\"ok\"}}")
@@ -795,14 +796,14 @@ func TestObjectToData4(t *testing.T) {
 
 func TestObjectToData5(t *testing.T) {
 	src := ValueInnerEntity1{Name: "zhou", Age: 12}
-	dst := map[string]interface{}{}
+	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
 	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData6(t *testing.T) {
-	src := map[string]interface{}{}
+	src := map[string]any{}
 	src["name"] = "zhou"
 	src["age"] = 12
 
@@ -811,11 +812,11 @@ func TestObjectToData6(t *testing.T) {
 }
 
 func TestObjectToData7(t *testing.T) {
-	src := map[string]interface{}{}
+	src := map[string]any{}
 	src["name"] = "zhou"
 	src["age"] = 12
 
-	dst := map[string]interface{}{}
+	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
 	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
@@ -840,7 +841,7 @@ func TestObjectToData8(t *testing.T) {
 
 func TestObjectToData10(t *testing.T) {
 	src := ValueInnerEntity1{Name: "zhou", Age: 12}
-	dst := map[string]interface{}{}
+	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
 	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
@@ -856,10 +857,10 @@ func TestObjectToData11(t *testing.T) {
 
 func TestObjectToData12(t *testing.T) {
 	var src []ValueInnerEntity1
-	var dst []map[string]interface{}
+	var dst []map[string]any
 	src = append(src, ValueInnerEntity1{Name: "zhou", Age: 12})
 
-	map1 := map[string]interface{}{}
+	map1 := map[string]any{}
 	map1["name"] = "zhou"
 	map1["age"] = 12
 	dst = append(dst, map1)
@@ -869,10 +870,10 @@ func TestObjectToData12(t *testing.T) {
 
 func TestObjectToData13(t *testing.T) {
 	var dst []ValueInnerEntity1
-	var src []map[string]interface{}
+	var src []map[string]any
 	dst = append(dst, ValueInnerEntity1{Name: "zhou", Age: 12})
 
-	map1 := map[string]interface{}{}
+	map1 := map[string]any{}
 	map1["name"] = "zhou"
 	map1["age"] = 12
 	src = append(src, map1)
@@ -889,7 +890,7 @@ func BenchmarkSprintfPress(b *testing.B) {
 		var entity ValueInnerEntity1
 		isc.DataToObject(jsonStr, &entity)
 
-		resultMap := make(map[string]interface{})
+		resultMap := make(map[string]any)
 		json.Unmarshal([]byte(jsonStr), &resultMap)
 	}
 }
@@ -906,7 +907,7 @@ func BenchmarkSprintfPress(b *testing.B) {
 //
 //	act := ValueInnerEntityPtr{}
 //
-//	map1 := map[string]interface{}{}
+//	map1 := map[string]any{}
 //	map1["ptr"] = &entity
 //
 //	isc.MapToObject(map1, &act)

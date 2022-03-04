@@ -26,7 +26,7 @@ func TestISCList_associateBy(t *testing.T) {
 		Name: "K3",
 		Age:  3,
 	})
-	l := isc.AssociateBy(testList, func(t MyStruct) interface{} {
+	l := isc.AssociateBy(testList, func(t MyStruct) any {
 		return t.Name
 	})
 	t.Logf("%v\n", isc.ToString(l))
