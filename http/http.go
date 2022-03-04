@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"reflect"
@@ -293,11 +292,11 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 
 func call(httpRequest *http.Request, url string) ([]byte, error) {
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
-		log.Printf("Error sending request to API endpoint. %+v", err)
+		logger.Info("Error sending request to API endpoint. %+v", err)
 		return nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
 		if httpResponse == nil {
-			log.Printf("httpResponse is nil")
+			logger.Info("httpResponse is nil")
 			return nil, nil
 		}
 		defer func(Body io.ReadCloser) {
@@ -330,11 +329,11 @@ func call(httpRequest *http.Request, url string) ([]byte, error) {
 
 func callIgnoreReturn(httpRequest *http.Request, url string) error {
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
-		log.Printf("Error sending request to API endpoint. %+v", err)
+		logger.Info("Error sending request to API endpoint. %+v", err)
 		return &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
 		if httpResponse == nil {
-			log.Printf("httpResponse is nil")
+			logger.Info("httpResponse is nil")
 			return nil
 		}
 
