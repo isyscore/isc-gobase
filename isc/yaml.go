@@ -39,7 +39,7 @@ var Dot = "."
 // ArrayBlanks 数组缩进
 var ArrayBlanks = "- "
 
-// NewLineDom yaml的value换行符
+// YamlNewLineDom yaml的value换行符
 var YamlNewLineDom = "|\n"
 
 var rangePattern = regexp.MustCompile("^(.*)\\[(\\d*)\\]$")
@@ -100,7 +100,7 @@ func IsJson(content string) bool {
 		return false
 	}
 
-	var object interface{}
+	var object any
 	err := json.Unmarshal([]byte(content), &object)
 	if err != nil {
 		return false
@@ -132,7 +132,7 @@ func YamlToPropertiesWithKey(key string, contentOfYaml string) (string, error) {
 
 	contentOfYaml = strings.TrimSpace(contentOfYaml)
 	if strings.HasPrefix(contentOfYaml, "-") {
-		dataMap := map[string]interface{}{}
+		dataMap := make(map[string]any)
 		kvList, err := YamlToList(contentOfYaml)
 		if err != nil {
 			log.Printf("YamlToPropertiesWithKey error: %v, content: %v", err, contentOfYaml)
@@ -156,11 +156,11 @@ func YamlToPropertiesWithKey(key string, contentOfYaml string) (string, error) {
 	return propertiesAppendPrefixKey(key, property)
 }
 
-func JsonToMap(contentOfJson string) (map[string]interface{}, error) {
+func JsonToMap(contentOfJson string) (map[string]any, error) {
 	if contentOfJson == "" || strings.HasPrefix(contentOfJson, "{") || strings.HasPrefix(contentOfJson, "[") {
 		return nil, &ChangeError{ErrMsg: "不符合json格式"}
 	}
-	resultMap := make(map[string]interface{})
+	resultMap := make(map[string]any)
 	err := json.Unmarshal([]byte(contentOfJson), &resultMap)
 	if err != nil {
 		log.Printf("JsonToMap, error: %v, content: %v", err, contentOfJson)
@@ -170,8 +170,8 @@ func JsonToMap(contentOfJson string) (map[string]interface{}, error) {
 	return resultMap, nil
 }
 
-func YamlToMap(contentOfYaml string) (map[string]interface{}, error) {
-	resultMap := make(map[string]interface{})
+func YamlToMap(contentOfYaml string) (map[string]any, error) {
+	resultMap := make(map[string]any)
 	err := yaml.Unmarshal([]byte(contentOfYaml), &resultMap)
 	if err != nil {
 		log.Printf("YamlToMap, error: %v, content: %v", err, contentOfYaml)
@@ -186,7 +186,7 @@ func YamlToJson(contentOfYaml string) (string, error) {
 		return "", &ConvertError{errMsg: "the content is invalidate for json"}
 	}
 
-	var data interface{}
+	var data any
 	err := yaml.Unmarshal([]byte(contentOfYaml), &data)
 	if err != nil {
 		log.Printf("YamlToList, error: %v, content: %v", err, contentOfYaml)
@@ -224,11 +224,11 @@ func YamlToKvList(contentOfYaml string) ([]StringPair, error) {
 	return pairs, nil
 }
 
-func YamlToList(contentOfYaml string) ([]interface{}, error) {
+func YamlToList(contentOfYaml string) ([]any, error) {
 	if !strings.HasPrefix(strings.TrimSpace(contentOfYaml), "-") {
-		return []interface{}{}, &ConvertError{errMsg: "the content of yaml not start with '-'"}
+		return []any{}, &ConvertError{errMsg: "the content of yaml not start with '-'"}
 	}
-	var resultList []interface{}
+	var resultList []any
 	err := yaml.Unmarshal([]byte(contentOfYaml), &resultList)
 	if err != nil {
 		log.Printf("YamlToList, error: %v, content: %v", err, contentOfYaml)
@@ -258,12 +258,12 @@ func YamlCheck(content string) error {
 	return nil
 }
 
-func PropertiesToMap(contentOfProperties string) (map[string]interface{}, error) {
+func PropertiesToMap(contentOfProperties string) (map[string]any, error) {
 	if !strings.Contains(contentOfProperties, "=") {
 		return nil, &ConvertError{errMsg: "the content is illegal for properties"}
 	}
 
-	var resultMap = make(map[string]interface{})
+	var resultMap = make(map[string]any)
 	propertiesLineWordList := GetPropertiesItemLineList(contentOfProperties)
 	for _, line := range propertiesLineWordList {
 		line = strings.TrimSpace(line)
@@ -300,14 +300,14 @@ func propertiesAppendPrefixKey(key string, propertiesContent string) (string, er
 	return strings.Join(datas, NewLine), nil
 }
 
-func deepPut(dataMap map[string]interface{}, key string, value interface{}) map[string]interface{} {
+func deepPut(dataMap map[string]any, key string, value any) map[string]any {
 	mapValue, exist := dataMap[key]
 	if !exist {
 		dataMap[key] = value
 	} else {
 		if reflect.Map == reflect.TypeOf(value).Kind() {
-			leftMap := mapValue.(map[string]interface{})
-			rightMap := value.(map[string]interface{})
+			leftMap := mapValue.(map[string]any)
+			rightMap := value.(map[string]any)
 
 			for rightMapKey := range rightMap {
 				leftMap = deepPut(leftMap, rightMapKey, rightMap[rightMapKey])
@@ -349,7 +349,7 @@ func PropertiesToYaml(contentOfProperties string) (string, error) {
 	return strings.Join(yamlLineList, "\n") + "\n", nil
 }
 
-func ObjectToYaml(value interface{}) (string, error) {
+func ObjectToYaml(value any) (string, error) {
 	bytes2, err := yaml.Marshal(value)
 	if err != nil {
 		log.Printf("ObjectToYaml error: %v, content: %v", err, value)
@@ -358,8 +358,8 @@ func ObjectToYaml(value interface{}) (string, error) {
 	return string(bytes2), nil
 }
 
-// 进行深层嵌套的map数据处理
-func MapToProperties(dataMap map[string]interface{}) (string, error) {
+// MapToProperties 进行深层嵌套的map数据处理
+func MapToProperties(dataMap map[string]any) (string, error) {
 	var propertyStrList []string
 	for key, value := range dataMap {
 		valueKind := reflect.TypeOf(value).Kind()
@@ -423,7 +423,7 @@ func JsonToYaml(contentOfJson string) (string, error) {
 	// go中的json转换不识别"'"字符，因此这里将其转换为"""这种字符
 	contentOfJsonTem := strings.ReplaceAll(contentOfJson, "'", "\"")
 
-	var object interface{}
+	var object any
 	err := json.Unmarshal([]byte(contentOfJsonTem), &object)
 	if err != nil {
 		return "", err
@@ -589,7 +589,7 @@ func wordToNode(lineWordList []string, nodeList []YamlNode, parentNode *YamlNode
 	return lineWordList, nodeList
 }
 
-func doMapToProperties(propertyStrList []string, value interface{}, prefix string) []string {
+func doMapToProperties(propertyStrList []string, value any, prefix string) []string {
 	valueKind := reflect.TypeOf(value).Kind()
 	switch valueKind {
 	case reflect.Map:
@@ -688,7 +688,7 @@ func appendSpaceForArrayValue(value string) string {
 	value = value[len(YamlNewLineDom):]
 	valueTems := strings.Split(value, "\\n")
 
-	strs := []string{}
+	var strs []string
 	for _, element := range valueTems {
 		tem := element
 		if strings.HasSuffix(element, "\\") {

@@ -1,6 +1,10 @@
 package test
 
-/*
+import (
+	"github.com/isyscore/isc-gobase/isc"
+	"testing"
+)
+
 func TestGeneric(t *testing.T) {
 	list := isc.NewListWithItems(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 	i := list.IndexOf(5)
@@ -12,7 +16,7 @@ func TestGeneric(t *testing.T) {
 
 	t.Logf("filter = %v\n", l2)
 
-	lg := isc.ListToGroupFrom[int, string, string](list)
+	lg := isc.ListToTripleFrom[int, string, string](list)
 	mg := lg.GroupBy(func(item int) string {
 		if item%2 == 0 {
 			return "even"
@@ -22,5 +26,3 @@ func TestGeneric(t *testing.T) {
 	})
 	t.Logf("grouped = %v\n", mg)
 }
-
-*/

@@ -27,19 +27,19 @@ func gcRunning() bool {
 type store struct {
 	gid    int64
 	count  uint32
-	values map[uintptr]interface{}
+	values map[uintptr]any
 }
 
 type storage struct {
 }
 
-func (t *storage) Get() (v interface{}) {
+func (t *storage) Get() (v any) {
 	s := loadCurrentStore()
 	id := uintptr(unsafe.Pointer(t))
 	return s.values[id]
 }
 
-func (t *storage) Set(v interface{}) (oldValue interface{}) {
+func (t *storage) Set(v any) (oldValue any) {
 	s := loadCurrentStore()
 	id := uintptr(unsafe.Pointer(t))
 	oldValue = s.values[id]
@@ -57,7 +57,7 @@ func (t *storage) Set(v interface{}) (oldValue interface{}) {
 	return
 }
 
-func (t *storage) Del() (v interface{}) {
+func (t *storage) Del() (v any) {
 	s := loadCurrentStore()
 	id := uintptr(unsafe.Pointer(t))
 	v = s.values[id]
@@ -68,7 +68,7 @@ func (t *storage) Del() (v interface{}) {
 
 func (t *storage) Clear() {
 	s := loadCurrentStore()
-	s.values = map[uintptr]interface{}{}
+	s.values = make(map[uintptr]any)
 	atomic.StoreUint32(&s.count, 0)
 }
 
@@ -82,7 +82,7 @@ func loadCurrentStore() (s *store) {
 		if s = oldStoreMap[gid]; s == nil {
 			s = &store{
 				gid:    gid,
-				values: map[uintptr]interface{}{},
+				values: make(map[uintptr]any),
 			}
 			newStoreMap := make(map[int64]*store, len(oldStoreMap)+1)
 			for k, v := range oldStoreMap {

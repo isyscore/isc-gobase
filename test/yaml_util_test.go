@@ -12,7 +12,7 @@ import (
 )
 
 func TestMapToProperties1(t *testing.T) {
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 12
 	dataMap["b"] = 13
 	dataMap["c"] = 14
@@ -29,12 +29,12 @@ func TestMapToProperties1(t *testing.T) {
 }
 
 func TestMapToProperties2(t *testing.T) {
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 12
 	dataMap["b"] = 13
 	dataMap["c"] = 14
 
-	innerMap1 := map[string]interface{}{}
+	innerMap1 := map[string]any{}
 	innerMap1["a"] = "inner1"
 	innerMap1["b"] = "inner2"
 	innerMap1["c"] = "inner3"
@@ -51,18 +51,18 @@ func TestMapToProperties2(t *testing.T) {
 }
 
 func TestMapToProperties3(t *testing.T) {
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 12
 	dataMap["b"] = 13
 	dataMap["c"] = 14
 
-	innerMap1 := map[string]interface{}{}
+	innerMap1 := map[string]any{}
 	innerMap1["a"] = "inner1"
 	innerMap1["b"] = "inner2"
 	innerMap1["c"] = "inner3"
 	dataMap["d"] = innerMap1
 
-	array := []string{}
+	var array []string
 	array = append(array, "a")
 	array = append(array, "b")
 	dataMap["e"] = array
@@ -78,12 +78,12 @@ func TestMapToProperties3(t *testing.T) {
 }
 
 func TestMapToProperties4(t *testing.T) {
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	dataMap["a"] = 12
 	dataMap["b"] = 13
 	dataMap["c"] = 14
 
-	innerMap1 := map[string]interface{}{}
+	innerMap1 := map[string]any{}
 	innerMap1["a"] = "inner1"
 	innerMap1["b"] = "inner2"
 	innerMap1["c"] = "inner3"
@@ -275,9 +275,4 @@ func propertiesToYamlTest(t *testing.T, filePath string) {
 	act, err := isc.YamlToProperties(yamlContent)
 	act = strings.TrimSpace(act)
 	Equal(t, act, expect)
-}
-
-type TestEntity2 struct {
-	Name string
-	Age  int
 }

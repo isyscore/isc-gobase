@@ -345,13 +345,13 @@ func AppendJsonFile(filePath string) {
 	}
 }
 
-func SetValue(key string, value interface{}) {
+func SetValue(key string, value any) {
 	if nil == value {
 		return
 	}
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
-		appProperty.ValueMap = map[string]interface{}{}
+		appProperty.ValueMap = make(map[string]any)
 	}
 
 	if oldValue, exist := appProperty.ValueMap[key]; exist {
@@ -363,7 +363,7 @@ func SetValue(key string, value interface{}) {
 	doPutValue(key, value)
 }
 
-func doPutValue(key string, value interface{}) {
+func doPutValue(key string, value any) {
 	if strings.Contains(key, ".") {
 		oldValue := GetValue(key)
 		if nil == oldValue {
@@ -668,7 +668,7 @@ func GetValueBoolDefault(key string, defaultValue bool) bool {
 	return defaultValue
 }
 
-func GetValueObject(key string, targetPtrObj interface{}) error {
+func GetValueObject(key string, targetPtrObj any) error {
 	if nil == appProperty {
 		return nil
 	}
@@ -680,14 +680,14 @@ func GetValueObject(key string, targetPtrObj interface{}) error {
 	return nil
 }
 
-func GetValue(key string) interface{} {
+func GetValue(key string) any {
 	if nil == appProperty {
 		return nil
 	}
 	return doGetValue(appProperty.ValueDeepMap, key)
 }
 
-func doGetValue(parentValue interface{}, key string) interface{} {
+func doGetValue(parentValue any, key string) any {
 	if key == "" {
 		return parentValue
 	}
@@ -709,8 +709,8 @@ func doGetValue(parentValue interface{}, key string) interface{} {
 }
 
 type ApplicationProperty struct {
-	ValueMap     map[string]interface{}
-	ValueDeepMap map[string]interface{}
+	ValueMap     map[string]any
+	ValueDeepMap map[string]any
 }
 
 //LoadYamlConfig read fileName from private path fileName,eg:application.yml, and transform it to AConfig

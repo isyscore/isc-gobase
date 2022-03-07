@@ -2,8 +2,10 @@ package http
 
 import (
 	"encoding/json"
+	"github.com/isyscore/isc-gobase/logger"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"reflect"
@@ -40,9 +42,9 @@ func (error *NetError) Error() string {
 }
 
 type StandardResponse struct {
-	Code    interface{} `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Code    any    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
 }
 
 // createHTTPClient for connection re-use
@@ -128,15 +130,15 @@ func Head(url string, header http.Header, parameterMap map[string]string) error 
 
 // ------------------ post ------------------
 
-func PostSimple(url string, body interface{}) ([]byte, error) {
+func PostSimple(url string, body any) ([]byte, error) {
 	return Post(url, nil, nil, body)
 }
 
-func PostSimpleOfStandard(url string, body interface{}) ([]byte, error) {
+func PostSimpleOfStandard(url string, body any) ([]byte, error) {
 	return PostOfStandard(url, nil, nil, body)
 }
 
-func Post(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func Post(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
@@ -152,7 +154,7 @@ func Post(url string, header http.Header, parameterMap map[string]string, body i
 	return call(httpRequest, url)
 }
 
-func PostOfStandard(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func PostOfStandard(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
@@ -170,15 +172,15 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 
 // ------------------ put ------------------
 
-func PutSimple(url string, body interface{}) ([]byte, error) {
+func PutSimple(url string, body any) ([]byte, error) {
 	return Put(url, nil, nil, body)
 }
 
-func PutSimpleOfStandard(url string, body interface{}) ([]byte, error) {
+func PutSimpleOfStandard(url string, body any) ([]byte, error) {
 	return PutOfStandard(url, nil, nil, body)
 }
 
-func Put(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func Put(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
@@ -194,7 +196,7 @@ func Put(url string, header http.Header, parameterMap map[string]string, body in
 	return call(httpRequest, url)
 }
 
-func PutOfStandard(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func PutOfStandard(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
@@ -250,15 +252,15 @@ func DeleteOfStandard(url string, header http.Header, parameterMap map[string]st
 
 // ------------------ patch ------------------
 
-func PatchSimple(url string, body interface{}) ([]byte, error) {
+func PatchSimple(url string, body any) ([]byte, error) {
 	return Post(url, nil, nil, body)
 }
 
-func PatchSimpleOfStandard(url string, body interface{}) ([]byte, error) {
+func PatchSimpleOfStandard(url string, body any) ([]byte, error) {
 	return PostOfStandard(url, nil, nil, body)
 }
 
-func Patch(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func Patch(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
@@ -274,7 +276,7 @@ func Patch(url string, header http.Header, parameterMap map[string]string, body 
 	return call(httpRequest, url)
 }
 
-func PatchOfStandard(url string, header http.Header, parameterMap map[string]string, body interface{}) ([]byte, error) {
+func PatchOfStandard(url string, header http.Header, parameterMap map[string]string, body any) ([]byte, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)

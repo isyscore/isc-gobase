@@ -4,13 +4,13 @@ package goid
 type LocalStorage interface {
 
 	// Get returns the value in the current goroutine's local storage, if it was set before.
-	Get() (value interface{})
+	Get() (value any)
 
 	// Set copy the value into the current goroutine's local storage, and return the old value.
-	Set(value interface{}) (oldValue interface{})
+	Set(value any) (oldValue any)
 
 	// Del delete the value from the current goroutine's local storage, and return it.
-	Del() (oldValue interface{})
+	Del() (oldValue any)
 
 	// Clear delete values from all goroutine's local storages.
 	Clear()
@@ -19,7 +19,7 @@ type LocalStorage interface {
 // ImmutableContext represents all local storages of one goroutine.
 type ImmutableContext struct {
 	gid    int64
-	values map[uintptr]interface{}
+	values map[uintptr]any
 }
 
 // Go start an new goroutine, and copy all local storages from current goroutine.
@@ -34,7 +34,7 @@ func Go(f func()) {
 // BackupContext copy all local storages into an ImmutableContext instance.
 func BackupContext() *ImmutableContext {
 	s := loadCurrentStore()
-	data := make(map[uintptr]interface{}, len(s.values))
+	data := make(map[uintptr]any, len(s.values))
 	for k, v := range s.values {
 		data[k] = v
 	}

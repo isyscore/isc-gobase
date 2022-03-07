@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/isc"
 
 	"github.com/isyscore/isc-gobase/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/isyscore/isc-gobase/websocket"
 )
 
 type HttpMethod int
@@ -29,7 +31,10 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 
-func init() {
+func InitServer() {
+
+	isc.PrintBanner()
+
 	config.LoadConfig()
 
 	mode := config.GetValueString("server.gin.mode")
@@ -169,4 +174,11 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 		engine.POST(path, handler)
 	}
 
+}
+
+func RegisterWebSocketRoute(path string, svr *websocket.Server) {
+	if !checkEngine() {
+		return
+	}
+	engine.GET(path, svr.Handler())
 }

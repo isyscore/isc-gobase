@@ -376,7 +376,7 @@ func Cast(fieldKind reflect.Kind, valueStr string) (any, error) {
 //  - map类型
 //  - 集合/分片类型
 //  - 字符串类型：如果是json，则按照json进行转换
-func DataToObject(data interface{}, targetPtrObj interface{}) error {
+func DataToObject(data any, targetPtrObj any) error {
 	if data == nil {
 		return nil
 	}
@@ -389,14 +389,14 @@ func DataToObject(data interface{}, targetPtrObj interface{}) error {
 	if srcType.Kind() == reflect.Map {
 		return MapToObject(data, targetPtrObj)
 	} else if srcType.Kind() == reflect.Array || srcType.Kind() == reflect.Slice {
-		return ArrayToObject(data.([]interface{}), targetPtrObj)
+		return ArrayToObject(data.([]any), targetPtrObj)
 	} else {
 		switch data.(type) {
 		case io.Reader:
 			return ReaderToObject(data.(io.Reader), targetPtrObj)
 		case string:
 			return StrToObject(data.(string), targetPtrObj)
-		case interface{}:
+		case any:
 			return MapToObject(ToMap(data), targetPtrObj)
 		}
 	}
@@ -410,7 +410,7 @@ func DataToObject(data interface{}, targetPtrObj interface{}) error {
 	return nil
 }
 
-func ReaderToObject(reader io.Reader, targetPtrObj interface{}) error {
+func ReaderToObject(reader io.Reader, targetPtrObj any) error {
 	if reader == nil {
 		return nil
 	}
@@ -425,7 +425,7 @@ func ReaderToObject(reader io.Reader, targetPtrObj interface{}) error {
 	return StrToObject(string(data), targetPtrObj)
 }
 
-func StrToObject(contentOfJson string, targetPtrObj interface{}) error {
+func StrToObject(contentOfJson string, targetPtrObj any) error {
 	if contentOfJson == "" {
 		return &ChangeError{ErrMsg: "content is nil"}
 	}
@@ -445,14 +445,14 @@ func StrToObject(contentOfJson string, targetPtrObj interface{}) error {
 	}
 
 	if strings.HasPrefix(contentOfJson, "{") && (reflect.ValueOf(targetPtrObj).Elem().Kind() == reflect.Map || reflect.ValueOf(targetPtrObj).Elem().Kind() == reflect.Struct) {
-		resultMap := make(map[string]interface{})
+		resultMap := make(map[string]any)
 		err := json.Unmarshal([]byte(contentOfJson), &resultMap)
 		if err != nil {
 			return err
 		}
 		return MapToObject(resultMap, targetPtrObj)
 	} else if strings.HasPrefix(contentOfJson, "[") && (reflect.ValueOf(targetPtrObj).Elem().Kind() == reflect.Slice || reflect.ValueOf(targetPtrObj).Elem().Kind() == reflect.Array) {
-		var srcArray []interface{}
+		var srcArray []any
 		err := json.Unmarshal([]byte(contentOfJson), &srcArray)
 		if err != nil {
 			return err
@@ -469,7 +469,7 @@ func StrToObject(contentOfJson string, targetPtrObj interface{}) error {
 	}
 }
 
-func ArrayToObject(dataArray interface{}, targetPtrObj interface{}) error {
+func ArrayToObject(dataArray any, targetPtrObj any) error {
 	if dataArray == nil {
 		return nil
 	}
@@ -510,7 +510,7 @@ func ArrayToObject(dataArray interface{}, targetPtrObj interface{}) error {
 	return nil
 }
 
-func MapToObject(dataMap interface{}, targetPtrObj interface{}) error {
+func MapToObject(dataMap any, targetPtrObj any) error {
 	if dataMap == nil {
 		return nil
 	}
@@ -686,7 +686,7 @@ func valueToTarget(srcValue reflect.Value, dstType reflect.Type) reflect.Value {
 }
 
 // ObjectToData 字段转化，其中对应字段为小写，map的话为小写
-func ObjectToData(object interface{}) interface{} {
+func ObjectToData(object any) any {
 	if object == nil || reflect.ValueOf(object).Kind() == reflect.Ptr {
 		return "{}"
 	}
@@ -699,7 +699,7 @@ func ObjectToData(object interface{}) interface{} {
 
 	if objKind == reflect.Map {
 		// Map 结构
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		if objValue.Len() == 0 {
 			return "{}"
@@ -717,7 +717,7 @@ func ObjectToData(object interface{}) interface{} {
 		return resultMap
 	} else if objKind == reflect.Struct {
 		// Struct 结构
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		objType := objValue.Type()
 		for index, num := 0, objType.NumField(); index < num; index++ {
@@ -736,7 +736,7 @@ func ObjectToData(object interface{}) interface{} {
 		return resultMap
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
 		// Array 结构
-		var resultSlice []interface{}
+		var resultSlice []any
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
@@ -752,7 +752,7 @@ func ObjectToData(object interface{}) interface{} {
 }
 
 // ObjectToJson 对象转化为json，其中map对应的key大小写均可
-func ObjectToJson(object interface{}) string {
+func ObjectToJson(object any) string {
 	if object == nil || reflect.ValueOf(object).Kind() == reflect.Ptr {
 		return "{}"
 	}
@@ -765,7 +765,7 @@ func ObjectToJson(object interface{}) string {
 
 	if objKind == reflect.Map {
 		// Map 结构
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		if objValue.Len() == 0 {
 			return "{}"
@@ -783,7 +783,7 @@ func ObjectToJson(object interface{}) string {
 		return ToJsonString(resultMap)
 	} else if objKind == reflect.Struct {
 		// Struct 结构
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		objType := objValue.Type()
 		for index, num := 0, objType.NumField(); index < num; index++ {
@@ -802,7 +802,7 @@ func ObjectToJson(object interface{}) string {
 		return ToJsonString(resultMap)
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
 		// Array 结构
-		var resultSlice []interface{}
+		var resultSlice []any
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
@@ -828,7 +828,7 @@ func ObjectToJson(object interface{}) string {
 // 集合/分片类型 		-> [xx]；其中xx对应的类型集合中的对象再次进行转换
 // 结构体 			-> 转换为map
 // map 				-> 转换为map
-func doObjectChange(objType reflect.Type, object interface{}) interface{} {
+func doObjectChange(objType reflect.Type, object any) any {
 	if objType == nil || object == nil {
 		return nil
 	}
@@ -853,7 +853,7 @@ func doObjectChange(objType reflect.Type, object interface{}) interface{} {
 	} else if objKind == reflect.String {
 		return ToString(object)
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
-		var resultSlice []interface{}
+		var resultSlice []any
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
@@ -865,7 +865,7 @@ func doObjectChange(objType reflect.Type, object interface{}) interface{} {
 		}
 		return resultSlice
 	} else if objKind == reflect.Struct {
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		objType := objValue.Type()
 		for index, num := 0, objType.NumField(); index < num; index++ {
@@ -883,7 +883,7 @@ func doObjectChange(objType reflect.Type, object interface{}) interface{} {
 		}
 		return resultMap
 	} else if objKind == reflect.Map {
-		resultMap := map[string]interface{}{}
+		resultMap := make(map[string]any)
 		objValue := reflect.ValueOf(object)
 		if objValue.Len() == 0 {
 			return nil
