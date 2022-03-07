@@ -31,7 +31,7 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 
-func InitServer() {
+func init() {
 
 	isc.PrintBanner()
 

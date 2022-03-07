@@ -8,8 +8,6 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	server.InitServer()
-
 	server.RegisterCustomHealthCheck("/api/sample",
 		func() string {
 			return "OK"
