@@ -71,6 +71,11 @@ func init() {
 	logger.InitLog(level, timeFieldFormat, colored, appName)
 }
 
+func Run() {
+	StartServer()
+}
+
+// 后续弃用，使用简化版的Run()
 func StartServer() {
 	if !checkEngine() {
 		return
