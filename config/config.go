@@ -190,24 +190,24 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 			}
 		}
 	}
-	SetValue("base.actives.profile", profile)
+	SetValue("base.profiles.active", profile)
 }
 
 // 临时写死
 // 优先级：本地配置 > 启动参数 > 环境变量
 func getActiveProfile() string {
-	profile := GetValueString("base.actives.profile")
+	profile := GetValueString("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
 
-	flag.StringVar(&profile, "base.actives.profile", "", "环境变量")
+	flag.StringVar(&profile, "base.profiles.active", "", "环境变量")
 	flag.Parse()
 	if "" != profile {
 		return profile
 	}
 
-	profile = os.Getenv("base.actives.profile")
+	profile = os.Getenv("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
