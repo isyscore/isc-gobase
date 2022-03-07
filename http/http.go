@@ -5,15 +5,12 @@ import (
 	"github.com/isyscore/isc-gobase/logger"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/isyscore/isc-gobase/logger"
 )
 
 var httpClient = createHTTPClient()
