@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/isyscore/isc-gobase/config"
@@ -75,7 +76,6 @@ func Run() {
 	StartServer()
 }
 
-// 后续弃用，使用简化版的Run()
 func StartServer() {
 	if !checkEngine() {
 		return
@@ -186,4 +186,85 @@ func RegisterWebSocketRoute(path string, svr *websocket.Server) {
 		return
 	}
 	engine.GET(path, svr.Handler())
+}
+
+func Post(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmPost, handler)
+}
+
+func PostApiModel(path string, handler gin.HandlerFunc) {
+	Post(getPathAppendApiModel(path), handler)
+}
+
+func Delete(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmDelete, handler)
+}
+
+func DeleteApiModel(path string, handler gin.HandlerFunc) {
+	Delete(getPathAppendApiModel(path), handler)
+}
+
+func Put(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmPut, handler)
+}
+
+func PutApiModel(path string, handler gin.HandlerFunc) {
+	Put(getPathAppendApiModel(path), handler)
+}
+
+func Head(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmHead, handler)
+}
+
+func HeadApiModel(path string, handler gin.HandlerFunc) {
+	Head(getPathAppendApiModel(path), handler)
+}
+
+func Get(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmGet, handler)
+}
+
+func GetApiModel(path string, handler gin.HandlerFunc) {
+	Get(getPathAppendApiModel(path), handler)
+}
+
+func Options(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmOptions, handler)
+}
+
+func OptionsApiModel(path string, handler gin.HandlerFunc) {
+	Options(getPathAppendApiModel(path), handler)
+}
+
+func GetPost(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmGetPost, handler)
+}
+
+func GetPostApiModel(path string, handler gin.HandlerFunc) {
+	GetPost(getPathAppendApiModel(path), handler)
+}
+
+func All(path string, handler gin.HandlerFunc) {
+	RegisterRoute(path, HmAll, handler)
+}
+
+func AllApiModel(path string, handler gin.HandlerFunc) {
+	All(getPathAppendApiModel(path), handler)
+}
+
+func getPathAppendApiModel(path string) string {
+	apiModel := config.GetValueString("api-module")
+	if !strings.HasPrefix(apiModel, "/") {
+		apiModel = "/" + apiModel
+	}
+
+	if !strings.HasSuffix(apiModel, "/") {
+		apiModel = apiModel + "/"
+	}
+
+	if !strings.HasPrefix(path, "/") {
+		return apiModel + path
+	} else {
+		return apiModel + path[:len(path)-1]
+	}
 }
