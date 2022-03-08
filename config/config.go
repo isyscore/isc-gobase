@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -35,7 +34,6 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 	doLoadConfigFromAbsPath(resourceAbsPath)
 
 	// 读取cm文件
-	//AppendConfigFromAbsPath("/home/" + GetValueString("base.application.name") + "/config/application-default.yml")
 	AppendConfigFromRelativePath("./config/application-default.yml")
 
 	// 加载内部配置
@@ -194,20 +192,14 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 }
 
 // 临时写死
-// 优先级：本地配置 > 启动参数 > 环境变量
+// 优先级：环境变量 > 本地配置
 func getActiveProfile() string {
-	profile := GetValueString("base.profiles.active")
+	profile := os.Getenv("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
 
-	flag.StringVar(&profile, "base.profiles.active", "", "环境变量")
-	flag.Parse()
-	if "" != profile {
-		return profile
-	}
-
-	profile = os.Getenv("base.profiles.active")
+	profile = GetValueString("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
