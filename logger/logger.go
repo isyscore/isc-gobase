@@ -100,7 +100,6 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 
 	SetGlobalLevel(logLevel)
 
-	initLogDir()
 	zerolog.CallerSkipFrameCount = 2
 	zerolog.CallerMarshalFunc = callerMarshalFunc
 	//时间格式设置
@@ -110,11 +109,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-
-	outers := append(listWriter, out)
-	writer := zerolog.MultiLevelWriter(outers...)
-
-	log.Logger = log.Logger.Output(writer).With().Caller().Timestamp().Logger()
+	initLogDir(out)
 
 }
 
@@ -130,68 +125,64 @@ func (lw *FileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err
 	return 0, nil
 }
 
-var listWriter []io.Writer
-
-//initLoggerFile open or create and open log file
-func initLoggerFile(logDir string, fileName string, level zerolog.Level) {
-	pwd, _ := os.Getwd()
-	linkName := filepath.Join(pwd, logDir, fileName)
-	var file *os.File
+//initLogDir create log dir and file
+func initLogDir(out zerolog.ConsoleWriter) {
+	var levels []zerolog.Level
+	levels = append(levels, zerolog.InfoLevel, zerolog.DebugLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.TraceLevel, zerolog.NoLevel)
+	var oldWriter []io.Writer
 	fileHandler := func() {
+		//修改listWriter
+		var newWriter []io.Writer
 		t := t0.Now()
 		//关闭现有的流
-		for _, w := range listWriter {
+		for _, w := range oldWriter {
 			if w == nil {
 				continue
 			}
-			if fw, ok := w.(FileLevelWriter); ok {
+			if fw, ok := w.(*FileLevelWriter); ok {
 				fw.Close()
-			}
-		}
-		d, _ := t0.ParseDuration("-24h")
-		t1 := t.Add(d)
-		//时间格式转换
-		logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", time.TimeToStringFormat(t1, time.FmtYMdHms)))
-		if err := os.Rename(linkName, logFile); err != nil {
-			fmt.Printf("%v\n", err)
-			log.Printf("logfile[%s]重命名失败%v", logFile, err)
-		}
-		//打开创建流
-		file, _ = os.OpenFile(linkName, os.O_CREATE, 0666)
-		go func() {
-			//判断文件是否为空，如果为空则删除
-			fi, _ := os.Stat(logFile)
-			if fi != nil {
-				println("logFile[%s]文件大小:%v", fi.Size())
-				if fi.Size() == 0 {
-					os.Remove(logFile)
+				fi, _ := os.Stat(fw.File.Name())
+				if fi != nil && fi.Size() == 0 {
+					os.Remove(fw.File.Name())
 				}
 			}
-		}()
+		}
+		//时间格式转换
+		strTime := time.TimeToStringFormat(t, time.FmtYMd)
+		strTime = strings.ReplaceAll(strTime, ":", "_")
+		strTime = strings.ReplaceAll(strTime, " ", "_")
+		pwd, _ := os.Getwd()
+		// 创建日志目录
+		logDir := filepath.Join(pwd, "logs")
+		if _, err := os.Stat(logDir); os.IsNotExist(err) {
+			_ = os.Mkdir(logDir, os.ModePerm)
+		}
+		for _, level := range levels {
+			linkName := fmt.Sprintf("app-%s.log", level.String())
+			linkName = filepath.Join(logDir, linkName)
+			logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
+			//打开创建流
+			file1, err := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0666)
+			if err != nil {
+				fmt.Printf("日志文件创建失败%v\n", err)
+			}
+			newWriter = append(newWriter, &FileLevelWriter{file1, level})
+			//建立软链
+			if err := os.Remove(linkName); err != nil {
+				//fmt.Printf("删除链接文件异常：%v\n",err)
+			}
+			if err := os.Link(logFile, linkName); err != nil {
+				//fmt.Printf("链接文件创建失败：%v\n",err)
+			}
+		}
+		oldWriter = newWriter
+		outers := append(oldWriter, out)
+		writer := zerolog.MultiLevelWriter(outers...)
+		log.Logger = log.Logger.Output(writer).With().Caller().Logger()
 	}
 	fileHandler()
 	//每天创建一个文件
 	c_d := cron.New()
-	c_d.AddFunc("*/5 * * * * ?", fileHandler)
+	c_d.AddFunc("0 0 0 * * ?", fileHandler)
 	c_d.Start()
-	if file != nil {
-		fw := &FileLevelWriter{file, level}
-		listWriter = append(listWriter, fw)
-	}
-}
-
-//initLogDir create log dir and file
-func initLogDir() {
-	// 创建日志目录
-	logDir := filepath.Join(".", "logs")
-	if _, err := os.Stat(logDir); os.IsNotExist(err) {
-		_ = os.Mkdir(logDir, os.ModePerm)
-	}
-	// 创建日志文件
-	initLoggerFile(logDir, "app-info.log", zerolog.InfoLevel)
-	initLoggerFile(logDir, "app-debug.log", zerolog.DebugLevel)
-	initLoggerFile(logDir, "app-warn.log", zerolog.WarnLevel)
-	initLoggerFile(logDir, "app-error.log", zerolog.ErrorLevel)
-	initLoggerFile(logDir, "app-assert.log", zerolog.NoLevel)
-	initLoggerFile(logDir, "app-trace.log", zerolog.TraceLevel)
 }
