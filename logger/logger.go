@@ -30,6 +30,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,6 +39,19 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
+
+//callerMarshalFunc if you call the Info or Warn etd,the caller will lose it's original caller info,so it will to get it's original caller
+//suggest: please use zerolog's Func,such as log.Info,log.Debug and so on,eg:
+//log.Info().Msg("%s am a little Cutie","酷达舒")
+//log.Debug().Msg("%s say me too","kucs")
+func callerMarshalFunc(file string, l int) string {
+	if strings.Contains(file, "logger/logger.go") {
+		_, f, line, _ := runtime.Caller(6)
+		file = f
+		l = line
+	}
+	return file + ":" + strconv.Itoa(l)
+}
 
 func Info(format string, v ...any) {
 	log.Info().Msgf(format, v...)
@@ -55,7 +70,7 @@ func Debug(format string, v ...any) {
 }
 
 func Assert(format string, v ...any) {
-	log.WithLevel(zerolog.NoLevel).Msgf(format, v)
+	log.WithLevel(zerolog.NoLevel).Msgf(format, v...)
 }
 
 // var CustomizeFiles []string
@@ -91,6 +106,8 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	zerolog.ErrorHandler = func(err error) {
 		// do nothing
 	}
+
+	zerolog.CallerMarshalFunc = callerMarshalFunc
 
 	SetGlobalLevel(logLevel)
 
