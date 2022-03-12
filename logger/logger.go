@@ -27,15 +27,17 @@ package logger
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/cron"
+	"github.com/isyscore/isc-gobase/time"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
-	"time"
-
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	t0 "time"
 )
 
 func Info(format string, v ...any) {
@@ -58,15 +60,6 @@ func Assert(format string, v ...any) {
 	log.WithLevel(zerolog.NoLevel).Msgf(format, v)
 }
 
-// var CustomizeFiles []string
-
-var loggerInfo zerolog.LevelWriter
-var loggerDebug zerolog.LevelWriter
-var loggerWarn zerolog.LevelWriter
-var loggerError zerolog.LevelWriter
-var loggerAssert zerolog.LevelWriter
-var loggerTrace zerolog.LevelWriter
-
 // SetGlobalLevel sets the global override for log level. If this
 // values is raised, all Loggers will use at least this value.
 //
@@ -83,6 +76,19 @@ func SetGlobalLevel(strLevel string) {
 	zerolog.SetGlobalLevel(level)
 }
 
+//callerMarshalFunc if you call the Info or Warn etd,the caller will lose it's original caller info,so it will to get it's original caller
+//suggest: please use zerolog's Func,such as log.Info,log.Debug and so on,eg:
+//log.Info().Msg("%s am a little Cutie","酷达舒")
+//log.Debug().Msg("%s say me too","kucs")
+func callerMarshalFunc(file string, l int) string {
+	if strings.Contains(file, "logger/logger.go") {
+		_, f, line, _ := runtime.Caller(6)
+		file = f
+		l = line
+	}
+	return file + ":" + strconv.Itoa(l)
+}
+
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
@@ -96,6 +102,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 
 	initLogDir()
 	zerolog.CallerSkipFrameCount = 2
+	zerolog.CallerMarshalFunc = callerMarshalFunc
 	//时间格式设置
 	zerolog.TimeFieldFormat = timeFmt
 	//设置日志输出
@@ -103,30 +110,74 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	writer := zerolog.MultiLevelWriter(out, loggerDebug, loggerInfo, loggerWarn, loggerError, loggerTrace, loggerAssert)
+
+	outers := append(listWriter, out)
+	writer := zerolog.MultiLevelWriter(outers...)
+
 	log.Logger = log.Logger.Output(writer).With().Caller().Timestamp().Logger()
 
 }
 
-type fileLevelWriter struct {
-	io.Writer
+type FileLevelWriter struct {
+	*os.File
 	level zerolog.Level
 }
 
-func (lw *fileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err error) {
+func (lw *FileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err error) {
 	if level.String() == lw.level.String() {
 		return lw.Write(p)
 	}
 	return 0, nil
 }
 
+var listWriter []io.Writer
+
 //initLoggerFile open or create and open log file
-func initLoggerFile(logDir string, fileName string, level zerolog.Level) zerolog.LevelWriter {
-	linkName := filepath.Join(logDir, fileName)
-	logFile := strings.ReplaceAll(linkName, ".log", "-%Y%m%d.log")
-	file, _ := rotatelogs.New(logFile, rotatelogs.WithLinkName(linkName), rotatelogs.WithMaxAge(24*time.Hour), rotatelogs.WithRotationTime(time.Hour))
-	//file, _ := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
-	return &fileLevelWriter{file, level}
+func initLoggerFile(logDir string, fileName string, level zerolog.Level) {
+	pwd, _ := os.Getwd()
+	linkName := filepath.Join(pwd, logDir, fileName)
+	var file *os.File
+	fileHandler := func() {
+		t := t0.Now()
+		//关闭现有的流
+		for _, w := range listWriter {
+			if w == nil {
+				continue
+			}
+			if fw, ok := w.(FileLevelWriter); ok {
+				fw.Close()
+			}
+		}
+		d, _ := t0.ParseDuration("-24h")
+		t1 := t.Add(d)
+		//时间格式转换
+		logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", time.TimeToStringFormat(t1, time.FmtYMdHms)))
+		if err := os.Rename(linkName, logFile); err != nil {
+			fmt.Printf("%v\n", err)
+			log.Printf("logfile[%s]重命名失败%v", logFile, err)
+		}
+		//打开创建流
+		file, _ = os.OpenFile(linkName, os.O_CREATE, 0666)
+		go func() {
+			//判断文件是否为空，如果为空则删除
+			fi, _ := os.Stat(logFile)
+			if fi != nil {
+				println("logFile[%s]文件大小:%v", fi.Size())
+				if fi.Size() == 0 {
+					os.Remove(logFile)
+				}
+			}
+		}()
+	}
+	fileHandler()
+	//每天创建一个文件
+	c_d := cron.New()
+	c_d.AddFunc("*/5 * * * * ?", fileHandler)
+	c_d.Start()
+	if file != nil {
+		fw := &FileLevelWriter{file, level}
+		listWriter = append(listWriter, fw)
+	}
 }
 
 //initLogDir create log dir and file
@@ -137,10 +188,10 @@ func initLogDir() {
 		_ = os.Mkdir(logDir, os.ModePerm)
 	}
 	// 创建日志文件
-	loggerInfo = initLoggerFile(logDir, "app-info.log", zerolog.InfoLevel)
-	loggerDebug = initLoggerFile(logDir, "app-debug.log", zerolog.DebugLevel)
-	loggerWarn = initLoggerFile(logDir, "app-warn.log", zerolog.WarnLevel)
-	loggerError = initLoggerFile(logDir, "app-error.log", zerolog.ErrorLevel)
-	loggerAssert = initLoggerFile(logDir, "app-assert.log", zerolog.NoLevel)
-	loggerTrace = initLoggerFile(logDir, "app-trace.log", zerolog.TraceLevel)
+	initLoggerFile(logDir, "app-info.log", zerolog.InfoLevel)
+	initLoggerFile(logDir, "app-debug.log", zerolog.DebugLevel)
+	initLoggerFile(logDir, "app-warn.log", zerolog.WarnLevel)
+	initLoggerFile(logDir, "app-error.log", zerolog.ErrorLevel)
+	initLoggerFile(logDir, "app-assert.log", zerolog.NoLevel)
+	initLoggerFile(logDir, "app-trace.log", zerolog.TraceLevel)
 }

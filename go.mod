@@ -4,13 +4,16 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.7.7
+	github.com/gorilla/websocket v1.5.0
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/magiconair/properties v1.8.5
+	github.com/robfig/cron v1.2.0
 	github.com/rs/zerolog v1.26.1
 	gopkg.in/yaml.v2 v2.4.0
-	github.com/gorilla/websocket v1.5.0
 )
+
+require github.com/jonboulle/clockwork v0.2.2 // indirect
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -18,7 +21,6 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
-	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
