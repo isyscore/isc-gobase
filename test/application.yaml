@@ -3,6 +3,8 @@ server:
   port: 31000
   gin:
     mode: release
+  logger:
+    level: debug
 
 base:
   application:

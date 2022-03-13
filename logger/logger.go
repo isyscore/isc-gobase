@@ -125,64 +125,123 @@ func (lw *FileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err
 	return 0, nil
 }
 
+func closeFileLevelWriter(writers []io.Writer) {
+	if len(writers) == 0 {
+		return
+	}
+	for _, w := range writers {
+		if w == nil {
+			continue
+		}
+		if fw, ok := w.(*FileLevelWriter); ok {
+			fw.Close()
+			fi, _ := os.Stat(fw.File.Name())
+			if fi != nil && fi.Size() == 0 {
+				println("删除空文件", fi.Name())
+				os.Remove(fw.File.Name())
+			}
+		}
+	}
+}
+
+func getLogDir() string {
+	pwd, _ := os.Getwd()
+	// 创建日志目录
+	logDir := filepath.Join(pwd, "logs")
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		_ = os.Mkdir(logDir, os.ModePerm)
+	}
+	return logDir
+}
+
+func createFileLeveWriter(level zerolog.Level, strTime string, idx int) *FileLevelWriter {
+	strL := level.String()
+	if level == zerolog.NoLevel {
+		strL = "assert"
+	}
+	linkName := fmt.Sprintf("app-%s.log", strL)
+	linkName = filepath.Join(getLogDir(), linkName)
+	logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
+	if idx > 0 {
+		logFile = strings.ReplaceAll(logFile, ".log", fmt.Sprintf(".%d.log", idx))
+	}
+	//建立软链
+	if _, err := os.Stat(linkName); err != nil {
+		if !os.IsNotExist(err) {
+			if err = os.Remove(linkName); err != nil {
+				fmt.Printf("链接文件删除失败：%v\n", err)
+			}
+		}
+		if runtime.GOOS != "windows" {
+			if err = os.Symlink(logFile, linkName); err != nil {
+				fmt.Printf("链接文件创建失败：%v\n", err)
+			}
+		} else {
+			os.Link(logFile, linkName)
+		}
+
+	}
+	//打开创建流
+	file1, err := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Printf("日志文件创建失败%v\n", err)
+		return nil
+	}
+	return &FileLevelWriter{file1, level}
+
+}
+
+var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel}
+
+func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level) {
+	//关闭现有流
+	closeFileLevelWriter(oldWriter)
+	//修改listWriter
+	var newWriter []io.Writer
+	//时间格式转换
+	strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
+	for _, level := range ls {
+		fw := createFileLeveWriter(level, strTime, idx)
+		newWriter = append(newWriter, fw)
+	}
+	outers := append(newWriter, out)
+	writer := zerolog.MultiLevelWriter(outers...)
+	log.Logger = log.Logger.Output(writer).With().Caller().Logger()
+	oldWriter = newWriter
+}
+
+var oldWriter []io.Writer
+
 //initLogDir create log dir and file
 func initLogDir(out zerolog.ConsoleWriter) {
-	var levels []zerolog.Level
-	levels = append(levels, zerolog.InfoLevel, zerolog.DebugLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.TraceLevel, zerolog.NoLevel)
-	var oldWriter []io.Writer
-	fileHandler := func() {
-		//修改listWriter
-		var newWriter []io.Writer
-		t := t0.Now()
-		//关闭现有的流
-		for _, w := range oldWriter {
-			if w == nil {
-				continue
-			}
-			if fw, ok := w.(*FileLevelWriter); ok {
-				fw.Close()
-				fi, _ := os.Stat(fw.File.Name())
-				if fi != nil && fi.Size() == 0 {
-					os.Remove(fw.File.Name())
-				}
-			}
-		}
-		//时间格式转换
-		strTime := time.TimeToStringFormat(t, time.FmtYMd)
-		strTime = strings.ReplaceAll(strTime, ":", "_")
-		strTime = strings.ReplaceAll(strTime, " ", "_")
-		pwd, _ := os.Getwd()
-		// 创建日志目录
-		logDir := filepath.Join(pwd, "logs")
-		if _, err := os.Stat(logDir); os.IsNotExist(err) {
-			_ = os.Mkdir(logDir, os.ModePerm)
-		}
-		for _, level := range levels {
-			linkName := fmt.Sprintf("app-%s.log", level.String())
-			linkName = filepath.Join(logDir, linkName)
-			logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
-			//打开创建流
-			file1, err := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0666)
-			if err != nil {
-				fmt.Printf("日志文件创建失败%v\n", err)
-			}
-			newWriter = append(newWriter, &FileLevelWriter{file1, level})
-			//建立软链
-			if err := os.Remove(linkName); err != nil {
-				//fmt.Printf("删除链接文件异常：%v\n",err)
-			}
-			if err := os.Link(logFile, linkName); err != nil {
-				//fmt.Printf("链接文件创建失败：%v\n",err)
-			}
-		}
-		oldWriter = newWriter
-		outers := append(oldWriter, out)
-		writer := zerolog.MultiLevelWriter(outers...)
-		log.Logger = log.Logger.Output(writer).With().Caller().Logger()
-	}
+	fileHandler := func() { updateOuters(out, 0, levels) }
 	fileHandler()
 	//每天创建一个文件
 	c_d := cron.New()
 	c_d.AddFunc("0 0 0 * * ?", fileHandler)
 	c_d.Start()
+
+	c_check := cron.New()
+	c_check.AddFunc("*/1 * * * * ?", func() {
+		//检查文件大小，如果超过核定大小，则生成新文件
+		go func() {
+			for _, w := range oldWriter {
+				if fw, ok := w.(*FileLevelWriter); ok {
+					//判断文件大小,默认300M
+					if fi, _ := os.Stat(fw.File.Name()); fi != nil && fi.Size() >= 300<<20 {
+						name := fi.Name()
+						idxs := strings.Split(name, ".")
+						idx := 0
+						if len(idxs) == 3 {
+							idx, _ = strconv.Atoi(idxs[1])
+						} else if len(idxs) > 3 {
+							idx, _ = strconv.Atoi(idxs[len(idxs)-2])
+						}
+						updateOuters(out, idx+1, []zerolog.Level{fw.level})
+					}
+				}
+			}
+		}()
+	})
+	c_check.Start()
 }

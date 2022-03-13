@@ -31,9 +31,9 @@ func TestServer(t *testing.T) {
 				c_s := cron.New()
 				c_s.AddFunc("*/1 * * * * ?", func() {
 					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
-					logger.Info("协程ID=：%d,我是库陈胜1", idx)
-					logger.Warn("协程ID=：%d,我是库陈胜2", idx)
-					logger.Error("协程ID=：%d,我是库陈胜3", idx)
+					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
+					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
+					logger.Error("协程ID=：%d,我是库陈胜Error", idx)
 				})
 				c_s.Start()
 			}(i)
