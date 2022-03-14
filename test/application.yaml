@@ -3,6 +3,12 @@ server:
   port: 31000
   gin:
     mode: release
+  logger:
+    level: debug
+    split:
+      enable: true
+      # 单位: M
+      size: 300
 
 base:
   application:

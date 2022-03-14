@@ -68,7 +68,9 @@ func InitServer() {
 	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
 	colored := config.GetValueBoolDefault("server.logger.color.enable", false)
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
-	logger.InitLog(level, timeFieldFormat, colored, appName)
+	splitEnable := config.GetValueBoolDefault("server.logger.split.enable", false)
+	splitSize := config.GetValueInt64Default("server.logger.split.size", 300)
+	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize)
 }
 
 func StartServer() {
