@@ -27,7 +27,7 @@ type Job interface {
 
 // The Schedule describes a job's duty cycle.
 type Schedule interface {
-	// Return the next activation time, later than the given time.
+	// Next Return the next activation time, later than the given time.
 	// Next is invoked initially, and then each time the job is run.
 	Next(time.Time) time.Time
 }
@@ -86,7 +86,7 @@ func NewWithLocation(location *time.Location) *Cron {
 	}
 }
 
-// A wrapper that turns a func() into a cron.Job
+// FuncJob A wrapper that turns a func() into a cron.Job
 type FuncJob func()
 
 func (f FuncJob) Run() { f() }
@@ -241,7 +241,7 @@ func (c *Cron) Stop() {
 
 // entrySnapshot returns a copy of the current cron entry list.
 func (c *Cron) entrySnapshot() []*Entry {
-	entries := []*Entry{}
+	var entries []*Entry
 	for _, e := range c.entries {
 		entries = append(entries, &Entry{
 			Schedule: e.Schedule,

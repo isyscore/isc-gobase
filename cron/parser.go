@@ -77,7 +77,7 @@ func NewParser(options ParseOption) Parser {
 // It accepts crontab specs and features configured by NewParser.
 func (p Parser) Parse(spec string) (Schedule, error) {
 	if len(spec) == 0 {
-		return nil, fmt.Errorf("Empty spec string")
+		return nil, fmt.Errorf("empty spec string")
 	}
 	if spec[0] == '@' && p.options&Descriptor > 0 {
 		return parseDescriptor(spec)
@@ -98,9 +98,9 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 	// Validate number of fields
 	if count := len(fields); count < min || count > max {
 		if min == max {
-			return nil, fmt.Errorf("Expected exactly %d fields, found %d: %s", min, count, spec)
+			return nil, fmt.Errorf("expected exactly %d fields, found %d: %s", min, count, spec)
 		}
-		return nil, fmt.Errorf("Expected %d to %d fields, found %d: %s", min, max, count, spec)
+		return nil, fmt.Errorf("expected %d to %d fields, found %d: %s", min, max, count, spec)
 	}
 
 	// Fill in missing fields
@@ -232,7 +232,7 @@ func getRange(expr string, r bounds) (uint64, error) {
 				return 0, err
 			}
 		default:
-			return 0, fmt.Errorf("Too many hyphens: %s", expr)
+			return 0, fmt.Errorf("too many hyphens: %s", expr)
 		}
 	}
 
@@ -250,20 +250,20 @@ func getRange(expr string, r bounds) (uint64, error) {
 			end = r.max
 		}
 	default:
-		return 0, fmt.Errorf("Too many slashes: %s", expr)
+		return 0, fmt.Errorf("too many slashes: %s", expr)
 	}
 
 	if start < r.min {
-		return 0, fmt.Errorf("Beginning of range (%d) below minimum (%d): %s", start, r.min, expr)
+		return 0, fmt.Errorf("beginning of range (%d) below minimum (%d): %s", start, r.min, expr)
 	}
 	if end > r.max {
-		return 0, fmt.Errorf("End of range (%d) above maximum (%d): %s", end, r.max, expr)
+		return 0, fmt.Errorf("end of range (%d) above maximum (%d): %s", end, r.max, expr)
 	}
 	if start > end {
-		return 0, fmt.Errorf("Beginning of range (%d) beyond end of range (%d): %s", start, end, expr)
+		return 0, fmt.Errorf("beginning of range (%d) beyond end of range (%d): %s", start, end, expr)
 	}
 	if step == 0 {
-		return 0, fmt.Errorf("Step of range should be a positive number: %s", expr)
+		return 0, fmt.Errorf("step of range should be a positive number: %s", expr)
 	}
 
 	return getBits(start, end, step) | extra, nil
@@ -283,10 +283,10 @@ func parseIntOrName(expr string, names map[string]uint) (uint, error) {
 func mustParseInt(expr string) (uint, error) {
 	num, err := strconv.Atoi(expr)
 	if err != nil {
-		return 0, fmt.Errorf("Failed to parse int from %s: %s", expr, err)
+		return 0, fmt.Errorf("failed to parse int from %s: %s", expr, err)
 	}
 	if num < 0 {
-		return 0, fmt.Errorf("Negative number (%d) not allowed: %s", num, expr)
+		return 0, fmt.Errorf("negative number (%d) not allowed: %s", num, expr)
 	}
 
 	return uint(num), nil
@@ -371,10 +371,10 @@ func parseDescriptor(descriptor string) (Schedule, error) {
 	if strings.HasPrefix(descriptor, every) {
 		duration, err := time.ParseDuration(descriptor[len(every):])
 		if err != nil {
-			return nil, fmt.Errorf("Failed to parse duration %s: %s", descriptor, err)
+			return nil, fmt.Errorf("failed to parse duration %s: %s", descriptor, err)
 		}
 		return Every(duration), nil
 	}
 
-	return nil, fmt.Errorf("Unrecognized descriptor: %s", descriptor)
+	return nil, fmt.Errorf("unrecognized descriptor: %s", descriptor)
 }

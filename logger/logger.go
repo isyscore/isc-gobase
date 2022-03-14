@@ -27,10 +27,6 @@ package logger
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/cron"
-	"github.com/isyscore/isc-gobase/time"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"io"
 	"os"
 	"path/filepath"
@@ -38,6 +34,12 @@ import (
 	"strconv"
 	"strings"
 	t0 "time"
+
+	"github.com/isyscore/isc-gobase/cron"
+	f0 "github.com/isyscore/isc-gobase/file"
+	"github.com/isyscore/isc-gobase/time"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func Info(format string, v ...any) {
@@ -92,7 +94,7 @@ func callerMarshalFunc(file string, l int) string {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
+func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64) {
 	//日志级别设置，默认Info
 	zerolog.ErrorHandler = func(err error) {
 		// do nothing
@@ -109,7 +111,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string) {
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out)
+	initLogDir(out, splitEnable, splitSize)
 
 }
 
@@ -134,11 +136,11 @@ func closeFileLevelWriter(writers []io.Writer) {
 			continue
 		}
 		if fw, ok := w.(*FileLevelWriter); ok {
-			fw.Close()
+			_ = fw.Close()
 			fi, _ := os.Stat(fw.File.Name())
 			if fi != nil && fi.Size() == 0 {
 				println("删除空文件", fi.Name())
-				os.Remove(fw.File.Name())
+				_ = os.Remove(fw.File.Name())
 			}
 		}
 	}
@@ -166,27 +168,19 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int) *FileLev
 		logFile = strings.ReplaceAll(logFile, ".log", fmt.Sprintf(".%d.log", idx))
 	}
 	//建立软链
-	if _, err := os.Stat(linkName); err != nil {
-		if !os.IsNotExist(err) {
-			if err = os.Remove(linkName); err != nil {
-				fmt.Printf("链接文件删除失败：%v\n", err)
-			}
-		}
-		if runtime.GOOS != "windows" {
-			if err = os.Symlink(logFile, linkName); err != nil {
-				fmt.Printf("链接文件创建失败：%v\n", err)
-			}
-		} else {
-			os.Link(logFile, linkName)
-		}
 
+	if f0.FileExists(linkName) {
+		f0.DeleteFile(linkName)
 	}
+
+	if strings.ToLower(runtime.GOOS) != "windows" {
+		_ = os.Symlink(logFile, linkName)
+	} else {
+		_ = os.Link(logFile, linkName)
+	}
+
 	//打开创建流
-	file1, err := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0666)
-	if err != nil {
-		fmt.Printf("日志文件创建失败%v\n", err)
-		return nil
-	}
+	file1, _ := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0644)
 	return &FileLevelWriter{file1, level}
 
 }
@@ -213,35 +207,38 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level) {
 var oldWriter []io.Writer
 
 //initLogDir create log dir and file
-func initLogDir(out zerolog.ConsoleWriter) {
+func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64) {
 	fileHandler := func() { updateOuters(out, 0, levels) }
 	fileHandler()
+
 	//每天创建一个文件
 	c_d := cron.New()
-	c_d.AddFunc("0 0 0 * * ?", fileHandler)
+	_ = c_d.AddFunc("0 0 0 * * ?", fileHandler)
 	c_d.Start()
 
-	c_check := cron.New()
-	c_check.AddFunc("*/1 * * * * ?", func() {
-		//检查文件大小，如果超过核定大小，则生成新文件
-		go func() {
-			for _, w := range oldWriter {
-				if fw, ok := w.(*FileLevelWriter); ok {
-					//判断文件大小,默认300M
-					if fi, _ := os.Stat(fw.File.Name()); fi != nil && fi.Size() >= 300<<20 {
-						name := fi.Name()
-						idxs := strings.Split(name, ".")
-						idx := 0
-						if len(idxs) == 3 {
-							idx, _ = strconv.Atoi(idxs[1])
-						} else if len(idxs) > 3 {
-							idx, _ = strconv.Atoi(idxs[len(idxs)-2])
+	if splitEnable {
+		c_check := cron.New()
+		_ = c_check.AddFunc("*/1 * * * * ?", func() {
+			//检查文件大小，如果超过核定大小，则生成新文件
+			go func() {
+				for _, w := range oldWriter {
+					if fw, ok := w.(*FileLevelWriter); ok {
+						//判断文件大小,默认300M
+						if fi, _ := os.Stat(fw.File.Name()); fi != nil && fi.Size() >= (splitSize<<20) {
+							name := fi.Name()
+							idxs := strings.Split(name, ".")
+							idx := 0
+							if len(idxs) == 3 {
+								idx, _ = strconv.Atoi(idxs[1])
+							} else if len(idxs) > 3 {
+								idx, _ = strconv.Atoi(idxs[len(idxs)-2])
+							}
+							updateOuters(out, idx+1, []zerolog.Level{fw.level})
 						}
-						updateOuters(out, idx+1, []zerolog.Level{fw.level})
 					}
 				}
-			}
-		}()
-	})
-	c_check.Start()
+			}()
+		})
+		c_check.Start()
+	}
 }
