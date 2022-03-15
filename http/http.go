@@ -2,9 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/isyscore/isc-gobase/logger"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"reflect"
@@ -80,7 +80,7 @@ func GetSimpleOfStandard(url string) ([]byte, error) {
 func Get(url string, header http.Header, parameterMap map[string]string) ([]byte, error) {
 	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
@@ -94,7 +94,7 @@ func Get(url string, header http.Header, parameterMap map[string]string) ([]byte
 func GetOfStandard(url string, header http.Header, parameterMap map[string]string) ([]byte, error) {
 	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
@@ -114,7 +114,7 @@ func HeadSimple(url string) error {
 func Head(url string, header http.Header, parameterMap map[string]string) error {
 	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return err
 	}
 
@@ -140,14 +140,14 @@ func Post(url string, header http.Header, parameterMap map[string]string, body a
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return call(httpRequest, url)
 }
 
@@ -156,14 +156,14 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return callToStandard(httpRequest, url)
 }
 
@@ -182,14 +182,14 @@ func Put(url string, header http.Header, parameterMap map[string]string, body an
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return call(httpRequest, url)
 }
 
@@ -198,14 +198,14 @@ func PutOfStandard(url string, header http.Header, parameterMap map[string]strin
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return callToStandard(httpRequest, url)
 }
 
@@ -222,7 +222,7 @@ func DeleteSimpleOfStandard(url string) ([]byte, error) {
 func Delete(url string, header http.Header, parameterMap map[string]string) ([]byte, error) {
 	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
@@ -236,7 +236,7 @@ func Delete(url string, header http.Header, parameterMap map[string]string) ([]b
 func DeleteOfStandard(url string, header http.Header, parameterMap map[string]string) ([]byte, error) {
 	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
@@ -262,14 +262,14 @@ func Patch(url string, header http.Header, parameterMap map[string]string, body 
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return call(httpRequest, url)
 }
 
@@ -278,30 +278,30 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
-		logger.Error("NewRequest error(%v)", err)
+		log.Printf("NewRequest error(%v)\n", err)
 		return nil, err
 	}
 
 	if header != nil {
 		httpRequest.Header = header
 	}
-	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return callToStandard(httpRequest, url)
 }
 
 func call(httpRequest *http.Request, url string) ([]byte, error) {
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
-		logger.Info("Error sending request to API endpoint. %v", err)
+		log.Printf("Error sending request to API endpoint. %v\n", err)
 		return nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
 		if httpResponse == nil {
-			logger.Info("httpResponse is nil")
+			log.Printf("httpResponse is nil\n")
 			return nil, nil
 		}
 		defer func(Body io.ReadCloser) {
 			err := Body.Close()
 			if err != nil {
-				logger.Info("Body close error(%v)", err)
+				log.Printf("Body close error(%v)\n", err)
 			}
 		}(httpResponse.Body)
 
@@ -314,7 +314,7 @@ func call(httpRequest *http.Request, url string) ([]byte, error) {
 		// We have seen inconsistencies even when we get 200 OK response
 		body, err := ioutil.ReadAll(httpResponse.Body)
 		if err != nil {
-			logger.Error("Couldn't parse response body(%v)", err)
+			log.Printf("Couldn't parse response body(%v)\n", err)
 			return nil, &NetError{ErrMsg: "Couldn't parse response body, err: " + err.Error()}
 		}
 
@@ -328,18 +328,18 @@ func call(httpRequest *http.Request, url string) ([]byte, error) {
 
 func callIgnoreReturn(httpRequest *http.Request, url string) error {
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
-		logger.Info("Error sending request to API endpoint. %v", err)
+		log.Printf("Error sending request to API endpoint. %v\n", err)
 		return &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
 		if httpResponse == nil {
-			logger.Info("httpResponse is nil")
+			log.Printf("httpResponse is nil\n")
 			return nil
 		}
 
 		defer func(Body io.ReadCloser) {
 			err := Body.Close()
 			if err != nil {
-				logger.Info("Body close error(%v)", err)
+				log.Printf("Body close error(%v)\n", err)
 			}
 		}(httpResponse.Body)
 

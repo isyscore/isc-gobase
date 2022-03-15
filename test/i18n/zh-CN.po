@@ -1,0 +1,5 @@
+msgid "hello"
+msgstr "你好"
+msgfmt "hello\nworld"
+msgcn "这是默认的"
+msgf2 "hello %s, %d"
