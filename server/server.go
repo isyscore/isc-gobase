@@ -265,6 +265,6 @@ func getPathAppendApiModel(path string) string {
 	if !strings.HasPrefix(path, "/") {
 		return apiModel + path
 	} else {
-		return apiModel + path[:len(path)-1]
+		return apiModel + path[1:]
 	}
 }
