@@ -175,7 +175,41 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 		engine.GET(path, handler)
 		engine.POST(path, handler)
 	}
+}
 
+func RegisterRouteWith(path string, method HttpMethod, header string, versionName string, handler gin.HandlerFunc) {
+	if !checkEngine() {
+		return
+	}
+	p := GetApiPath(path, method)
+	if p == nil {
+		p = NewApiPath(path, method)
+		switch method {
+		case HmAll:
+			engine.GET(path, p.Handler)
+			engine.POST(path, p.Handler)
+			engine.PUT(path, p.Handler)
+			engine.DELETE(path, p.Handler)
+			engine.OPTIONS(path, p.Handler)
+			engine.HEAD(path, p.Handler)
+		case HmGet:
+			engine.GET(path, p.Handler)
+		case HmPost:
+			engine.POST(path, p.Handler)
+		case HmPut:
+			engine.PUT(path, p.Handler)
+		case HmDelete:
+			engine.DELETE(path, p.Handler)
+		case HmOptions:
+			engine.OPTIONS(path, p.Handler)
+		case HmHead:
+			engine.HEAD(path, p.Handler)
+		case HmGetPost:
+			engine.GET(path, p.Handler)
+			engine.POST(path, p.Handler)
+		}
+	}
+	p.AddVersion(header, versionName, handler)
 }
 
 func RegisterWebSocketRoute(path string, svr *websocket.Server) {
