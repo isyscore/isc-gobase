@@ -16,6 +16,7 @@ import (
 )
 
 var appProperty *ApplicationProperty
+var configExist = false
 
 func LoadConfig() {
 	LoadConfigFromRelativePath("")
@@ -89,6 +90,10 @@ type EnvProperty struct {
 	Value string
 }
 
+func ExistConfigFile() bool {
+	return configExist
+}
+
 func GetConfigValues(c *gin.Context) {
 	if nil != appProperty {
 		c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(appProperty.ValueMap)))
@@ -132,7 +137,6 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		log.Printf("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
 		return
 	}
 
@@ -154,15 +158,19 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 
 		// 默认配置
 		if "application.yaml" == fileName {
+			configExist = true
 			LoadYamlFile(resourceAbsPath + "application.yaml")
 			break
 		} else if "application.yml" == fileName {
+			configExist = true
 			LoadYamlFile(resourceAbsPath + "application.yml")
 			break
 		} else if "application.properties" == fileName {
+			configExist = true
 			LoadPropertyFile(resourceAbsPath + "application.properties")
 			break
 		} else if "application.json" == fileName {
+			configExist = true
 			LoadJsonFile(resourceAbsPath + "application.json")
 			break
 		}
@@ -173,15 +181,19 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 				extend := getFileExtension(fileName)
 				extend = strings.ToLower(extend)
 				if "yaml" == extend {
+					configExist = true
 					LoadYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "yml" == extend {
+					configExist = true
 					LoadYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "properties" == extend {
+					configExist = true
 					LoadPropertyFile(resourceAbsPath + fileName)
 					break
 				} else if "json" == extend {
+					configExist = true
 					LoadJsonFile(resourceAbsPath + fileName)
 					break
 				}

@@ -39,6 +39,16 @@ func init() {
 
 	config.LoadConfig()
 
+	if config.ExistConfigFile() && config.GetValueBoolDefault("server.enable", true) {
+		InitServer()
+	}
+}
+
+func InitServer() {
+	if !config.ExistConfigFile() {
+		logger.Error("没有找到任何配置文件，服务启动失败")
+		return
+	}
 	mode := config.GetValueString("server.gin.mode")
 	if "debug" == mode {
 		gin.SetMode(gin.DebugMode)
