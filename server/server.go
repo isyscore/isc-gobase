@@ -150,9 +150,9 @@ func checkEngine() bool {
 	}
 	return true
 }
-func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
+func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) gin.IRoutes {
 	if !checkEngine() {
-		return
+		return engine
 	}
 	switch method {
 	case HmAll:
@@ -178,78 +178,79 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 		engine.GET(path, handler)
 		engine.POST(path, handler)
 	}
-
+	return engine
 }
 
-func RegisterWebSocketRoute(path string, svr *websocket.Server) {
+func RegisterWebSocketRoute(path string, svr *websocket.Server) gin.IRoutes {
 	if !checkEngine() {
-		return
+		return engine
 	}
 	engine.GET(path, svr.Handler())
+	return engine
 }
 
-func Post(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmPost, handler)
+func Post(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmPost, handler)
 }
 
-func PostApiModel(path string, handler gin.HandlerFunc) {
-	Post(getPathAppendApiModel(path), handler)
+func PostApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Post(getPathAppendApiModel(path), handler)
 }
 
-func Delete(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmDelete, handler)
+func Delete(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmDelete, handler)
 }
 
-func DeleteApiModel(path string, handler gin.HandlerFunc) {
-	Delete(getPathAppendApiModel(path), handler)
+func DeleteApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Delete(getPathAppendApiModel(path), handler)
 }
 
-func Put(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmPut, handler)
+func Put(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmPut, handler)
 }
 
-func PutApiModel(path string, handler gin.HandlerFunc) {
-	Put(getPathAppendApiModel(path), handler)
+func PutApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Put(getPathAppendApiModel(path), handler)
 }
 
-func Head(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmHead, handler)
+func Head(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmHead, handler)
 }
 
-func HeadApiModel(path string, handler gin.HandlerFunc) {
-	Head(getPathAppendApiModel(path), handler)
+func HeadApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Head(getPathAppendApiModel(path), handler)
 }
 
-func Get(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmGet, handler)
+func Get(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmGet, handler)
 }
 
-func GetApiModel(path string, handler gin.HandlerFunc) {
-	Get(getPathAppendApiModel(path), handler)
+func GetApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Get(getPathAppendApiModel(path), handler)
 }
 
-func Options(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmOptions, handler)
+func Options(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmOptions, handler)
 }
 
-func OptionsApiModel(path string, handler gin.HandlerFunc) {
-	Options(getPathAppendApiModel(path), handler)
+func OptionsApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return Options(getPathAppendApiModel(path), handler)
 }
 
-func GetPost(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmGetPost, handler)
+func GetPost(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmGetPost, handler)
 }
 
-func GetPostApiModel(path string, handler gin.HandlerFunc) {
-	GetPost(getPathAppendApiModel(path), handler)
+func GetPostApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return GetPost(getPathAppendApiModel(path), handler)
 }
 
-func All(path string, handler gin.HandlerFunc) {
-	RegisterRoute(path, HmAll, handler)
+func All(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRoute(path, HmAll, handler)
 }
 
-func AllApiModel(path string, handler gin.HandlerFunc) {
-	All(getPathAppendApiModel(path), handler)
+func AllApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
+	return All(getPathAppendApiModel(path), handler)
 }
 
 func getPathAppendApiModel(path string) string {
