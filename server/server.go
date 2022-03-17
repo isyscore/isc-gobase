@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/server/rsp"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -50,6 +51,11 @@ func init() {
 
 	engine = gin.New()
 	engine.Use(Cors(), gin.Recovery())
+
+	// 注册 异常返回值打印
+	if config.GetValueBoolDefault("server.exception.print.enable", true) {
+		engine.Use(rsp.ResponseHandler(config.GetValueArrayInt("server.exception.print.except")...))
+	}
 
 	ap := config.GetValueStringDefault("base.api.prefix", "")
 	if ap != "" {

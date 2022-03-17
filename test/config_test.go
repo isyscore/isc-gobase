@@ -25,6 +25,6 @@ func TestReadDefault(t *testing.T) {
 func TestReadDefault2(t *testing.T) {
 	config.LoadConfig()
 
-	fmt.Println(config.GetValueString("one.name"))
-	fmt.Println("xxx")
+	//fmt.Println(config.GetValueString("one.name"))
+	fmt.Println(config.GetValueArrayInt("server.exception.print.except"))
 }

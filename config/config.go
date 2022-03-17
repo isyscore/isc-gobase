@@ -672,6 +672,35 @@ func GetValueObject(key string, targetPtrObj any) error {
 	return nil
 }
 
+func GetValueArray(key string) []interface{} {
+	if nil == appProperty {
+		return nil
+	}
+
+	var arrayResult = []interface{}{}
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, &arrayResult)
+	if err != nil {
+		return arrayResult
+	}
+	return arrayResult
+}
+
+// todo 后续用泛型
+func GetValueArrayInt(key string) []int {
+	if nil == appProperty {
+		return nil
+	}
+
+	var arrayResult = []int{}
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, &arrayResult)
+	if err != nil {
+		return arrayResult
+	}
+	return arrayResult
+}
+
 func GetValue(key string) any {
 	if nil == appProperty {
 		return nil

@@ -59,3 +59,11 @@ func TestApiVersion(t *testing.T) {
 	})
 	server.StartServer()
 }
+
+func TestErrorPrint(t *testing.T) {
+	fmt.Printf("step 3\n")
+	server.RegisterRoute("/api/data", server.HmGet, func(c *gin.Context) {
+		c.Data(300, "text/plain", []byte("hello 3.0"))
+	})
+	server.StartServer()
+}
