@@ -686,7 +686,6 @@ func GetValueArray(key string) []interface{} {
 	return arrayResult
 }
 
-// todo 后续用泛型
 func GetValueArrayInt(key string) []int {
 	if nil == appProperty {
 		return nil
