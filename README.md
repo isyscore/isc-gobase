@@ -1,19 +1,23 @@
 # isc-gobase
 
-isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践中沉淀总结的一套至简化web框架。遵从大道至简原则，让开发者在工程化项目中快速上手，并使用go写代码
+isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践中沉淀总结的一套至简化工具框架。遵从大道至简原则，让开发者在开发go的项目方面使用更简单
 
-### 下载
+## 下载
 ```shell
 go get github.com/isyscore/isc-gobase
 ```
 
-### 快速入门
+## 快速入门
+isc-gobase定位是工具框架，包含各种各样的工具，并对开发中的各种常用的方法进行封装。也包括web方面的工具
+### web项目
 创建`main.go`文件和同目录的`application.yml` 文件
 
 ```yaml
 # application.yml 内容
 api-module: api/app/sample
 server:
+  # 是否启用，默认：true
+  enable: false
   # 端口号
   port: 8080
   gin:
@@ -50,6 +54,13 @@ func main() {
     })
     server.Run()
 }
+```
+### 非 web 项目
+对于非web项目，isc-gobase是作为一个纯工具使用。可以不使用配置文件，也可以使用配置文件不启用server服务
+```yaml
+server:
+  # 不启用server，默认：true
+  enable: false
 ```
 
 ### 各包的用法
