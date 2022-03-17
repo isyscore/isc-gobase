@@ -1,0 +1,3 @@
+msgid "hello"
+msgstr "Hello Again"
+msgfmt "hello english world"

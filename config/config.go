@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/isc"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -38,14 +38,14 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 
 	// 加载内部配置
 	if err := GetValueObject("server", &ServerCfg); err != nil {
-		log.Error().Msgf("加载 Server 配置失败(%v)", err)
+		log.Printf("加载 Server 配置失败(%v)\n", err)
 	}
 	if err := GetValueObject("base", &BaseCfg); err != nil {
-		log.Error().Msgf("加载 Base 配置失败(%v)", err)
+		log.Printf("加载 Base 配置失败(%v)", err)
 	}
 
 	if err := GetValueObject("log", &LogCfg); err != nil {
-		log.Error().Msgf("加载 Log 配置失败(%v)", err)
+		log.Printf("加载 Log 配置失败(%v)", err)
 	}
 }
 
@@ -118,7 +118,7 @@ func UpdateConfig(c *gin.Context) {
 	envProperty := EnvProperty{}
 	err := isc.DataToObject(c.Request.Body, &envProperty)
 	if err != nil {
-		log.Warn().Msgf("解析失败，%v", err.Error())
+		log.Printf("解析失败，%v", err.Error())
 		return
 	}
 
@@ -132,7 +132,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		log.Warn().Msgf("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
+		log.Printf("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
 		return
 	}
 
@@ -228,7 +228,7 @@ func getFileExtension(fileName string) string {
 func LoadYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("读取文件失败(%v)", err)
+		// log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -247,7 +247,7 @@ func LoadYamlFile(filePath string) {
 func AppendYamlFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("读取文件失败(%v)", err)
+		// log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -265,7 +265,7 @@ func AppendYamlFile(filePath string) {
 func LoadPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("读取文件失败(%v)", err)
+		// log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -284,7 +284,7 @@ func LoadPropertyFile(filePath string) {
 func AppendPropertyFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("读取文件失败(%v)", err)
+		// log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -301,7 +301,7 @@ func AppendPropertyFile(filePath string) {
 func LoadJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("读取文件失败(%v)", err)
+		// log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -321,7 +321,7 @@ func LoadJsonFile(filePath string) {
 func AppendJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Warn().Msgf("fail to read file:", err)
+		log.Printf("fail to read file:", err)
 		return
 	}
 
@@ -718,7 +718,7 @@ func LoadYamlConfig(fileName string, AConfig any, handler func(data []byte, ACon
 func LoadYamlConfigByAbsolutPath(path string, AConfig any, handler func(data []byte, AConfig any) error) error {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Error().Msgf("读取文件异常(%v)", err)
+		log.Printf("读取文件异常(%v)", err)
 	}
 	return handler(data, AConfig)
 }
@@ -732,7 +732,7 @@ func LoadSpringConfig(AConfig any) {
 	_ = LoadYamlConfig("application.yml", AConfig, func(data []byte, AConfig any) error {
 		err := yaml.Unmarshal(data, AConfig)
 		if err != nil {
-			log.Error().Msgf("读取 application.yml 异常(%v)", err)
+			log.Printf("读取 application.yml 异常(%v)", err)
 			return err
 		}
 		v1 := reflect.ValueOf(AConfig).Elem()
@@ -744,12 +744,12 @@ func LoadSpringConfig(AConfig any) {
 		if act != "" && act != "default" {
 			yamlAdditional, err := ioutil.ReadFile(fmt.Sprintf("./application-%s.yml", act))
 			if err != nil {
-				log.Error().Msgf("读取 application-%s.yml 失败", act)
+				log.Printf("读取 application-%s.yml 失败", act)
 				return err
 			} else {
 				err = yaml.Unmarshal(yamlAdditional, AConfig)
 				if err != nil {
-					log.Error().Msgf("读取 application-%s.yml 异常", act)
+					log.Printf("读取 application-%s.yml 异常", act)
 					return err
 				}
 			}

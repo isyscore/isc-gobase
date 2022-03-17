@@ -223,3 +223,7 @@ func SecondSpan(now, then t0.Time) float64 {
 func MilliSecondSpan(now, then t0.Time) int64 {
 	return now.Sub(then).Milliseconds()
 }
+
+func Now() t0.Time {
+	return t0.Now()
+}

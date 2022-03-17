@@ -69,7 +69,9 @@ func init() {
 	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
 	colored := config.GetValueBoolDefault("server.logger.color.enable", false)
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
-	logger.InitLog(level, timeFieldFormat, colored, appName)
+	splitEnable := config.GetValueBoolDefault("server.logger.split.enable", false)
+	splitSize := config.GetValueInt64Default("server.logger.split.size", 300)
+	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize)
 }
 
 func Run() {
@@ -181,12 +183,47 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) gin.
 	return engine
 }
 
-func RegisterWebSocketRoute(path string, svr *websocket.Server) gin.IRoutes {
+func RegisterRouteWith(path string, method HttpMethod, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
 	if !checkEngine() {
 		return engine
 	}
-	engine.GET(path, svr.Handler())
+	p := GetApiPath(path, method)
+	if p == nil {
+		p = NewApiPath(path, method)
+		switch method {
+		case HmAll:
+			engine.GET(path, p.Handler)
+			engine.POST(path, p.Handler)
+			engine.PUT(path, p.Handler)
+			engine.DELETE(path, p.Handler)
+			engine.OPTIONS(path, p.Handler)
+			engine.HEAD(path, p.Handler)
+		case HmGet:
+			engine.GET(path, p.Handler)
+		case HmPost:
+			engine.POST(path, p.Handler)
+		case HmPut:
+			engine.PUT(path, p.Handler)
+		case HmDelete:
+			engine.DELETE(path, p.Handler)
+		case HmOptions:
+			engine.OPTIONS(path, p.Handler)
+		case HmHead:
+			engine.HEAD(path, p.Handler)
+		case HmGetPost:
+			engine.GET(path, p.Handler)
+			engine.POST(path, p.Handler)
+		}
+	}
+	p.AddVersion(header, versionName, handler)
 	return engine
+}
+
+func RegisterWebSocketRoute(path string, svr *websocket.Server) {
+	if !checkEngine() {
+		return
+	}
+	engine.GET(path, svr.Handler())
 }
 
 func Post(path string, handler gin.HandlerFunc) gin.IRoutes {
