@@ -177,7 +177,7 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) {
 	}
 }
 
-func RegisterRouteWith(path string, method HttpMethod, header string, versionName string, handler gin.HandlerFunc) {
+func RegisterRouteWithHeader(path string, method HttpMethod, header []string, versionName []string, handler gin.HandlerFunc) {
 	if !checkEngine() {
 		return
 	}

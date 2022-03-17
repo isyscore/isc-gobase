@@ -49,15 +49,15 @@ func TestServer(t *testing.T) {
 func TestApiVersion(t *testing.T) {
 	server.InitServer()
 	fmt.Printf("step 1\n")
-	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "1.0", func(c *gin.Context) {
+	server.RegisterRouteWithHeader("/api/sample", server.HmGet, []string{"isc-api-version"}, []string{"1.0"}, func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 1.0"))
 	})
 	fmt.Printf("step 2\n")
-	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "2.0", func(c *gin.Context) {
+	server.RegisterRouteWithHeader("/api/sample", server.HmGet, []string{"isc-api-version"}, []string{"2.0"}, func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 2.0"))
 	})
 	fmt.Printf("step 3\n")
-	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "3.0", func(c *gin.Context) {
+	server.RegisterRouteWithHeader("/api/sample", server.HmGet, []string{"isc-api-version"}, []string{"3.0"}, func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 3.0"))
 	})
 	server.StartServer()
