@@ -45,7 +45,6 @@ func TestServer(t *testing.T) {
 }
 
 func TestApiVersion(t *testing.T) {
-	server.InitServer()
 	fmt.Printf("step 1\n")
 	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "1.0", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 1.0"))

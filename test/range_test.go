@@ -10,7 +10,7 @@ func TestRange(t *testing.T) {
 	om.Put("a", "1")
 	om.Put("b", "2")
 	om.Put("c", "3")
-	for _, item := range isc.OrderMap(om) {
+	for _, item := range isc.OrderMapToList(om) {
 		t.Logf("%s: %s", item.Key, item.Value)
 	}
 
