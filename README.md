@@ -12,7 +12,7 @@ go get github.com/isyscore/isc-gobase
 
 ```yaml
 # application.yml 内容
-api-module: api/app/demo
+api-module: api/app/sample
 server:
   # 端口号
   port: 8080
@@ -23,7 +23,7 @@ server:
 base:
   application:
     # 应用名称
-    name: isc-demo
+    name: sample
   endpoint:
     # 健康检查处理，默认关闭，true/false
     health:
@@ -48,12 +48,14 @@ func main() {
 ```
 
 ### 各包的用法
-
-[config 用法](/config)<br/>
-[validate 用法](/validate)
-
-
-
-
-
+|包名        | 简介 |
+| --------   | :----: |
+| [isc](/isc)| 基础工具（待更新）|
+| [config](/config)| 配置文件管理|
+| [validate](/validate)|校验核查 |
+| [logger](/logger)| 日志（待更新） |
+| [coder](/coder)| 编解码（待更新） |
+| [database](/database)|数据库处理（待更新） |
+| [file](/file)| 文件处理（待更新） |
+| [http](/http)| http处理（待更新） |
 
