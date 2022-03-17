@@ -220,7 +220,6 @@ func TestRangeInt3(t *testing.T) {
 // 测试整数类型4
 func TestRangeInt4(t *testing.T) {
 
-	// todo 测试数据的判断异常情况
 	//测试 正常情况
 	//value = RangeIntEntity4{Age: 3}
 	//result, err = validate.Check(value, "age")

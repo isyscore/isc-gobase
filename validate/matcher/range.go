@@ -276,7 +276,6 @@ func parseRange(fieldKind reflect.Kind, subCondition string) *RangeEntity {
 			beginNum := parseNum(fieldKind, begin)
 			endNum := parseNum(fieldKind, end)
 
-			// todo 核查beginNum和endNum
 			return &RangeEntity{beginAli: beginAli, begin: beginNum, end: endNum, endAli: endAli, dateFlag: true}
 		} else if (begin != "" && timePlusRegex.MatchString(begin)) || (end != "" && timePlusRegex.MatchString(end)) {
 			// 解析动态时间
