@@ -43,6 +43,11 @@ func main() {
     server.RegisterRoute("/api/app/demo/get/data", server.HmGet, func(c *gin.Context) {
         c.Data(200, "application/json; charset=utf-8", []byte("ok"))
     })
+
+    // 简化版，自动添加api-model
+    server.GetApiModel("/demo/get/data", func(c *gin.Context) {
+        c.Data(200, "application/json; charset=utf-8", []byte("ok"))
+    })
     server.Run()
 }
 ```
