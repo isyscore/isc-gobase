@@ -3,6 +3,17 @@
 server包是用于更加方便的开发web项目而封装的包，开启配置的话，如下
 
 ```go
+// main.go 文件
+import (
+    "github.com/gin-gonic/gin"
+    "github.com/isyscore/isc-gobase/server"
+    "github.com/isyscore/isc-gobase/server/rsp"
+)
+
+func main() {
+    server.Get("group1/data", GetData)
+    server.Run()
+}
 
 ```
 
@@ -26,4 +37,14 @@ base:
         except:
           - 408
           - 409
+  # 内部开放的 endpoint
+  endpoint:
+    # 健康检查处理，默认关闭，true/false
+    health:
+      enable: true
+    # 配置的管理（查看和变更），默认关闭，true/false
+    config:
+      enable: true
 ```
+
+

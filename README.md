@@ -14,10 +14,12 @@ isc-gobase定位是工具框架，包含各种各样的工具，并对开发中�
 
 ```yaml
 # application.yml 内容
-# api前缀
-api-module: api/app/sample
+api-module: app/sample
 
 base:
+  api:
+    # api前缀
+    prefix: /api
   application:
     # 应用名称
     name: sample
@@ -30,39 +32,36 @@ base:
     gin:
       # 有三种模式：debug/release/test
       mode: debug
-  endpoint:
-    # 健康检查处理，默认关闭，true/false
-    health:
-      enable: true
-    # 配置的动态实时变更，默认关闭，true/false
-    config:
-      enable: true
 ```
 ```go
-// main.go 文件
 import (
-  "github.com/gin-gonic/gin"
-  "github.com/isyscore/isc-gobase/server"
+    "github.com/gin-gonic/gin"
+    "github.com/isyscore/isc-gobase/server"
+    "github.com/isyscore/isc-gobase/server/rsp"
 )
 
 func main() {
-    server.RegisterRoute("/api/app/demo/get/data", server.HmGet, func(c *gin.Context) {
-        c.Data(200, "application/json; charset=utf-8", []byte("ok"))
-    })
-
-    // 简化版，自动添加api-model
-    server.GetApiModel("/demo/get/data", func(c *gin.Context) {
-        c.Data(200, "application/json; charset=utf-8", []byte("ok"))
-    })
+    server.Get("group1/data", GetData)
     server.Run()
 }
+
+func GetData(c *gin.Context) {
+    rsp.SuccessOfStandard(c, "ok")
+}
+```
+运行如下
+```shell
+root@user ~> curl http://localhost:8080/api/app/sample/group1/data
+{"code":"success","data":"ok","message":"成功"}
 ```
 ### 非 web 项目
-对于非web项目，isc-gobase是作为一个纯工具使用。可以不使用配置文件，如果想使用config包的功能，但是不启用server，那么可以关闭server
+对于非web项目，isc-gobase是作为一个纯工具使用。这时候要分情况
+- 不使用config包，则不需要添加 application.yml 文件
+- 使用config包，不启动server，则将base.server.enable关闭
 ```yaml
 base:
   server:
-    # 不启用server，默认：true
+    # 是否启用server，默认：true
     enable: false
 ```
 

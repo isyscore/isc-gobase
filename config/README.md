@@ -27,8 +27,11 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 ### 4. 内置的配置文件自动加载
 目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
 ```yaml
-api-module: api/xxx
+api-module: sample
 base:
+  api:
+    # api前缀
+    prefix: /api
   application:
     # 应用名称
     name: sample
