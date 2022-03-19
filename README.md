@@ -14,20 +14,22 @@ isc-gobase定位是工具框架，包含各种各样的工具，并对开发中�
 
 ```yaml
 # application.yml 内容
+# api前缀
 api-module: api/app/sample
-server:
-  # 是否启用，默认：true
-  enable: false
-  # 端口号
-  port: 8080
-  gin:
-    # 有三种模式：debug/release/test
-    mode: debug
 
 base:
   application:
     # 应用名称
     name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8080
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: debug
   endpoint:
     # 健康检查处理，默认关闭，true/false
     health:
@@ -56,11 +58,12 @@ func main() {
 }
 ```
 ### 非 web 项目
-对于非web项目，isc-gobase是作为一个纯工具使用。可以不使用配置文件，也可以使用配置文件不启用server服务
+对于非web项目，isc-gobase是作为一个纯工具使用。可以不使用配置文件，如果想使用config包的功能，但是不启用server，那么可以关闭server
 ```yaml
-server:
-  # 不启用server，默认：true
-  enable: false
+base:
+  server:
+    # 不启用server，默认：true
+    enable: false
 ```
 
 ### 各包的用法
@@ -69,10 +72,10 @@ server:
 | [isc](/isc)| 基础工具（待更新）|
 | [config](/config)| 配置文件管理|
 | [validate](/validate)|校验核查 |
-| [logger](/logger)| 日志（待更新） |
+| [logger](/logger)| 日志 |
 | [coder](/coder)| 编解码（待更新） |
 | [database](/database)|数据库处理（待更新） |
 | [file](/file)| 文件处理（待更新） |
 | [http](/http)| http处理（待更新） |
-| [server](/server)| 服务处理（待更新） |
+| [server](/server)| 服务处理 |
 

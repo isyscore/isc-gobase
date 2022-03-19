@@ -5,7 +5,6 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 默认该文件与main函数所在的类同目录
 ```go
 // 示例
-- applicaiton.go
 - application.yml
 - application-local.yml
 ```
@@ -23,29 +22,32 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 
 优先级：环境变量 > 本地配置
 
+![img.png](img.png)
+
 ### 4. 内置的配置文件自动加载
 目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
 ```yaml
 api-module: api/xxx
-server:
-  port: xxx
-  lookup: true/false
-  gin:
-    # gin运行的模式
-    mode: debug/release/test
-  
 base:
   application:
-    name: isc-demo-service
-  profiles:
-    active: local
+    # 应用名称
+    name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8080
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: debug
   endpoint:
-    # 健康检查处理，默认关闭
-    health: 
-      enable: true/false
-    # 配置的动态实时变更，默认关闭
+    # 健康检查处理，默认关闭，true/false
+    health:
+      enable: true
+    # 配置的动态实时变更，默认关闭，true/false
     config:
-      enable: true/false
+      enable: true
 ```
 
 
@@ -91,7 +93,7 @@ config.getValueObject("base", &ServerCfg)
 ```
 
 ### 6. 支持文件的绝对和相对路径读取
-配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学
+配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学约定的服务器路径位置
 ```go
 // 相对路径
 config.LoadConfigFromRelativePath(xx)

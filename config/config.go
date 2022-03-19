@@ -37,16 +37,12 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 	// 读取cm文件
 	AppendConfigFromRelativePath("./config/application-default.yml")
 
+	// 加载ApiModule
+	ApiModule = GetValueString("api-module")
+
 	// 加载内部配置
-	if err := GetValueObject("server", &ServerCfg); err != nil {
-		log.Printf("加载 Server 配置失败(%v)\n", err)
-	}
 	if err := GetValueObject("base", &BaseCfg); err != nil {
 		log.Printf("加载 Base 配置失败(%v)", err)
-	}
-
-	if err := GetValueObject("log", &LogCfg); err != nil {
-		log.Printf("加载 Log 配置失败(%v)", err)
 	}
 }
 
@@ -144,8 +140,6 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 		appProperty = &ApplicationProperty{}
 	}
 
-	profile := getActiveProfile()
-
 	for _, file := range files {
 		if file.IsDir() {
 			continue
@@ -175,7 +169,9 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 			break
 		}
 
+		profile := getActiveProfile()
 		if "" != profile {
+			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
 				extend := getFileExtension(fileName)
@@ -200,7 +196,6 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 			}
 		}
 	}
-	SetValue("base.profiles.active", profile)
 }
 
 // 临时写死

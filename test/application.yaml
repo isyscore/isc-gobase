@@ -1,37 +1,49 @@
-api-module: test
-server:
-  port: 31000
-  gin:
-    mode: release
-  logger:
-    level: debug
-    split:
-      enable: true
-      # 单位: M
-      size: 300
-  exception:
-    # 打印异常返回
-    print:
-      # 是否启用：true, false；默认 true
-      enable: true
-      # 一些异常code不打印；默认可不填
-      except:
-        - 301
-        - 409
+api-module: api/app/sample
+
 base:
+  profiles:
+    # 激活环境配置
+    active: local
   application:
-    name: "test"
-  api:
-    prefix: /api/core
+    # 应用名称
+    name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8080
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: debug
+    exception:
+      # 异常返回打印
+      print:
+        # 是否启用：true, false；默认 true
+        enable: true
+        # 一些异常httpStatus不打印；默认可不填
+        except:
+          - 408
+          - 409
   endpoint:
-    # 健康检查处理，默认关闭
+    # 健康检查处理，默认关闭，true/false
     health:
       enable: true
-    # 配置的动态实时变更，默认关闭
+    # 配置的动态实时变更，默认关闭，true/false
     config:
       enable: true
-
-test:
-  arrays:
-    - 12
-    - 43
+  logger:
+    # 日志root级别：trace/debug/info/warn/error/fatal/panic，默认：info
+    level: info
+    time:
+      # 时间格式，time包中的内容
+      format: time.RFC3339
+    # 日志颜色
+    color:
+      # 启用：true/false，默认：false
+      enable: false
+    split:
+      # 日志是否启用切分：true/false，默认false
+      enable: false
+      # 日志拆分的单位：MB
+      size: 300

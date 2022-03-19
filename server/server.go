@@ -39,7 +39,7 @@ func init() {
 
 	config.LoadConfig()
 
-	if config.ExistConfigFile() && config.GetValueBoolDefault("server.enable", true) {
+	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", true) {
 		InitServer()
 	}
 }
@@ -49,7 +49,7 @@ func InitServer() {
 		logger.Error("没有找到任何配置文件，服务启动失败")
 		return
 	}
-	mode := config.GetValueString("server.gin.mode")
+	mode := config.BaseCfg.Server.Gin.Mode
 	if "debug" == mode {
 		gin.SetMode(gin.DebugMode)
 	} else if "test" == mode {
@@ -63,8 +63,8 @@ func InitServer() {
 	engine.Use(Cors(), gin.Recovery())
 
 	// 注册 异常返回值打印
-	if config.GetValueBoolDefault("server.exception.print.enable", true) {
-		engine.Use(rsp.ResponseHandler(config.GetValueArrayInt("server.exception.print.except")...))
+	if config.GetValueBoolDefault("base.server.exception.print.enable", true) {
+		engine.Use(rsp.ResponseHandler(config.BaseCfg.Server.Exception.Print.Except...))
 	}
 
 	ap := config.GetValueStringDefault("base.api.prefix", "")
@@ -74,19 +74,19 @@ func InitServer() {
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
-		RegisterHealthCheckEndpoint(ApiPrefix + "/" + config.GetValueString("api-module"))
+		RegisterHealthCheckEndpoint(ApiPrefix + "/" + config.ApiModule)
 	}
 
 	// 注册 配置检测endpoint
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
-		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.GetValueString("api-module"))
+		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
 	}
-	level := config.GetValueStringDefault("server.logger.level", "info")
-	timeFieldFormat := config.GetValueStringDefault("server.logger.time.format", time.RFC3339)
-	colored := config.GetValueBoolDefault("server.logger.color.enable", false)
+	level := config.GetValueStringDefault("base.logger.level", "info")
+	timeFieldFormat := config.GetValueStringDefault("base.logger.time.format", time.RFC3339)
+	colored := config.GetValueBoolDefault("base.logger.color.enable", false)
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
-	splitEnable := config.GetValueBoolDefault("server.logger.split.enable", false)
-	splitSize := config.GetValueInt64Default("server.logger.split.size", 300)
+	splitEnable := config.GetValueBoolDefault("base.logger.split.enable", false)
+	splitSize := config.GetValueInt64Default("base.logger.split.size", 300)
 	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize)
 }
 
@@ -98,8 +98,13 @@ func StartServer() {
 	if !checkEngine() {
 		return
 	}
+
+	if !config.BaseCfg.Server.Enable {
+		return
+	}
+
 	logger.Info("开始启动服务")
-	port := config.GetValueIntDefault("server.port", 8080)
+	port := config.GetValueIntDefault("base.server.port", 8080)
 	logger.Info("服务端口号: %d", port)
 	err := engine.Run(fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -243,70 +248,71 @@ func RegisterWebSocketRoute(path string, svr *websocket.Server) {
 }
 
 func Post(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmPost, handler)
-}
-
-func PostApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Post(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmPost, handler)
 }
 
 func Delete(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmDelete, handler)
-}
-
-func DeleteApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Delete(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmDelete, handler)
 }
 
 func Put(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmPut, handler)
-}
-
-func PutApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Put(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmPut, handler)
 }
 
 func Head(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmHead, handler)
-}
-
-func HeadApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Head(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmHead, handler)
 }
 
 func Get(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmGet, handler)
-}
-
-func GetApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Get(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmGet, handler)
 }
 
 func Options(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmOptions, handler)
-}
-
-func OptionsApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return Options(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmOptions, handler)
 }
 
 func GetPost(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmGetPost, handler)
-}
-
-func GetPostApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return GetPost(getPathAppendApiModel(path), handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmGetPost, handler)
 }
 
 func All(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return RegisterRoute(path, HmAll, handler)
+	return RegisterRoute(getPathAppendApiModel(path), HmAll, handler)
 }
 
-func AllApiModel(path string, handler gin.HandlerFunc) gin.IRoutes {
-	return All(getPathAppendApiModel(path), handler)
+func PostWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmPost, header, versionName, handler)
+}
+
+func DeleteWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmDelete, header, versionName, handler)
+}
+
+func PutWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmPut, header, versionName, handler)
+}
+
+func HeadWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmHead, header, versionName, handler)
+}
+
+func GetWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmGet, header, versionName, handler)
+}
+
+func OptionsWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmOptions, header, versionName, handler)
+}
+
+func GetPostWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmGetPost, header, versionName, handler)
+}
+
+func AllWith(path string, header string, versionName string, handler gin.HandlerFunc) gin.IRoutes {
+	return RegisterRouteWith(getPathAppendApiModel(path), HmAll, header, versionName, handler)
 }
 
 func getPathAppendApiModel(path string) string {
+	// 获取api前缀
 	apiModel := config.GetValueString("api-module")
 	if !strings.HasPrefix(apiModel, "/") {
 		apiModel = "/" + apiModel
@@ -316,9 +322,23 @@ func getPathAppendApiModel(path string) string {
 		apiModel = apiModel + "/"
 	}
 
+	// 获取api前缀
+	ap := config.GetValueStringDefault("base.api.prefix", "")
+	if ap != "" {
+		ApiPrefix = ap
+	}
+
+	if !strings.HasPrefix(ApiPrefix, "/") {
+		ApiPrefix = "/" + ApiPrefix
+	}
+
+	if strings.HasSuffix(ApiPrefix, "/") {
+		ApiPrefix = ApiPrefix[:len(ApiPrefix)-1]
+	}
+
 	if !strings.HasPrefix(path, "/") {
-		return apiModel + path
+		return ApiPrefix + apiModel + path
 	} else {
-		return apiModel + path[1:]
+		return ApiPrefix + apiModel + path[1:]
 	}
 }
