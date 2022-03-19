@@ -34,6 +34,7 @@ base:
       mode: debug
 ```
 ```go
+//main.go
 import (
     "github.com/gin-gonic/gin"
     "github.com/isyscore/isc-gobase/server"
