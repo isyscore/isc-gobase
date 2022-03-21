@@ -2,10 +2,8 @@ package server
 
 import (
 	"fmt"
-	"io/ioutil"
-	"time"
-
 	"github.com/isyscore/isc-gobase/server/rsp"
+	"io/ioutil"
 
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
@@ -80,7 +78,7 @@ func InitServer() {
 		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
 	}
 	level := config.GetValueStringDefault("base.logger.level", "info")
-	timeFieldFormat := config.GetValueStringDefault("base.logger.time.format", time.RFC3339)
+	timeFieldFormat := config.GetValueStringDefault("base.logger.time.format", "2006-01-02 15:04:05")
 	colored := config.GetValueBoolDefault("base.logger.color.enable", false)
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 	splitEnable := config.GetValueBoolDefault("base.logger.split.enable", false)

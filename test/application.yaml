@@ -3,7 +3,7 @@ api-module: sample
 base:
   profiles:
     # 激活环境配置
-    active: local
+    active: default
   api:
     prefix: /api/app
   application:
