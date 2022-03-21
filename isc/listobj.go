@@ -232,3 +232,7 @@ func (l ISCList[T]) Minus(n []T) ISCList[T] {
 func (l ISCList[T]) Equals(n ISCList[T]) bool {
 	return ListEquals(l, n)
 }
+
+func (l ISCList[T]) ToSet() ISCSet[T] {
+	return NewSetWithList(l)
+}

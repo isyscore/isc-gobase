@@ -1,7 +1,11 @@
 package time
 
 import (
+	"fmt"
+	"log"
 	"math"
+	"regexp"
+	"strings"
 	t0 "time"
 )
 
@@ -28,6 +32,16 @@ var (
 	FmtHms        = "15:04:05"
 	FmtHm         = "15:04"
 	FmtH          = "15"
+
+	EmptyTime = t0.Time{}
+
+	yRegex       = regexp.MustCompile("^(\\d){4}$")
+	ymRegex      = regexp.MustCompile("^(\\d){4}-(\\d){2}$")
+	ymdRegex     = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2}$")
+	ymdHRegex    = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}$")
+	ymdHmRegex   = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}$")
+	ymdHmsRegex  = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}$")
+	ymdHmsSRegex = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}.(\\d){3}$")
 )
 
 type FPCDateTime float64
@@ -226,4 +240,90 @@ func MilliSecondSpan(now, then t0.Time) int64 {
 
 func Now() t0.Time {
 	return t0.Now()
+}
+
+func AddHour(times t0.Time, plusOrMinus string, seconds string) t0.Time {
+	h, _ := t0.ParseDuration(fmt.Sprintf("%s%v", plusOrMinus, seconds))
+	return times.Add(h)
+}
+
+func AddMinutes(times t0.Time, plusOrMinus string, minutes string) t0.Time {
+	h, _ := t0.ParseDuration(fmt.Sprintf("%s%v", plusOrMinus, minutes))
+	return times.Add(h)
+}
+
+func AddSeconds(times t0.Time, plusOrMinus string, hours string) t0.Time {
+	h, _ := t0.ParseDuration(fmt.Sprintf("%s%v", plusOrMinus, hours))
+	return times.Add(h)
+}
+
+func AddDays(times t0.Time, days int) t0.Time {
+	return times.AddDate(0, 0, days)
+}
+
+func AddMonths(times t0.Time, month int) t0.Time {
+	return times.AddDate(0, month, 0)
+}
+
+func AddYears(times t0.Time, year int) t0.Time {
+	return times.AddDate(year, 0, 0)
+}
+
+func ParseTime(timeStr string) t0.Time {
+	timeStr = strings.TrimSpace(timeStr)
+	timeStr = strings.TrimSpace(strings.ReplaceAll(timeStr, "\\'", " "))
+
+	if timeStr == "" {
+		return EmptyTime
+	}
+	if yRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtY, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYM, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymdRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYMd, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymdHRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYMdH, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymdHmRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYMdHm, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymdHmsRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYMdHms, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if ymdHmsSRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYMdHmsSSS, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else {
+		log.Printf("解析时间错误, time: %v", timeStr)
+	}
+	return EmptyTime
+}
+
+func IsTimeEmpty(time t0.Time) bool {
+	return time == EmptyTime
 }

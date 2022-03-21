@@ -24,7 +24,7 @@ func InitI18N(language string) error {
 	return nil
 }
 
-// LoadLanguage 加载指定语言，该语言将优先于默认语言，但是若指定语言中不存在某个key，将会从默认语言读取
+// LoadI18NLanguage 加载指定语言，该语言将优先于默认语言，但是若指定语言中不存在某个key，将会从默认语言读取
 func LoadI18NLanguage(language string) error {
 	pwd, _ := os.Getwd()
 	i18nDir := filepath.Join(pwd, "i18n")

@@ -1,6 +1,4 @@
-package ir
-
-import "github.com/isyscore/isc-gobase/isc"
+package isc
 
 func Int(AStart, AEnd int) []int {
 	var ret []int
@@ -39,7 +37,7 @@ type MapPair[K comparable, V comparable] struct {
 	Value V
 }
 
-func OrderMap[K comparable, V comparable](m isc.OrderMap[K, V]) []MapPair[K, V] {
+func OrderMapToList[K comparable, V comparable](m OrderMap[K, V]) []MapPair[K, V] {
 	var n []MapPair[K, V]
 	for _, key := range m.Keys() {
 		n = append(n, MapPair[K, V]{key, m.Data[key]})

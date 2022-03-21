@@ -87,7 +87,7 @@ func int64ToBytes(i int64) []byte {
 func encodeHex(data []byte, dig []uint8) []uint8 {
 	l := len(data)
 	out := make([]uint8, l<<1)
-	var j int = 0
+	var j = 0
 	for i := 0; i < l; i++ {
 		out[j] = dig[(0xf0&data[i])>>4]
 		j++

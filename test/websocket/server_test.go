@@ -14,7 +14,6 @@ func TestWebSocketServer(t *testing.T) {
 		WriteBufferSize: 1024,
 	})
 	ws.OnConnection(handleConnection)
-	server.InitServer()
 	server.RegisterWebSocketRoute("/ws", ws)
 	server.StartServer()
 }

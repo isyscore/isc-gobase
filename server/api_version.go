@@ -25,7 +25,7 @@ var apiVersionList ISCList[*ApiPath]
 
 func GetApiPath(path string, method HttpMethod) *ApiPath {
 	v := apiVersionList.Find(func(ap *ApiPath) bool {
-		return ap.Path == path
+		return ap.Path == path && ap.Method == method
 	})
 	if v == nil {
 		return nil

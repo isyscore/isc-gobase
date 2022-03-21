@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -17,6 +16,7 @@ import (
 )
 
 var appProperty *ApplicationProperty
+var configExist = false
 
 func LoadConfig() {
 	LoadConfigFromRelativePath("")
@@ -35,19 +35,14 @@ func LoadConfigFromAbsPath(resourceAbsPath string) {
 	doLoadConfigFromAbsPath(resourceAbsPath)
 
 	// 读取cm文件
-	//AppendConfigFromAbsPath("/home/" + GetValueString("base.application.name") + "/config/application-default.yml")
 	AppendConfigFromRelativePath("./config/application-default.yml")
 
+	// 加载ApiModule
+	ApiModule = GetValueString("api-module")
+
 	// 加载内部配置
-	if err := GetValueObject("server", &ServerCfg); err != nil {
-		log.Printf("加载 Server 配置失败(%v)\n", err)
-	}
 	if err := GetValueObject("base", &BaseCfg); err != nil {
 		log.Printf("加载 Base 配置失败(%v)", err)
-	}
-
-	if err := GetValueObject("log", &LogCfg); err != nil {
-		log.Printf("加载 Log 配置失败(%v)", err)
 	}
 }
 
@@ -89,6 +84,10 @@ func AppendConfigFromAbsPath(fileName string) {
 type EnvProperty struct {
 	Key   string
 	Value string
+}
+
+func ExistConfigFile() bool {
+	return configExist
 }
 
 func GetConfigValues(c *gin.Context) {
@@ -134,15 +133,12 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 	files, err := ioutil.ReadDir(resourceAbsPath)
 	if err != nil {
-		log.Printf("读取配置资源失败，路径(%v), 异常(%v)", resourceAbsPath, err.Error())
 		return
 	}
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
 	}
-
-	profile := getActiveProfile()
 
 	for _, file := range files {
 		if file.IsDir() {
@@ -156,58 +152,61 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 
 		// 默认配置
 		if "application.yaml" == fileName {
+			configExist = true
 			LoadYamlFile(resourceAbsPath + "application.yaml")
 			break
 		} else if "application.yml" == fileName {
+			configExist = true
 			LoadYamlFile(resourceAbsPath + "application.yml")
 			break
 		} else if "application.properties" == fileName {
+			configExist = true
 			LoadPropertyFile(resourceAbsPath + "application.properties")
 			break
 		} else if "application.json" == fileName {
+			configExist = true
 			LoadJsonFile(resourceAbsPath + "application.json")
 			break
 		}
 
+		profile := getActiveProfile()
 		if "" != profile {
+			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
 				extend := getFileExtension(fileName)
 				extend = strings.ToLower(extend)
 				if "yaml" == extend {
+					configExist = true
 					LoadYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "yml" == extend {
+					configExist = true
 					LoadYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "properties" == extend {
+					configExist = true
 					LoadPropertyFile(resourceAbsPath + fileName)
 					break
 				} else if "json" == extend {
+					configExist = true
 					LoadJsonFile(resourceAbsPath + fileName)
 					break
 				}
 			}
 		}
 	}
-	SetValue("base.actives.profile", profile)
 }
 
 // 临时写死
-// 优先级：本地配置 > 启动参数 > 环境变量
+// 优先级：环境变量 > 本地配置
 func getActiveProfile() string {
-	profile := GetValueString("base.actives.profile")
+	profile := os.Getenv("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
 
-	flag.StringVar(&profile, "base.actives.profile", "", "环境变量")
-	flag.Parse()
-	if "" != profile {
-		return profile
-	}
-
-	profile = os.Getenv("base.actives.profile")
+	profile = GetValueString("base.profiles.active")
 	if "" != profile {
 		return profile
 	}
@@ -329,7 +328,7 @@ func LoadJsonFile(filePath string) {
 func AppendJsonFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Printf("fail to read file:", err)
+		log.Printf("fail to read file: %v\n", err)
 		return
 	}
 
@@ -678,6 +677,34 @@ func GetValueObject(key string, targetPtrObj any) error {
 		return err
 	}
 	return nil
+}
+
+func GetValueArray(key string) []any {
+	if nil == appProperty {
+		return nil
+	}
+
+	var arrayResult []any
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, &arrayResult)
+	if err != nil {
+		return arrayResult
+	}
+	return arrayResult
+}
+
+func GetValueArrayInt(key string) []int {
+	if nil == appProperty {
+		return nil
+	}
+
+	var arrayResult []int
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, &arrayResult)
+	if err != nil {
+		return arrayResult
+	}
+	return arrayResult
 }
 
 func GetValue(key string) any {
