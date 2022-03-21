@@ -173,3 +173,13 @@ func (m ISCMap[K, V]) Minus(n map[K]V) ISCMap[K, V] {
 func (m ISCMap[K, V]) Equals(n map[K]V) bool {
 	return MapEquals(m, n)
 }
+
+func (m ISCMap[K, V]) Keys() ISCList[K] {
+	i := 0
+	keys := make([]K, len(m))
+	for k, _ := range m {
+		keys[i] = k
+		i++
+	}
+	return keys
+}

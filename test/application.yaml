@@ -9,7 +9,7 @@ base:
     name: sample
   server:
     # 是否启用，默认：true
-    enable: true
+    enable: false
     # 端口号
     port: 8080
     # web框架gin的配置

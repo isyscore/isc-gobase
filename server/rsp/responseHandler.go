@@ -3,15 +3,16 @@ package rsp
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/config"
 	http2 "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type bodyLogWriter struct {
@@ -47,15 +48,15 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 		// 状态码
 		statusCode := c.Writer.Status()
 
-		var body interface{}
+		var body any
 		bodyStr := string(data)
 		if "" != bodyStr {
 			if strings.HasPrefix(bodyStr, "{") && strings.HasSuffix(bodyStr, "}") {
-				bodys := map[string]interface{}{}
+				bodys := map[string]any{}
 				_ = isc.StrToObject(bodyStr, &bodys)
 				body = bodys
 			} else if strings.HasPrefix(bodyStr, "[") && strings.HasSuffix(bodyStr, "]") {
-				var bodys []interface{}
+				var bodys []any
 				_ = isc.StrToObject(bodyStr, &bodys)
 				body = bodys
 			}
@@ -110,7 +111,7 @@ type Request struct {
 	Ip         string
 	Headers    http.Header
 	Parameters gin.Params
-	Body       interface{}
+	Body       any
 }
 
 type ErrorMessage struct {

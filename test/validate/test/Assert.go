@@ -29,7 +29,7 @@ func FalseErr(t *testing.T, value bool, errMsg string) {
 }
 
 // Equal 参数为act-expect-act-expect-...结构，其中expect为期望值，act为实际值
-func Equal(t *testing.T, objects ...interface{}) {
+func Equal(t *testing.T, objects ...any) {
 	if len(objects)%2 != 0 {
 		t.Error("参数个数必须为偶数")
 	}

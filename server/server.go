@@ -2,10 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/server/rsp"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/isyscore/isc-gobase/server/rsp"
 
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
@@ -34,9 +35,7 @@ var ApiPrefix = "/api"
 var engine *gin.Engine = nil
 
 func init() {
-
 	isc.PrintBanner()
-
 	config.LoadConfig()
 
 	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", true) {

@@ -679,12 +679,12 @@ func GetValueObject(key string, targetPtrObj any) error {
 	return nil
 }
 
-func GetValueArray(key string) []interface{} {
+func GetValueArray(key string) []any {
 	if nil == appProperty {
 		return nil
 	}
 
-	var arrayResult = []interface{}{}
+	var arrayResult = []any{}
 	data := doGetValue(appProperty.ValueDeepMap, key)
 	err := isc.DataToObject(data, &arrayResult)
 	if err != nil {
