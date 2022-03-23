@@ -141,7 +141,7 @@ func closeFileLevelWriter(writers []io.Writer) {
 			_ = fw.Close()
 			fi, _ := os.Stat(fw.File.Name())
 			if fi != nil && fi.Size() == 0 {
-				println("删除空文件", fi.Name())
+				//println("删除空文件", fi.Name())
 				_ = os.Remove(fw.File.Name())
 			}
 		}
