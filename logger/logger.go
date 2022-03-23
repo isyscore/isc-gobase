@@ -94,7 +94,7 @@ func callerMarshalFunc(file string, l int) string {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64) {
+func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64, logDir string) {
 	//日志级别设置，默认Info
 	zerolog.ErrorHandler = func(err error) {
 		// do nothing
@@ -113,7 +113,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out, splitEnable, splitSize)
+	initLogDir(out, splitEnable, splitSize, logDir)
 
 }
 
@@ -147,23 +147,27 @@ func closeFileLevelWriter(writers []io.Writer) {
 	}
 }
 
-func getLogDir() string {
-	pwd, _ := os.Getwd()
-	// 创建日志目录
-	logDir := filepath.Join(pwd, "logs")
+func getLogDir(logDir string) string {
+	if logDir == "" || !strings.HasPrefix(logDir, "/") {
+		pwd, _ := os.Getwd()
+		// 创建日志目录
+		logDir = filepath.Join(pwd, "logs")
+	}
+
+	fmt.Println("日志目录", logDir)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		_ = os.Mkdir(logDir, os.ModePerm)
 	}
 	return logDir
 }
 
-func createFileLeveWriter(level zerolog.Level, strTime string, idx int) *FileLevelWriter {
+func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir string) *FileLevelWriter {
 	strL := level.String()
 	if level == zerolog.NoLevel {
 		strL = "assert"
 	}
 	linkName := fmt.Sprintf("app-%s.log", strL)
-	linkName = filepath.Join(getLogDir(), linkName)
+	linkName = filepath.Join(getLogDir(dir), linkName)
 	logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
 	if idx > 0 {
 		logFile = strings.ReplaceAll(logFile, ".log", fmt.Sprintf(".%d.log", idx))
@@ -188,7 +192,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int) *FileLev
 
 var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel}
 
-func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level) {
+func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir string) {
 	//关闭现有流
 	closeFileLevelWriter(oldWriter)
 	//修改listWriter
@@ -196,7 +200,7 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level) {
 	//时间格式转换
 	strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
 	for _, level := range ls {
-		fw := createFileLeveWriter(level, strTime, idx)
+		fw := createFileLeveWriter(level, strTime, idx, dir)
 		newWriter = append(newWriter, fw)
 	}
 	outers := append(newWriter, out)
@@ -208,8 +212,8 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level) {
 var oldWriter []io.Writer
 
 //initLogDir create log dir and file
-func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64) {
-	fileHandler := func() { updateOuters(out, 0, levels) }
+func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string) {
+	fileHandler := func() { updateOuters(out, 0, levels, dir) }
 	fileHandler()
 
 	//每天创建一个文件
@@ -234,7 +238,7 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64) {
 							} else if len(idxs) > 3 {
 								idx, _ = strconv.Atoi(idxs[len(idxs)-2])
 							}
-							updateOuters(out, idx+1, []zerolog.Level{fw.level})
+							updateOuters(out, idx+1, []zerolog.Level{fw.level}, dir)
 						}
 					}
 				}
