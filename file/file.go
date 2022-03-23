@@ -2,7 +2,6 @@ package file
 
 import (
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -20,6 +19,33 @@ func DirectoryExists(dirPath string) bool {
 		return false
 	} else {
 		return s.IsDir()
+	}
+}
+
+func ExtractFilePath(filePath string) string {
+	idx := strings.LastIndex(filePath, string(os.PathSeparator))
+	return filePath[:idx]
+}
+
+func ExtractFileName(filePath string) string {
+	idx := strings.LastIndex(filePath, string(os.PathSeparator))
+	return filePath[idx+1:]
+}
+
+func ExtractFileExt(filePath string) string {
+	idx := strings.LastIndex(filePath, ".")
+	if idx != -1 {
+		return filePath[idx+1:]
+	}
+	return ""
+}
+
+func ChangeFileExt(filePath string, ext string) string {
+	mext := ExtractFileExt(filePath)
+	if mext == "" {
+		return filePath + "." + ext
+	} else {
+		return filePath[:len(filePath)-len(mext)] + ext
 	}
 }
 
@@ -64,22 +90,49 @@ func ReadFileLines(filePath string) []string {
 }
 
 func WriteFile(filePath string, text string) bool {
-	return ioutil.WriteFile(filePath, []byte(text), fs.ModePerm) == nil
+	return WriteFileBytes(filePath, []byte(text))
 }
 
 func WriteFileBytes(filePath string, data []byte) bool {
-	return ioutil.WriteFile(filePath, data, fs.ModePerm) == nil
+	p0 := ExtractFilePath(filePath)
+	if !DirectoryExists(p0) {
+		MkDirs(p0)
+	}
+	if FileExists(filePath) {
+		DeleteFile(filePath)
+	}
+	if fl, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+		return false
+	} else {
+		_, err := fl.Write(data)
+		_ = fl.Close()
+		return err == nil
+	}
 }
 
 func AppendFile(filePath string, text string) bool {
-	return ioutil.WriteFile(filePath, []byte(text), fs.ModeAppend) == nil
+	return AppendFileBytes(filePath, []byte(text))
 }
 
 func AppendFileBytes(filePath string, data []byte) bool {
-	return ioutil.WriteFile(filePath, data, fs.ModeAppend) == nil
+	p0 := ExtractFilePath(filePath)
+	if !DirectoryExists(p0) {
+		MkDirs(p0)
+	}
+	if fl, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+		return false
+	} else {
+		_, err := fl.Write(data)
+		_ = fl.Close()
+		return err == nil
+	}
 }
 
 func CopyFile(srcFilePath string, destFilePath string) bool {
+	p0 := ExtractFilePath(destFilePath)
+	if !DirectoryExists(p0) {
+		MkDirs(p0)
+	}
 	src, _ := os.Open(srcFilePath)
 	defer func(src *os.File) { _ = src.Close() }(src)
 	dst, _ := os.OpenFile(destFilePath, os.O_WRONLY|os.O_CREATE, 0644)
@@ -89,5 +142,9 @@ func CopyFile(srcFilePath string, destFilePath string) bool {
 }
 
 func RenameFile(srcFilePath string, destFilePath string) bool {
+	p0 := ExtractFilePath(destFilePath)
+	if !DirectoryExists(p0) {
+		MkDirs(p0)
+	}
 	return os.Rename(srcFilePath, destFilePath) == nil
 }
