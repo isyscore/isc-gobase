@@ -26,7 +26,7 @@ base:
     port: 8080
     # web框架gin的配置
     gin:
-      # 有三种模式：debug/release/test
+      # 有三种模式：debug/release/test，填错则使用release
       mode: debug
     exception:
       # 异常返回打印
