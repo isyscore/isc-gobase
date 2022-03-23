@@ -5,6 +5,94 @@ validate包核查模块，用于对入参的校验
 ## 快速使用
 这里举个例子，快速使用
 
+### 基于isc-gobase的web的项目的示例：
+```go
+// main.go 文件
+package main
+
+import (
+  "github.com/gin-gonic/gin"
+  "github.com/isyscore/isc-gobase/isc"
+  "github.com/isyscore/isc-gobase/logger"
+  "github.com/isyscore/isc-gobase/server"
+  "github.com/isyscore/isc-gobase/server/rsp"
+  "github.com/isyscore/isc-gobase/validate"
+)
+
+func main() {
+    server.Post("test/insert", InsertData)
+    server.Run()
+}
+
+// InsertData 数据插入
+func InsertData(c *gin.Context) {
+    insertReq := InsertReq{}
+
+  // 读取body数据，可以采用isc提供的工具
+    err := isc.DataToObject(c.Request.Body, &insertReq)
+    if err != nil {
+        // ... 省略异常日志
+        return
+    }
+
+    // api示例：核查入参
+    if result, msg := CheckData(c, insertReq); !result {
+        logger.Error(msg)
+        return
+    }
+
+    rsp.SuccessOfStandard(c, "ok")
+}
+
+type InsertReq struct {
+    Name    string `match:"value={zhou, chen}"`
+    Profile string `match:"range=[0, 10)" errMsg:"长度不合法"`
+}
+```
+```yaml
+# application.yml 文件
+api-module: app/sample
+
+base:
+  api:
+    # api前缀
+    prefix: /api
+  application:
+    # 应用名称
+    name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8080
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: release
+
+```
+
+请求
+```shell
+curl -X POST \
+  http://localhost:8080/api/app/sample/test/insert \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"name": "zhou",
+	"profile": "abcde-abcde"
+}'
+```
+返回异常
+```json
+{
+    "code": 53,
+    "data": null,
+    "message": "长度不合法"
+}
+```
+
+### 非web的普通类核查示例：
+
 ```go
 package main
 
@@ -13,41 +101,31 @@ import (
     "github.com/isyscore/isc-gobase/logger"
 )
 
-type ValueBaseEntityOne struct {
+type DemoInsert struct {
     // 对属性修饰 
     Name string `match:"value=zhou"`
     Age  int
 }
 
 func main() {
-    var value ValueBaseEntityOne
+    var value DemoInsert
     var result bool
     var errMsg string
 
-    value = ValueBaseEntityOne{Name: "chen"}
+    value = DemoInsert{Name: "chen"}
     // 核查
     result, errMsg = validate.Check(value)
-    if !result { 
+    if !result {
         // 属性 Name 的值 chen 不在只可用列表 [zhou] 中 
         logger.Error(errMsg)
     }
 }
-
 ```
 说明：<br/>
 
-1. 这里提供方法Check，用于核查属性，Check方法也支持核查指定属性，默认核查所有属性
-2. 提供标签match，标签内容中提供匹配器：value，该匹配器表示匹配的具体的一些值
-
-提示：<br/>
-value除了匹配一个值，还可以修饰多个值，更多的功能，以及更多匹配器见更多功能
-
-```go
-type ValueBaseEntity struct {
-    Name string `match:"value={zhou, 宋江}"`
-    Age  int    `match:"value={12, 13}"`
-}
-```
+1. 这里提供方法CheckContext，支持gin的Context用于处理核查
+2. 这里提供方法Check，用于核查属性，Check方法也支持核查指定属性，默认核查所有属性
+3. 提供标签match，标签内容中提供匹配器：value，该匹配器表示匹配的具体的一些值
 
 ## 更多功能
 

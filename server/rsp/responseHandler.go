@@ -50,7 +50,7 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 
 		var body any
 		bodyStr := string(data)
-		if "" != bodyStr {
+		if "" != bodyStr && len(bodyStr) < 1000 {
 			if strings.HasPrefix(bodyStr, "{") && strings.HasSuffix(bodyStr, "}") {
 				bodys := map[string]any{}
 				_ = isc.StrToObject(bodyStr, &bodys)
