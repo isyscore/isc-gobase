@@ -80,4 +80,5 @@ base:
 | [file](/file)| 文件处理（待更新） |
 | [http](/http)| http处理（待更新） |
 | [server](/server)| 服务处理 |
+| [goid](/goid)| 局部id传递处理 |
 

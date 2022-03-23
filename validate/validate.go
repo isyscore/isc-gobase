@@ -3,11 +3,9 @@ package validate
 import (
 	"fmt"
 	"github.com/antonmedv/expr"
-	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/constant"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/server/rsp"
 	"github.com/isyscore/isc-gobase/validate/matcher"
 	"github.com/isyscore/isc-gobase/validate/util"
 	"reflect"
@@ -35,15 +33,6 @@ var checkerEntities []CollectorEntity
 
 /* 核查的标签 */
 var matchTagArray = []string{constant.Value, constant.IsBlank, constant.Range, constant.Model, constant.Condition, constant.Regex, constant.Customize}
-
-func CheckContext(c *gin.Context, dataReq interface{}) (bool, string) {
-	checkResult, errMsg := Check(dataReq)
-	if !checkResult {
-		rsp.FailedOfStandard(c, 53, errMsg)
-		return false, errMsg
-	}
-	return true, ""
-}
 
 func Check(object interface{}, fieldNames ...string) (bool, string) {
 	if object == nil {

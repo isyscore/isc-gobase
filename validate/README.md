@@ -11,12 +11,17 @@ validate包核查模块，用于对入参的校验
 package main
 
 import (
-  "github.com/gin-gonic/gin"
-  "github.com/isyscore/isc-gobase/isc"
-  "github.com/isyscore/isc-gobase/logger"
-  "github.com/isyscore/isc-gobase/server"
-  "github.com/isyscore/isc-gobase/server/rsp"
-  "github.com/isyscore/isc-gobase/validate"
+  "bytes"
+    "encoding/json"
+    "github.com/gin-gonic/gin"
+    "github.com/isyscore/isc-gobase/http"
+    "github.com/isyscore/isc-gobase/isc"
+    "github.com/isyscore/isc-gobase/logger"
+    "github.com/isyscore/isc-gobase/server"
+    "github.com/isyscore/isc-gobase/server/rsp"
+    "github.com/isyscore/isc-gobase/validate"
+    "io/ioutil"
+    "strings"
 )
 
 func main() {
@@ -28,7 +33,7 @@ func main() {
 func InsertData(c *gin.Context) {
     insertReq := InsertReq{}
 
-  // 读取body数据，可以采用isc提供的工具
+    // 读取body数据，可以采用isc提供的工具
     err := isc.DataToObject(c.Request.Body, &insertReq)
     if err != nil {
         // ... 省略异常日志
@@ -36,7 +41,9 @@ func InsertData(c *gin.Context) {
     }
 
     // api示例：核查入参
-    if result, msg := CheckData(c, insertReq); !result {
+    if result, msg := validate.Check(insertReq); !result {
+        // 参数异常
+        rsp.FailedOfStandard(c, 53, msg)
         logger.Error(msg)
         return
     }
@@ -46,7 +53,7 @@ func InsertData(c *gin.Context) {
 
 type InsertReq struct {
     Name    string `match:"value={zhou, chen}"`
-    Profile string `match:"range=[0, 10)" errMsg:"长度不合法"`
+    Profile string `match:"range=[0, 10)"`
 }
 ```
 ```yaml

@@ -1,0 +1,28 @@
+api-module: api/app/sample
+
+base:
+  profiles:
+    # 激活环境配置
+    active: local
+  application:
+    # 应用名称
+    name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8081
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: debug
+    exception:
+      # 异常返回打印
+      print:
+        # 是否启用：true, false；默认 true
+        enable: true
+        # 一些异常httpStatus不打印；默认可不填
+        except:
+          - 408
+          - 409
+

@@ -131,13 +131,13 @@ base:
 
 ```shell
 // 查看应用所有配置
-curl http://localhost:xxx/{api-module}system/config/values
+curl http://localhost:xxx/{api-module}config/values
 
 // 查看应用的某个配置
-curl http://localhost:xxx/{api-module}system/config/value/{key}
+curl http://localhost:xxx/{api-module}config/value/{key}
 
 // 修改应用的配置
-curl -X PUT http://localhost:xxx/{api-module}system/config/update -d '{"key":"xxx", "value":"yyyy"}'
+curl -X PUT http://localhost:xxx/{api-module}config/update -d '{"key":"xxx", "value":"yyyy"}'
 ```
 
 ##### 注意

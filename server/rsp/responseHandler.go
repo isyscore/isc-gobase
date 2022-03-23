@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isyscore/isc-gobase/config"
 	http2 "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
@@ -67,11 +66,8 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 			Uri:        c.Request.RequestURI,
 			Ip:         c.ClientIP(),
 			Parameters: c.Params,
+			Headers:    c.Request.Header,
 			Body:       body,
-		}
-
-		if config.GetValueBoolDefault("base.server.head.show", true) {
-			request.Headers = c.Request.Header
 		}
 
 		message := ErrorMessage{
