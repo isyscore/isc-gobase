@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/server/rsp"
 	"testing"
 
@@ -71,7 +70,6 @@ func TestErrorPrint(t *testing.T) {
 }
 
 func TestWebHandler(t *testing.T) {
-	server.GetEngine().Use(rsp.ResponseHandler(config.BaseCfg.Server.Exception.Print.Except...))
 	server.Get("test/get", func(context *gin.Context) {
 		rsp.Success(context, "ok")
 	})
