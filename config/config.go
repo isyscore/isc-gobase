@@ -180,19 +180,19 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 				extend = strings.ToLower(extend)
 				if "yaml" == extend {
 					configExist = true
-					LoadYamlFile(resourceAbsPath + fileName)
+					AppendYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "yml" == extend {
 					configExist = true
-					LoadYamlFile(resourceAbsPath + fileName)
+					AppendYamlFile(resourceAbsPath + fileName)
 					break
 				} else if "properties" == extend {
 					configExist = true
-					LoadPropertyFile(resourceAbsPath + fileName)
+					AppendPropertyFile(resourceAbsPath + fileName)
 					break
 				} else if "json" == extend {
 					configExist = true
-					LoadJsonFile(resourceAbsPath + fileName)
+					AppendJsonFile(resourceAbsPath + fileName)
 					break
 				}
 			}
