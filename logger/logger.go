@@ -156,7 +156,9 @@ func getLogDir(logDir string) string {
 
 	fmt.Println("日志目录", logDir)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
-		_ = os.Mkdir(logDir, os.ModePerm)
+		if err = os.MkdirAll(logDir, os.ModePerm); err != nil {
+			log.Fatal().Msgf("日志目录创建异常:%v", err)
+		}
 	}
 	return logDir
 }
@@ -201,7 +203,10 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir st
 	strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
 	for _, level := range ls {
 		fw := createFileLeveWriter(level, strTime, idx, dir)
-		newWriter = append(newWriter, fw)
+		if fw != nil {
+			newWriter = append(newWriter, fw)
+		}
+
 	}
 	outers := append(newWriter, out)
 	writer := zerolog.MultiLevelWriter(outers...)
