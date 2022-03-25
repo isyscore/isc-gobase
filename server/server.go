@@ -83,7 +83,8 @@ func InitServer() {
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 	splitEnable := config.GetValueBoolDefault("base.logger.split.enable", false)
 	splitSize := config.GetValueInt64Default("base.logger.split.size", 300)
-	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize)
+	logDir := config.GetValueStringDefault("base.logger.dir", "")
+	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize, logDir)
 }
 
 func Run() {

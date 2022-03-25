@@ -17,6 +17,8 @@ base:
       enable: false
       # 日志拆分的单位：MB
       size: 300
+    ## 日志文件目录，默认工程目录的logs文件夹
+    dir: ./logs/
     
     
 ```
