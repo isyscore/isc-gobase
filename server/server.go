@@ -38,7 +38,7 @@ func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 
-	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", true) {
+	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", false) {
 		InitServer()
 	}
 }
