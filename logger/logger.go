@@ -260,7 +260,14 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 			now := time.Now()
 			if time.DaysBetween(now, info.ModTime()) > history {
 				//remove file
-				os.Remove(path)
+				err = os.Remove(path)
+				defer func() error {
+					if x := recover(); x != nil {
+						log.Error().Msgf("日志文件[%s]删除错误", err)
+						return x.(error)
+					}
+					return nil
+				}()
 			}
 			return err
 		})
