@@ -28,6 +28,7 @@ package logger
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -94,7 +95,7 @@ func callerMarshalFunc(file string, l int) string {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64, logDir string) {
+func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64, logDir string, history int) {
 	//日志级别设置，默认Info
 	zerolog.ErrorHandler = func(err error) {
 		// do nothing
@@ -113,7 +114,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out, splitEnable, splitSize, logDir)
+	initLogDir(out, splitEnable, splitSize, logDir, history)
 
 }
 
@@ -215,7 +216,7 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir st
 var oldWriter []io.Writer
 
 //initLogDir create log dir and file
-func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string) {
+func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int) {
 	fileHandler := func() { updateOuters(out, 0, levels, dir) }
 	fileHandler()
 
@@ -249,4 +250,18 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 		})
 		c_check.Start()
 	}
+	log.Info().Msgf("开启定时日志清理任务")
+	cClean := cron.New()
+	cClean.AddFunc("0 0 1 * * ?", func() {
+		log.Debug().Msg("定时每天日志清理任务执行")
+		filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
+			now := time.Now()
+			if time.DaysBetween(now, info.ModTime()) > history {
+				//remove file
+				os.Remove(path)
+			}
+			return err
+		})
+	})
+	cClean.Start()
 }

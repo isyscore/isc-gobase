@@ -85,7 +85,8 @@ func InitServer() {
 	splitEnable := config.GetValueBoolDefault("base.logger.split.enable", false)
 	splitSize := config.GetValueInt64Default("base.logger.split.size", 300)
 	logDir := config.GetValueStringDefault("base.logger.dir", "")
-	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize, logDir)
+	maxHistory := config.GetValueIntDefault("base.logger.max.history", 7)
+	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize, logDir, maxHistory)
 }
 
 func Run() {

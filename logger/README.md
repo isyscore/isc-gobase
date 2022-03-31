@@ -17,6 +17,9 @@ base:
       enable: false
       # 日志拆分的单位：MB
       size: 300
+    max:
+      ## 日志文件最大保留天数
+      history: 7
     ## 日志文件目录，默认工程目录的logs文件夹
     dir: ./logs/
     
