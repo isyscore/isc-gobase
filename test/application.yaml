@@ -49,5 +49,5 @@ base:
       enable: false
       # 日志拆分的单位：MB
       size: 300
-    dir: /test1/logs
+    dir: ./logs
 

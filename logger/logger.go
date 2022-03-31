@@ -153,8 +153,6 @@ func getLogDir(logDir string) string {
 		// 创建日志目录
 		logDir = filepath.Join(pwd, "logs")
 	}
-
-	fmt.Println("日志目录", logDir)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, os.ModePerm); err != nil {
 			log.Fatal().Msgf("日志目录创建异常:%v", err)

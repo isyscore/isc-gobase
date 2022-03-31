@@ -2,15 +2,16 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
-	"github.com/isyscore/isc-gobase/logger"
 	"net"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/isyscore/isc-gobase/logger"
 )
 
 var httpClient = createHTTPClient()
@@ -38,10 +39,10 @@ func (error *NetError) Error() string {
 	return error.ErrMsg
 }
 
-type StandardResponse struct {
-	Code    any    `json:"code"`
+type DataResponse[T any] struct {
+	Code    int    `json:"code"`
 	Message string `json:"message"`
-	Data    any    `json:"data"`
+	Data    T      `json:"data"`
 }
 
 // createHTTPClient for connection re-use
@@ -361,25 +362,15 @@ func parseStandard(responseResult []byte, errs error) ([]byte, error) {
 	if errs != nil {
 		return nil, errs
 	}
-	var standRsp StandardResponse
+	var standRsp DataResponse[any]
 	err := json.Unmarshal(responseResult, &standRsp)
 	if err != nil {
 		return nil, err
 	}
 
-	if standRsp.Code == nil {
-		return nil, &NetError{ErrMsg: "code is nil"}
-	}
-
 	// 判断业务的失败信息
-	if codeKind := reflect.ValueOf(standRsp.Code).Kind(); codeKind == reflect.String {
-		if standRsp.Code != "success" {
-			return nil, &NetError{ErrMsg: "remote err, bizCode=" + standRsp.Code.(string) + ", message=" + standRsp.Message}
-		}
-	} else if codeKind == reflect.Int || codeKind == reflect.Int8 || codeKind == reflect.Int16 || codeKind == reflect.Int32 || codeKind == reflect.Int64 {
-		if standRsp.Code != 0 && standRsp.Code != 200 {
-			return nil, &NetError{ErrMsg: "remote err, bizCode=" + standRsp.Code.(string) + ", message=" + standRsp.Message}
-		}
+	if standRsp.Code != 0 && standRsp.Code != 200 {
+		return nil, &NetError{ErrMsg: fmt.Sprintf("remote err, bizCode=%d, message=%s", standRsp.Code, standRsp.Message)}
 	}
 
 	if data, err := json.Marshal(standRsp.Data); err != nil {

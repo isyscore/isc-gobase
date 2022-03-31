@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/config"
-	http2 "github.com/isyscore/isc-gobase/http"
+
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 )
@@ -88,15 +88,11 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 			}
 			logger.Error("请求异常, result：%v", isc.ObjectToJson(message))
 		} else {
-			var response http2.StandardResponse
-			err := json.Unmarshal([]byte(blw.body.String()), &response)
-			if err != nil {
+			var response DataResponse[any]
+			if err := json.Unmarshal([]byte(blw.body.String()), &response); err != nil {
 				return
 			} else {
-				if response.Code == nil {
-					return
-				}
-				if response.Code != 0 && response.Code != "0" && response.Code != 200 && response.Code != "200" && response.Code != "success" {
+				if response.Code != 0 && response.Code != 200 {
 					message.Response = response
 					logger.Error("请求异常, result：%v", isc.ObjectToJson(message))
 				}
@@ -116,7 +112,7 @@ type Request struct {
 
 type ErrorMessage struct {
 	Request    Request
-	Response   http2.StandardResponse
+	Response   DataResponse[any]
 	Cost       string
 	StatusCode int
 }
