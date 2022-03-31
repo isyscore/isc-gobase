@@ -250,7 +250,7 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 		})
 		c_check.Start()
 	}
-	log.Info().Msgf("开启定时日志清理任务")
+	// log.Info().Msgf("开启定时日志清理任务")
 	cClean := cron.New()
 	cClean.AddFunc("0 0 1 * * ?", func() {
 		log.Debug().Msg("定时每天日志清理任务执行")
