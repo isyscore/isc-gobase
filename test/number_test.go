@@ -57,3 +57,11 @@ func TestRadix(t *testing.T) {
 	t.Logf("%d\n", i)
 
 }
+
+func TestRune(t *testing.T) {
+	c := ISCChar('青')
+	t.Logf("%d\n", c.Code())
+
+	c2 := ISCChar(38738)
+	t.Logf("%s\n", c2.ToString())
+}

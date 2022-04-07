@@ -3,6 +3,7 @@ package isc
 import (
 	"fmt"
 	"strconv"
+	"unicode"
 )
 
 type ISCInt int
@@ -10,9 +11,9 @@ type ISCInt8 int8
 type ISCInt16 int16
 type ISCInt32 int32
 type ISCInt64 int64
-type ISCChar uint8
 type ISCFloat float32
 type ISCFloat64 float64
+type ISCChar rune
 
 func (i ISCInt) RangeTo(to int) ISCList[int] {
 	var ret ISCList[int]
@@ -174,6 +175,38 @@ func (i ISCInt64) DownStepTo(to int64, step int64) ISCList[int64] {
 	return ret
 }
 
+func (i ISCChar) RangeTo(to rune) ISCList[rune] {
+	var ret ISCList[rune]
+	for ii := int64(i); ii <= int64(to); ii++ {
+		ret = append(ret, rune(ii))
+	}
+	return ret
+}
+
+func (i ISCChar) RangeStepTo(to rune, step int64) ISCList[rune] {
+	var ret ISCList[rune]
+	for ii := int64(i); ii <= int64(to); ii += step {
+		ret = append(ret, rune(ii))
+	}
+	return ret
+}
+
+func (i ISCChar) DownTo(to rune) ISCList[rune] {
+	var ret ISCList[rune]
+	for ii := int64(i); ii >= int64(to); ii-- {
+		ret = append(ret, rune(ii))
+	}
+	return ret
+}
+
+func (i ISCChar) DownStepTo(to rune, step int64) ISCList[rune] {
+	var ret ISCList[rune]
+	for ii := int64(i); ii >= int64(to); ii -= step {
+		ret = append(ret, rune(ii))
+	}
+	return ret
+}
+
 func (i ISCInt) ToString() ISCString {
 	return ISCString(fmt.Sprintf("%d", i))
 }
@@ -196,6 +229,10 @@ func (i ISCInt64) ToString() ISCString {
 
 func (i ISCChar) ToString() ISCString {
 	return ISCString(string(i))
+}
+
+func (i ISCChar) Code() int {
+	return int(i)
 }
 
 func (i ISCFloat) ToString() ISCString {
@@ -308,24 +345,65 @@ func (i ISCInt64) ToBinary() string {
 	return strconv.FormatInt(int64(i), 2)
 }
 
-/*
+func (i ISCChar) IsLetter() bool {
+	return unicode.IsLetter(rune(i))
+}
 
-===Char===
-isLetter
-isLetterOrDigit
-isDigit
-isIdentifierIgnorable
-isISOControl
-isWhitespace
-isUpperCase
-isLowerCase
-uppercase
-lowercase
-isTitleCase
-titlecase
-isHighSurrogate
-isLowSurrogate
+func (i ISCChar) IsDigit() bool {
+	return unicode.IsDigit(rune(i))
+}
 
+func (i ISCChar) IsLetterOrDigit() bool {
+	return unicode.IsLetter(rune(i)) || unicode.IsDigit(rune(i))
+}
 
+func (i ISCChar) IsSymbol() bool {
+	return unicode.IsSymbol(rune(i))
+}
 
-*/
+func (i ISCChar) IsWhitespace() bool {
+	return unicode.IsSpace(rune(i))
+}
+
+func (i ISCChar) ToUpper() ISCChar {
+	return ISCChar(unicode.ToUpper(rune(i)))
+}
+
+func (i ISCChar) ToLower() ISCChar {
+	return ISCChar(unicode.ToLower(rune(i)))
+}
+
+func (i ISCChar) ToTitle() ISCChar {
+	return ISCChar(unicode.ToTitle(rune(i)))
+}
+
+func (i ISCChar) IsUpper() bool {
+	return unicode.IsUpper(rune(i))
+}
+
+func (i ISCChar) IsLower() bool {
+	return unicode.IsLower(rune(i))
+}
+
+func (i ISCChar) IsTitle() bool {
+	return unicode.IsTitle(rune(i))
+}
+
+func (i ISCChar) IsISOControl() bool {
+	return unicode.IsControl(rune(i))
+}
+
+const (
+	MIN_LOW_SURROGATE  = 0xDC00
+	MAX_LOW_SURROGATE  = 0xDFFF
+	MIN_HIGH_SURROGATE = 0xD800
+	MAX_HIGH_SURROGATE = 0xDBFF
+)
+
+func (i ISCChar) IsHighSurrogate() bool {
+	return i >= MIN_HIGH_SURROGATE && i < (MAX_HIGH_SURROGATE+1)
+}
+
+func (i ISCChar) IsLowSurrogate() bool {
+	return i >= MIN_LOW_SURROGATE && i < (MAX_LOW_SURROGATE+1)
+}
