@@ -2,10 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/config"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/isyscore/isc-gobase/config"
 
 	"github.com/gin-gonic/gin"
 	h2 "github.com/isyscore/isc-gobase/http"
@@ -14,7 +15,10 @@ import (
 
 var procId = os.Getpid()
 var startTime = time.Now().Format(t2.FmtYMdHms)
-var VERSION *string
+
+const defaultVersion = "unknown"
+
+var Version string = defaultVersion
 
 func healthSystemStatus(c *gin.Context) {
 	c.Data(http.StatusOK, h2.ContentTypeJson, []byte(fmt.Sprintf(`{"status":"ok","running":true,"pid":%d,"startupAt":"%s","version":"%s"}`, procId, startTime, getVersion())))
@@ -29,10 +33,9 @@ func healthSystemDestroy(c *gin.Context) {
 }
 
 func getVersion() string {
-	if VERSION != nil {
-		return *VERSION
+	if Version != defaultVersion {
+		return Version
 	}
-	version := config.GetValueStringDefault("base.server.version", "unknown")
-	VERSION = &version
-	return *VERSION
+	Version := config.GetValueStringDefault("base.server.version", defaultVersion)
+	return Version
 }
