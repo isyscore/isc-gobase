@@ -751,7 +751,7 @@ func ObjectToData(object any) any {
 		return resultMap
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
 		// Array 结构
-		var resultSlice []any
+		resultSlice := []any{}
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
@@ -817,7 +817,7 @@ func ObjectToJson(object any) string {
 		return ToJsonString(resultMap)
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
 		// Array 结构
-		var resultSlice []any
+		resultSlice := []any{}
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
@@ -868,7 +868,7 @@ func doObjectChange(objType reflect.Type, object any) any {
 	} else if objKind == reflect.String {
 		return ToString(object)
 	} else if objKind == reflect.Array || objKind == reflect.Slice {
-		var resultSlice []any
+		resultSlice := []any{}
 		objValue := reflect.ValueOf(object)
 		for index := 0; index < objValue.Len(); index++ {
 			arrayItemValue := objValue.Index(index)
