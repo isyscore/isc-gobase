@@ -27,5 +27,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
 	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
+	golang.org/x/text v0.3.7
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
