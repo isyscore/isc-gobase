@@ -37,6 +37,8 @@ base:
         except:
           - 408
           - 409
+    # 版本号设置,默认值:unknown
+    version: 1.0.0
   # 内部开放的 endpoint
   endpoint:
     # 健康检查处理，默认关闭，true/false
