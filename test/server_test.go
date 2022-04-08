@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/isyscore/isc-gobase/server/rsp"
 	"testing"
 
@@ -46,15 +45,12 @@ func TestServer(t *testing.T) {
 }
 
 func TestApiVersion(t *testing.T) {
-	fmt.Printf("step 1\n")
 	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "1.0", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 1.0"))
 	})
-	fmt.Printf("step 2\n")
 	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "2.0", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 2.0"))
 	})
-	fmt.Printf("step 3\n")
 	server.RegisterRouteWith("/api/sample", server.HmGet, "isc-api-version", "3.0", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello 3.0"))
 	})
@@ -62,16 +58,15 @@ func TestApiVersion(t *testing.T) {
 }
 
 func TestErrorPrint(t *testing.T) {
-	fmt.Printf("step 3\n")
 	server.RegisterRoute("/api/data", server.HmGet, func(c *gin.Context) {
-		c.Data(300, "text/plain", []byte("hello 3.0"))
+		c.Data(200, "text/plain", []byte("hello 3.0"))
 	})
 	server.StartServer()
 }
 
 func TestWebHandler(t *testing.T) {
 	server.Get("test/get", func(context *gin.Context) {
-		rsp.Success(context, "ok")
+		rsp.SuccessOfStandard(context, "ok")
 	})
 
 	server.Run()

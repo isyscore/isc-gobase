@@ -1,16 +1,25 @@
-a:
-  b: 33
-  b1:
-    c1: 32
+api-module: api/app/sample
 
-one:
-  name: "haode"
-
-
-server:
-  port: 31000
 base:
   application:
-    name: "sdf-local"
-
+    # 应用名称
+    name: sample
+  server:
+    # 是否启用，默认：true
+    enable: true
+    # 端口号
+    port: 8082
+    # web框架gin的配置
+    gin:
+      # 有三种模式：debug/release/test
+      mode: release
+    exception:
+      # 异常返回打印
+      print:
+        # 是否启用：true, false；默认 true
+        enable: true
+        # 一些异常httpStatus不打印；默认可不填
+        except:
+          - 408
+          - 409
 

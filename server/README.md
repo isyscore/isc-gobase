@@ -15,6 +15,9 @@ func main() {
     server.Run()
 }
 
+func GetData(c *gin.Context) {
+    rsp.SuccessOfStandard(c, "ok")
+}
 ```
 
 ```yaml
