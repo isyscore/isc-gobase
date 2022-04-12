@@ -18,7 +18,7 @@ type cache struct {
 
 type Item struct {
 	//data
-	Data V
+	Data any
 	//ttl time.UnixNano.Expiration of Item,if it is -1,it will be not Expired
 	Ttl int64
 }
@@ -46,9 +46,14 @@ func NewWithExpirationAndCleanupInterval(defaultExpiration, cleanupInterval time
 	if defaultExpiration == 0 {
 		defaultExpiration = -1
 	}
+	ch := make(chan bool)
 	c := &cache{
 		defaultExpiration: defaultExpiration,
 		items:             make(map[string]Item),
+		j: &janitor{
+			Interval: 1 * time.Second,
+			stop:     ch,
+		},
 	}
 	//启动清理协程
 	go func() {
@@ -61,7 +66,6 @@ func NewWithExpirationAndCleanupInterval(defaultExpiration, cleanupInterval time
 type janitor struct {
 	Interval time.Duration
 	stop     chan bool
-	c        *cache
 }
 
 func (c *cache) runCleanup(cleanupInterval time.Duration) {
@@ -85,5 +89,17 @@ func stopJanitor(c *cache) {
 }
 
 func (c *cache) DeleteExpired() {
-
+	l := len(c.items)
+	if l < 1 {
+		return
+	}
+	ch := make(chan int8, len(c.items))
+	for key, item := range c.items {
+		go func(i Item) {
+			if i.Expired() {
+				delete(c.items, key)
+			}
+			ch <- int8(1)
+		}(item)
+	}
 }
