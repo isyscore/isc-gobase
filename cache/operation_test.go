@@ -62,31 +62,38 @@ func Test_cache_Get1(t *testing.T) {
 //性能测试
 //fixme 并发问题有待处理
 func Test_cache_Get2(t *testing.T) {
-	c := NewWithExpiration(2 * time.Second)
+	c := NewWithExpiration(3 * time.Second)
 	ch := make(chan int8, 20000)
 	start := time.Now()
-	println("开始执行", start.UnixMilli())
+	println("开始执行", start.UnixNano())
 	for i := 0; i < 10000; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
-		go func() {
-			c.Set(key, "库陈胜"+key)
+		go func(ii int, k string) {
+			c.Set(k, "库陈胜"+k)
 			ch <- int8(1)
-			c.SetHash(key+"hash", strconv.Itoa(i), "性能测试"+key)
+			c.SetHash(k+"hash", strconv.Itoa(ii), "性能测试"+k)
 			ch <- int8(1)
-		}()
+		}(i, key)
 	}
-	println("PUT结束执行,耗时", time.Now().UnixMilli()-start.UnixMilli(), "ms", "key总数", c.Cap())
+
+	for c.Cap() != 20000 {
+		time.Sleep(100 * time.Millisecond)
+		t.Logf("CAP %d", c.Cap())
+	}
+
+	t.Logf("PUT结束执行,耗时 %d ms, key总数: %d", time.Now().UnixMilli()-start.UnixMilli(), c.Cap())
+
 	ch1 := make(chan int8, 20000)
 	for i := 0; i < 10000; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		subKey := key + "hash"
 		go func(k, s string) {
 			if v, b := c.Get(k); b {
-				println("key=", k, "value = ", v.(string))
+				t.Logf("key= %s, value = %s", k, v.(string))
 			}
 			ch1 <- int8(1)
 			if v, b := c.GetHash(key+"hash", s); b {
-				println("key=", k, "subKey=", s, "value = ", v.(string))
+				t.Logf("key= %s, subkey = %s, value = %s", k, s, v.(string))
 			}
 			ch1 <- int8(1)
 		}(key, subKey)
@@ -95,7 +102,7 @@ func Test_cache_Get2(t *testing.T) {
 	println("当前有多少key?", c.Cap())
 	times := 1
 	for c.Cap() > 0 {
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Second)
 		println("沉睡", times, "秒后，剩余多少Key?", c.Cap())
 		times++
 	}

@@ -100,13 +100,13 @@ func (c *cache) DeleteExpired() {
 
 	ch := make(chan int8, len(c.items))
 	for key, item := range cloneMap {
-		go func(i Item) {
+		go func(k string, i Item) {
 			if i.Expired() {
 				c.mu.Lock()
-				delete(c.items, key)
+				delete(c.items, k)
 				c.mu.Unlock()
 			}
 			ch <- int8(1)
-		}(item)
+		}(key, item)
 	}
 }
