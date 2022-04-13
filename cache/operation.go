@@ -31,47 +31,6 @@ func (c *cache) Set(key string, value any) {
 	}
 }
 
-type HashStruct struct {
-	Key  string
-	Data any
-}
-
-//SetHash Add an item to the cache,replacing any existing item.
-//note key and subKey is primary key
-func (c *cache) SetHash(key, subKey string, value any) {
-	e := c.getUnixNano()
-	c.getLock()
-	defer c.mu.Unlock()
-
-	if vv, b := c.items[key]; b {
-		vv.Data.(map[string]any)[subKey] = value
-	} else {
-		subKeyValue := make(map[string]any)
-		subKeyValue[subKey] = value
-		v := Item{
-			Data: subKeyValue,
-			Ttl:  e,
-		}
-		c.items[key] = v
-	}
-}
-
-//GetHash get a hash value from the cache.Returns the hashes or nil, and a bool indicating
-// whether the key was found
-func (c *cache) GetHash(key, subKey string) (any, bool) {
-	c.getLock()
-	defer c.mu.Unlock()
-	if item, found := c.items[key]; !found {
-		return nil, found
-	} else {
-		if value, found := item.Data.(map[string]any)[subKey]; !found {
-			return nil, found
-		} else {
-			return value, true
-		}
-	}
-}
-
 //Get an item from the cache.Returns the item or nil, and a bool indicating
 // whether the key was found
 func (c *cache) Get(key string) (any, bool) {
