@@ -62,34 +62,41 @@ func Test_cache_Get1(t *testing.T) {
 //性能测试
 //fixme 并发问题有待处理
 func Test_cache_Get2(t *testing.T) {
-	c := NewWithExpiration(1 * time.Second)
+	c := NewWithExpiration(2 * time.Second)
 	ch := make(chan int8, 20000)
 	start := time.Now()
 	println("开始执行", start.UnixMilli())
 	for i := 0; i < 10000; i++ {
+		key := fmt.Sprintf("%s%d", "Key", i)
 		go func() {
-			key := fmt.Sprintf("%s%d", "Key", i)
-			c.Set(key, "库陈胜")
+			c.Set(key, "库陈胜"+key)
 			ch <- int8(1)
-			c.SetHash(key+"hash", strconv.Itoa(i), "性能测试")
+			c.SetHash(key+"hash", strconv.Itoa(i), "性能测试"+key)
 			ch <- int8(1)
-			println(c.Cap())
 		}()
 	}
-	println("PUT结束执行,耗时", time.Now().UnixMilli()-start.UnixMilli(), "ms")
+	println("PUT结束执行,耗时", time.Now().UnixMilli()-start.UnixMilli(), "ms", "key总数", c.Cap())
 	ch1 := make(chan int8, 20000)
 	for i := 0; i < 10000; i++ {
+		key := fmt.Sprintf("%s%d", "Key", i)
 		go func() {
-			key := fmt.Sprintf("%s%d", "Key", i)
-			_, _ = c.Get(key)
+			if v, b := c.Get(key); b {
+				println("key=", key, "value = ", v.(string))
+			}
 			ch1 <- int8(1)
-			_, _ = c.GetHash(key+"hash", strconv.Itoa(i))
+			subKey := strconv.Itoa(i)
+			if v, b := c.GetHash(key+"hash", subKey); b {
+				println("key=", key, "subKey=", subKey, "value = ", v.(string))
+			}
 			ch1 <- int8(1)
 		}()
 	}
-	time.Sleep(500 * time.Millisecond)
-	println("500ms 后还剩多少key ？ ", c.Cap())
 
-	time.Sleep(500 * time.Millisecond)
-	println("1000ms 后还剩多少key ？ ", c.Cap())
+	println("当前有多少key?", c.Cap())
+	times := 1
+	for c.Cap() > 0 {
+		time.Sleep(1 * time.Second)
+		println("沉睡", times, "秒后，剩余多少Key?", c.Cap())
+		times++
+	}
 }

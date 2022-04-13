@@ -70,7 +70,7 @@ type janitor struct {
 
 func (c *cache) runCleanup(cleanupInterval time.Duration) {
 	if cleanupInterval == 0 {
-		cleanupInterval = time.Second * 1
+		cleanupInterval = 500 * time.Millisecond
 	}
 	ticker := time.NewTicker(cleanupInterval)
 	for {
@@ -93,11 +93,18 @@ func (c *cache) DeleteExpired() {
 	if l < 1 {
 		return
 	}
+	cloneMap := make(map[string]Item, c.Cap())
+	for k, v := range c.items {
+		cloneMap[k] = v
+	}
+
 	ch := make(chan int8, len(c.items))
-	for key, item := range c.items {
+	for key, item := range cloneMap {
 		go func(i Item) {
 			if i.Expired() {
+				c.mu.Lock()
 				delete(c.items, key)
+				c.mu.Unlock()
 			}
 			ch <- int8(1)
 		}(item)
