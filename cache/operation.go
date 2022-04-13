@@ -13,11 +13,17 @@ func (c *cache) getUnixNano() int64 {
 	return e
 }
 
+func (c *cache) getLock() {
+	for !c.mu.TryLock() {
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 //Set Add an item to the cache,replacing any existing item.
 //note key is primary key
 func (c *cache) Set(key string, value V) {
 	e := c.getUnixNano()
-	c.mu.Lock()
+	c.getLock()
 	defer c.mu.Unlock()
 	c.items[key] = Item{
 		Data: value,
@@ -34,7 +40,7 @@ type HashStruct struct {
 //note key and subKey is primary key
 func (c *cache) SetHash(key, subKey string, value V) {
 	e := c.getUnixNano()
-	c.mu.Lock()
+	c.getLock()
 	defer c.mu.Unlock()
 
 	if vv, b := c.items[key]; b {
@@ -53,7 +59,7 @@ func (c *cache) SetHash(key, subKey string, value V) {
 //GetHash get a hash value from the cache.Returns the hashes or nil, and a bool indicating
 // whether the key was found
 func (c *cache) GetHash(key, subKey string) (V, bool) {
-	c.mu.Lock()
+	c.getLock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
 		return nil, found
@@ -69,7 +75,7 @@ func (c *cache) GetHash(key, subKey string) (V, bool) {
 //Get an item from the cache.Returns the item or nil, and a bool indicating
 // whether the key was found
 func (c *cache) Get(key string) (V, bool) {
-	c.mu.Lock()
+	c.getLock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
 		return nil, found
@@ -83,7 +89,7 @@ func (c *cache) Get(key string) (V, bool) {
 }
 
 func (c *cache) Remove(key string) {
-	c.mu.Lock()
+	c.getLock()
 	defer c.mu.Unlock()
 	if _, found := c.items[key]; found {
 		delete(c.items, key)
@@ -92,6 +98,8 @@ func (c *cache) Remove(key string) {
 }
 
 func (c *cache) Cap() int {
+	c.getLock()
+	defer c.mu.Unlock()
 	ci := c.items
 	return len(ci)
 }

@@ -79,17 +79,17 @@ func Test_cache_Get2(t *testing.T) {
 	ch1 := make(chan int8, 20000)
 	for i := 0; i < 10000; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
-		go func() {
-			if v, b := c.Get(key); b {
-				println("key=", key, "value = ", v.(string))
+		subKey := key + "hash"
+		go func(k, s string) {
+			if v, b := c.Get(k); b {
+				println("key=", k, "value = ", v.(string))
 			}
 			ch1 <- int8(1)
-			subKey := strconv.Itoa(i)
-			if v, b := c.GetHash(key+"hash", subKey); b {
-				println("key=", key, "subKey=", subKey, "value = ", v.(string))
+			if v, b := c.GetHash(key+"hash", s); b {
+				println("key=", k, "subKey=", s, "value = ", v.(string))
 			}
 			ch1 <- int8(1)
-		}()
+		}(key, subKey)
 	}
 
 	println("当前有多少key?", c.Cap())
