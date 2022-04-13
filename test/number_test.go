@@ -65,3 +65,9 @@ func TestRune(t *testing.T) {
 	c2 := ISCChar(38738)
 	t.Logf("%s\n", c2.ToString())
 }
+
+func TestForRange(t *testing.T) {
+	for idx, e := range ISCInt(0).RangeStepTo(10, 2) {
+		t.Logf("%d %d\n", idx, e)
+	}
+}
