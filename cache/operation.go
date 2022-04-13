@@ -13,28 +13,24 @@ func (c *cache) getUnixNano() int64 {
 	return e
 }
 
-func (c *cache) getLock() {
-	for !c.mu.TryLock() {
-		time.Sleep(10 * time.Millisecond)
-	}
-}
-
 //Set Add an item to the cache,replacing any existing item.
 //note key is primary key
-func (c *cache) Set(key string, value any) {
+func (c *cache) Set(key string, value any) error {
 	e := c.getUnixNano()
-	c.getLock()
+
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.items[key] = Item{
 		Data: value,
 		Ttl:  e,
 	}
+	return nil
 }
 
 //Get an item from the cache.Returns the item or nil, and a bool indicating
 // whether the key was found
 func (c *cache) Get(key string) (any, bool) {
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
 		return nil, found
@@ -48,7 +44,7 @@ func (c *cache) Get(key string) (any, bool) {
 }
 
 func (c *cache) Remove(key string) {
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	if _, found := c.items[key]; found {
 		delete(c.items, key)
@@ -57,7 +53,7 @@ func (c *cache) Remove(key string) {
 }
 
 func (c *cache) Cap() int {
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	ci := c.items
 	return len(ci)

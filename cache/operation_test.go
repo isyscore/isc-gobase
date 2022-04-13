@@ -62,11 +62,12 @@ func Test_cache_Get1(t *testing.T) {
 //性能测试
 //fixme 并发问题有待处理
 func Test_cache_Get2(t *testing.T) {
-	c := NewWithExpiration(3 * time.Second)
-	ch := make(chan int8, 20000)
+	c := NewWithExpiration(5 * time.Second)
+	length := 327000
+	ch := make(chan int8, length)
 	start := time.Now()
 	println("开始执行", start.UnixNano())
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < length/2; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		go func(ii int, k string) {
 			c.Set(k, "库陈胜"+k)
@@ -76,7 +77,7 @@ func Test_cache_Get2(t *testing.T) {
 		}(i, key)
 	}
 
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < length; i++ {
 		<-ch
 	}
 	close(ch)
@@ -88,8 +89,8 @@ func Test_cache_Get2(t *testing.T) {
 
 	t.Logf("PUT结束执行,耗时 %d ms, key总数: %d", time.Now().UnixMilli()-start.UnixMilli(), c.Cap())
 
-	ch1 := make(chan int8, 20000)
-	for i := 0; i < 10000; i++ {
+	ch1 := make(chan int8, length)
+	for i := 0; i < length/2; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		subKey := key + "hash"
 		go func(k, s string) {
@@ -99,7 +100,7 @@ func Test_cache_Get2(t *testing.T) {
 			ch1 <- int8(1)
 		}(key, subKey)
 	}
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < length; i++ {
 		<-ch1
 	}
 	close(ch1)

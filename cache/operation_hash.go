@@ -7,9 +7,9 @@ import (
 
 //SetHash Add an item to the cache,replacing any existing item.
 //note key and subKey is primary key
-func (c *cache) SetHash(key, subKey string, value any) {
+func (c *cache) SetHash(key, subKey string, value any) error {
 	e := c.getUnixNano()
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	if vv, b := c.items[key]; b {
@@ -23,10 +23,11 @@ func (c *cache) SetHash(key, subKey string, value any) {
 		}
 		c.items[key] = v
 	}
+	return nil
 }
 
 func (c *cache) RemoveHash(key, subKey string) error {
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; found {
 		data := item.Data
@@ -46,7 +47,7 @@ func (c *cache) RemoveHash(key, subKey string) error {
 //GetHash get a hash value from the cache.Returns the hashes or nil, and a bool indicating
 // whether the key was found
 func (c *cache) GetHash(key, subKey string) (any, bool) {
-	c.getLock()
+	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
 		return nil, found
