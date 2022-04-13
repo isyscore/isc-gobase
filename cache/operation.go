@@ -21,7 +21,7 @@ func (c *cache) getLock() {
 
 //Set Add an item to the cache,replacing any existing item.
 //note key is primary key
-func (c *cache) Set(key string, value V) {
+func (c *cache) Set(key string, value any) {
 	e := c.getUnixNano()
 	c.getLock()
 	defer c.mu.Unlock()
@@ -33,12 +33,12 @@ func (c *cache) Set(key string, value V) {
 
 type HashStruct struct {
 	Key  string
-	Data V
+	Data any
 }
 
 //SetHash Add an item to the cache,replacing any existing item.
 //note key and subKey is primary key
-func (c *cache) SetHash(key, subKey string, value V) {
+func (c *cache) SetHash(key, subKey string, value any) {
 	e := c.getUnixNano()
 	c.getLock()
 	defer c.mu.Unlock()
@@ -58,7 +58,7 @@ func (c *cache) SetHash(key, subKey string, value V) {
 
 //GetHash get a hash value from the cache.Returns the hashes or nil, and a bool indicating
 // whether the key was found
-func (c *cache) GetHash(key, subKey string) (V, bool) {
+func (c *cache) GetHash(key, subKey string) (any, bool) {
 	c.getLock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
@@ -74,7 +74,7 @@ func (c *cache) GetHash(key, subKey string) (V, bool) {
 
 //Get an item from the cache.Returns the item or nil, and a bool indicating
 // whether the key was found
-func (c *cache) Get(key string) (V, bool) {
+func (c *cache) Get(key string) (any, bool) {
 	c.getLock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {

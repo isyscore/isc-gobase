@@ -7,12 +7,11 @@ import (
 )
 
 type Cache *cache
-type V any
 type cache struct {
 	defaultExpiration time.Duration
 	items             map[string]Item
 	mu                sync.RWMutex
-	onEvicted         func(string, V)
+	onEvicted         func(string, any)
 	j                 *janitor
 }
 

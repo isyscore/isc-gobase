@@ -76,10 +76,15 @@ func Test_cache_Get2(t *testing.T) {
 		}(i, key)
 	}
 
-	for c.Cap() != 20000 {
-		time.Sleep(100 * time.Millisecond)
-		t.Logf("CAP %d", c.Cap())
+	for i := 0; i < 20000; i++ {
+		<-ch
 	}
+	close(ch)
+
+	//for c.Cap() != 20000 {
+	//	time.Sleep(100 * time.Millisecond)
+	//	t.Logf("CAP %d", c.Cap())
+	//}
 
 	t.Logf("PUT结束执行,耗时 %d ms, key总数: %d", time.Now().UnixMilli()-start.UnixMilli(), c.Cap())
 
@@ -88,22 +93,22 @@ func Test_cache_Get2(t *testing.T) {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		subKey := key + "hash"
 		go func(k, s string) {
-			if v, b := c.Get(k); b {
-				t.Logf("key= %s, value = %s", k, v.(string))
-			}
+			_, _ = c.Get(k)
 			ch1 <- int8(1)
-			if v, b := c.GetHash(key+"hash", s); b {
-				t.Logf("key= %s, subkey = %s, value = %s", k, s, v.(string))
-			}
+			_, _ = c.GetHash(key+"hash", s)
 			ch1 <- int8(1)
 		}(key, subKey)
 	}
+	for i := 0; i < 20000; i++ {
+		<-ch1
+	}
+	close(ch1)
 
-	println("当前有多少key?", c.Cap())
+	t.Logf("当前key的数量 = %d", c.Cap())
 	times := 1
 	for c.Cap() > 0 {
 		time.Sleep(time.Second)
-		println("沉睡", times, "秒后，剩余多少Key?", c.Cap())
+		t.Log("沉睡", times, "秒后，剩余多少Key?", c.Cap())
 		times++
 	}
 }
