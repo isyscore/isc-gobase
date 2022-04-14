@@ -4,6 +4,10 @@ import (
 	"time"
 )
 
+type optList interface {
+	AddItem(key string, value ...any) error
+}
+
 func (c *cache) getUnixNano() int64 {
 	de := c.defaultExpiration
 	var e int64
@@ -17,7 +21,6 @@ func (c *cache) getUnixNano() int64 {
 //note key is primary key
 func (c *cache) Set(key string, value any) error {
 	e := c.getUnixNano()
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.items[key] = Item{

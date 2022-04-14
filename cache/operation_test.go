@@ -63,16 +63,18 @@ func Test_cache_Get1(t *testing.T) {
 //fixme 并发问题有待处理
 func Test_cache_Get2(t *testing.T) {
 	c := NewWithExpiration(5 * time.Second)
-	length := 327000
+	length := 300000
 	ch := make(chan int8, length)
 	start := time.Now()
 	println("开始执行", start.UnixNano())
-	for i := 0; i < length/2; i++ {
+	for i := 0; i < length/3; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		go func(ii int, k string) {
 			c.Set(k, "库陈胜"+k)
 			ch <- int8(1)
 			c.SetHash(k+"hash", strconv.Itoa(ii), "性能测试"+k)
+			ch <- int8(1)
+			c.AddItem(k, ii)
 			ch <- int8(1)
 		}(i, key)
 	}
@@ -90,7 +92,7 @@ func Test_cache_Get2(t *testing.T) {
 	t.Logf("PUT结束执行,耗时 %d ms, key总数: %d", time.Now().UnixMilli()-start.UnixMilli(), c.Cap())
 
 	ch1 := make(chan int8, length)
-	for i := 0; i < length/2; i++ {
+	for i := 0; i < length/3; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		subKey := key + "hash"
 		go func(k, s string) {
@@ -98,6 +100,8 @@ func Test_cache_Get2(t *testing.T) {
 			ch1 <- int8(1)
 			_, _ = c.GetHash(key+"hash", s)
 			ch1 <- int8(1)
+			ret := c.GetItem(k)
+			fmt.Println("k=", k, "value=", ret)
 		}(key, subKey)
 	}
 	for i := 0; i < length; i++ {
@@ -112,4 +116,25 @@ func Test_cache_Get2(t *testing.T) {
 		t.Log("沉睡", times, "秒后，剩余多少Key?", c.Cap())
 		times++
 	}
+}
+
+func TestCache_AddItem(t *testing.T) {
+	c := NewWithExpiration(5 * time.Second)
+	start := time.Now().UnixMilli()
+	ch := make(chan int8, 100)
+	for i := 0; i < 100; i++ {
+		go func(ii int) {
+			if err := c.AddItem("test", ii, 666); err != nil {
+				t.Errorf("%v", err)
+			}
+			ch <- int8(1)
+		}(i)
+	}
+	for i := 0; i < 100; i++ {
+		<-ch
+	}
+	t.Log("执行结束，耗时", time.Now().UnixMilli()-start, "ms", "缓存大小", c.Cap())
+	ret := c.GetItem("test")
+	t.Logf("size = %d,%v", len(ret),
+		ret)
 }
