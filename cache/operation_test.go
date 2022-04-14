@@ -135,6 +135,37 @@ func TestCache_AddItem(t *testing.T) {
 	}
 	t.Log("执行结束，耗时", time.Now().UnixMilli()-start, "ms", "缓存大小", c.Cap())
 	ret := c.GetItem("test")
-	t.Logf("size = %d,%v", len(ret),
-		ret)
+	t.Logf("size = %d,%v", len(ret), ret)
+
+	for i := 0; i < 100; i++ {
+		go func(ii int) {
+			if err := c.SetItem("test", ii, 777); err != nil {
+				t.Errorf("%v", err)
+			}
+			ch <- int8(1)
+		}(i)
+	}
+	for i := 0; i < 100; i++ {
+		<-ch
+	}
+
+	t.Log("执行结束，耗时", time.Now().UnixMilli()-start, "ms", "缓存大小", c.Cap())
+	ret1 := c.GetItem("test")
+	t.Logf("size = %d,%v", len(ret1), ret1)
+
+	for i := 0; i < 100; i++ {
+		go func(ii int) {
+			if err := c.RemoveItem("test", ii); err != nil {
+				t.Errorf("%v", err)
+			}
+			ch <- int8(1)
+		}(i)
+	}
+	for i := 0; i < 100; i++ {
+		<-ch
+	}
+	t.Log("执行结束，耗时", time.Now().UnixMilli()-start, "ms", "缓存大小", c.Cap())
+	ret2 := c.GetItem("test")
+	t.Logf("size = %d,%v", len(ret2), ret2)
+
 }

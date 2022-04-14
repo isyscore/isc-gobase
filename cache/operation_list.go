@@ -40,7 +40,10 @@ func (c *cache) SetItem(key string, idx int, value any) error {
 		if len(items) <= idx {
 			return errors.New("数组下标越界")
 		}
-		item.Data = append(item.Data.([]any), value)
+
+		items[idx] = value
+		item.Data = items
+		return nil
 	}
 	return errors.New("key不存在")
 }
@@ -81,11 +84,14 @@ func (c *cache) RemoveItem(key string, idx int) error {
 		return nil
 	}
 	item := c.GetItem(key)
+	if item == nil {
+		return errors.New("key不存在")
+	}
 	if len(item) <= idx {
 		return nil
 	}
 	newItem := item[:idx]
-	newItem = append(newItem, item[idx:]...)
+	newItem = append(newItem, item[idx+1:]...)
 	c.Set(key, newItem)
 	return nil
 }
