@@ -6,6 +6,10 @@ import (
 
 type optList interface {
 	AddItem(key string, value ...any) error
+	SetItem(key string, index int, value any) error
+	GetItem(key string) []any
+	GetItemByIndex(key string, index int) any
+	RemoveItem(key string, index int) error
 }
 
 func (c *cache) getUnixNano() int64 {
