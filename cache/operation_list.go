@@ -14,12 +14,12 @@ func (c *cache) AddItem(key string, value ...any) error {
 		if reflect.TypeOf(data).Kind() != reflect.Slice {
 			return errors.New("key 对应的数据类型不是 slice")
 		}
-		item.Data = append(data.([]any), value)
+		item.Data = append(data.([]any), value...)
 		c.items[key] = item
 	} else {
 		e := c.getUnixNano()
 		data := Item{
-			Data: []any{value},
+			Data: value,
 			Ttl:  e,
 		}
 		c.items[key] = data
