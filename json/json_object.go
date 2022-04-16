@@ -131,10 +131,6 @@ func (jsonObject *Object) doGet(parentValue any, key string) any {
 	return nil
 }
 
-
-
-
-
 func (jsonObject *Object) GetString(key string) string {
 	return isc.ToString(jsonObject.Get(key))
 }

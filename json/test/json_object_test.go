@@ -7,37 +7,53 @@ import (
 	"testing"
 )
 
+//{
+//    "k1":12,
+//    "k2":true,
+//    "k3":{
+//        "k31":32,
+//        "k32":"str",
+//        "k33":{
+//            "k331":12
+//        }
+//    }
+//}
+var str = "{\n    \"k1\":12,\n    \"k2\":true,\n    \"k3\":{\n        \"k31\":32,\n        \"k32\":\"str\",\n        \"k33\":{\n            \"k331\":12\n        }\n    }\n}"
+
 func TestLoad(t *testing.T) {
-	jsonObject := json.Object{}
-	str := "{\n    \"test\":12,\n    \"ok\":\"haode\",\n    \"k1\":{\n        \"k2\":true,\n        \"k21\":{\n            \"k3\":43,\n            \"k3array\":[\n                1,\n                2,\n                3,\n                4\n            ]\n        }\n    }\n}"
-	err := jsonObject.Load(str)
+	jsonData := json.Object{}
+	err := jsonData.Load(str)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	assert.Equal(t, 12, jsonObject.Get("test"))
-	assert.Equal(t, "haode", jsonObject.Get("ok"))
-	assert.Equal(t, true, jsonObject.Get("k1.k2"))
-	assert.Equal(t, 43, jsonObject.Get("k1.k21.k3"))
+	assert.Equal(t, jsonData.Get("k1"), 12)
+	assert.Equal(t, jsonData.Get("k2"), true)
+	assert.Equal(t, jsonData.Get("k3.k31"), 32)
+	assert.Equal(t, jsonData.Get("k3.k32"), "str")
+	assert.Equal(t, jsonData.Get("k3.k33.k331"), 12)
 }
 
 func TestPut1(t *testing.T) {
 	jsonObject := json.Object{}
-	str := "{\n    \"test\":12,\n    \"ok\":\"haode\",\n    \"k1\":{\n        \"k2\":true,\n        \"k21\":{\n            \"k3\":43,\n            \"k3array\":[\n                1,\n                2,\n                3,\n                4\n            ]\n        }\n    }\n}"
 	err := jsonObject.Load(str)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	jsonObject.Put("test", 23)
-	jsonObject.Put("ok", "ok-change")
-	jsonObject.Put("k1.k2", false)
+	jsonObject.Put("k1", 13)
+	jsonObject.Put("k2", false)
+	jsonObject.Put("k3.k31", 33)
+	jsonObject.Put("k3.k32", "str-change")
+	jsonObject.Put("k3.k33.k331", 134)
 
-	assert.Equal(t, jsonObject.Get("test"), 23)
-	assert.Equal(t, jsonObject.Get("ok"), "ok-change")
-	assert.Equal(t, jsonObject.Get("k1.k2"), false)
+	assert.Equal(t, jsonObject.Get("k1"), 13)
+	assert.Equal(t, jsonObject.Get("k2"), false)
+	assert.Equal(t, jsonObject.Get("k3.k31"), 33)
+	assert.Equal(t, jsonObject.Get("k3.k32"), "str-change")
+	assert.Equal(t, jsonObject.Get("k3.k33.k331"), 134)
 }
 
 func TestPut2(t *testing.T) {
@@ -83,6 +99,8 @@ func TestPut4(t *testing.T) {
 
 	assert.Equal(t, jsonObject.GetString("stringValue"), "haode")
 	assert.Equal(t, jsonObject.GetBool("boolValue"), false)
+	assert.Equal(t, jsonObject.GetBool("objectValue.field1"), true)
+	assert.Equal(t, jsonObject.GetInt("objectValue.field2Struct.f21"), 43)
 
 	testEntity := TestEntity{}
 	jsonObject.GetObject("objectValue", &testEntity)
