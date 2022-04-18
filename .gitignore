@@ -20,3 +20,8 @@
 logs/
 go.sum
 
+# other language
+*.java
+*.class
+*.jar
+
