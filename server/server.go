@@ -46,12 +46,15 @@ func InitServer() {
 		logger.Error("没有找到任何配置文件，服务启动失败")
 		return
 	}
-	mode := config.BaseCfg.Server.Gin.Mode
+	mode := config.GetValueStringDefault("base.server.gin.mode", "release")
 	if "debug" == mode {
 		gin.SetMode(gin.DebugMode)
 	} else if "test" == mode {
 		gin.SetMode(gin.TestMode)
 	} else if "release" == mode {
+		gin.SetMode(gin.ReleaseMode)
+		gin.DefaultWriter = ioutil.Discard
+	} else {
 		gin.SetMode(gin.ReleaseMode)
 		gin.DefaultWriter = ioutil.Discard
 	}
@@ -98,7 +101,7 @@ func StartServer() {
 		return
 	}
 
-	if !config.BaseCfg.Server.Enable {
+	if !config.GetValueBoolDefault("base.server.enable", true) {
 		return
 	}
 

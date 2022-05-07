@@ -18,7 +18,7 @@ base:
     # web框架gin的配置
     gin:
       # 有三种模式：debug/release/test
-      mode: debug
+      mode: release
     exception:
       # 异常返回打印
       print:

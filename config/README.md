@@ -131,18 +131,28 @@ base:
 
 ```shell
 // 查看应用所有配置
-curl http://localhost:xxx/{api-module}system/config/values
+curl http://localhost:xxx/{api-module}config/values
 
 // 查看应用的某个配置
-curl http://localhost:xxx/{api-module}system/config/value/{key}
+curl http://localhost:xxx/{api-module}config/value/{key}
 
 // 修改应用的配置
-curl -X PUT http://localhost:xxx/{api-module}system/config/update -d '{"key":"xxx", "value":"yyyy"}'
+curl -X PUT http://localhost:xxx/{api-module}config/update -d '{"key":"xxx", "value":"yyyy"}'
 ```
 
-##### 注意
-该配置的修改只对`config.getValueXXX()` 这种实时调用的配置有效，配置使用方式有两种
-- 实体化：在对应文件中直接将配置实体化起来
-- api实时调用：代码中使用时候直接调用config.getValueXXX()
+---
+
+#### 注意
+
+- 配置实体化
+  - 无法动态的变更
+  - 不支持默认配置
+- api实时调用
+  - 配置可以动态的变更
+  - 有默认的api
+    
+建议：配置使用时候建议使用config.GetXXXX()
 
 其中动态变更只对api实时调用的方式有效
+
+---

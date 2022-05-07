@@ -252,9 +252,9 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 	}
 	// log.Info().Msgf("开启定时日志清理任务")
 	cClean := cron.New()
-	cClean.AddFunc("0 0 1 * * ?", func() {
+	_ = cClean.AddFunc("0 0 1 * * ?", func() {
 		log.Debug().Msg("定时每天日志清理任务执行")
-		filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
+		_ = filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
 			now := time.Now()
 			if time.DaysBetween(now, info.ModTime()) > history {
 				//remove file

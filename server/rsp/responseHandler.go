@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isyscore/isc-gobase/config"
-
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 )
@@ -50,7 +48,7 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 
 		var body any
 		bodyStr := string(data)
-		if "" != bodyStr {
+		if "" != bodyStr && len(bodyStr) < 1000 {
 			if strings.HasPrefix(bodyStr, "{") && strings.HasSuffix(bodyStr, "}") {
 				bodys := map[string]any{}
 				_ = isc.StrToObject(bodyStr, &bodys)
@@ -67,11 +65,8 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 			Uri:        c.Request.RequestURI,
 			Ip:         c.ClientIP(),
 			Parameters: c.Params,
+			Headers:    c.Request.Header,
 			Body:       body,
-		}
-
-		if config.GetValueBoolDefault("base.server.head.show", true) {
-			request.Headers = c.Request.Header
 		}
 
 		message := ErrorMessage{
