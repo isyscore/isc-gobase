@@ -34,7 +34,10 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	t0 "time"
+
+	l0 "log"
 
 	"github.com/isyscore/isc-gobase/cron"
 	f0 "github.com/isyscore/isc-gobase/file"
@@ -115,7 +118,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	initLogDir(out, splitEnable, splitSize, logDir, history)
-
+	initSystemPanicLog()
 }
 
 type FileLevelWriter struct {
@@ -160,6 +163,24 @@ func getLogDir(logDir string) string {
 		}
 	}
 	return logDir
+}
+
+func initSystemPanicLog() {
+	dir, _ := os.Getwd()
+	logDir := filepath.Join(dir, "logs")
+	if !f0.DirectoryExists(logDir) {
+		_ = f0.MkDirs(logDir)
+	}
+	logFilePath := filepath.Join(logDir, "system_panic.log")
+	if logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660); err == nil {
+		if err = syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd())); err == nil {
+			log.Printf("system panic log redirect to %s", logFilePath)
+		} else {
+			log.Printf("system panic log redirect to %s failed:%v", logFilePath, err)
+		}
+	} else {
+		l0.Printf("system_panic.log创建异常:%v", err)
+	}
 }
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir string) *FileLevelWriter {
