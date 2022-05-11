@@ -102,8 +102,6 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 		// do nothing
 	}
 
-	zerolog.CallerMarshalFunc = callerMarshalFunc
-
 	SetGlobalLevel(logLevel)
 
 	zerolog.CallerSkipFrameCount = 2

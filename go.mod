@@ -8,6 +8,7 @@ require (
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/magiconair/properties v1.8.5
 	github.com/rs/zerolog v1.26.1
+	golang.org/x/text v0.3.6
 	gopkg.in/yaml.v2 v2.4.0
 )
 
