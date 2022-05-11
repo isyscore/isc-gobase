@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,18 @@ func TestServer(t *testing.T) {
 			go func(idx int) {
 				c_s := cron.New()
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
 					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
 					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
 					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)

@@ -169,6 +169,9 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir stri
 	if level == zerolog.NoLevel {
 		strL = "assert"
 	}
+	if level == zerolog.Disabled {
+		strL = "console"
+	}
 	linkName := fmt.Sprintf("app-%s.log", strL)
 	linkName = filepath.Join(getLogDir(dir), linkName)
 	logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
@@ -193,7 +196,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir stri
 
 }
 
-var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel}
+var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel, zerolog.Disabled}
 
 func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir string) {
 	//关闭现有流
@@ -206,6 +209,10 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir st
 		fw := createFileLeveWriter(level, strTime, idx, dir)
 		if fw != nil {
 			newWriter = append(newWriter, fw)
+		}
+		if level == zerolog.Disabled {
+			os.Stdout = fw.File
+			os.Stderr = fw.File
 		}
 
 	}
