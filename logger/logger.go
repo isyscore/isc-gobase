@@ -27,6 +27,7 @@ package logger
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/isc"
 	"io"
 	"io/fs"
 	"os"
@@ -107,25 +108,26 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 
 	zerolog.CallerSkipFrameCount = 2
 	zerolog.CallerMarshalFunc = callerMarshalFunc
-	//时间格式设置
-	zerolog.TimeFieldFormat = timeFmt
 	//设置日志输出
-	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored}
+	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored, FormatTimestamp: func(i interface{}) string {
+		return "[" + time.Now().Format(time.FmtYMdHmsSSS) + "]"
+	}}
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out, splitEnable, splitSize, logDir, history)
+	initLogDir(out, splitEnable, splitSize, logDir, history, appName)
 
 }
 
 type FileLevelWriter struct {
 	*os.File
-	level zerolog.Level
+	level  zerolog.Level
+	writer zerolog.ConsoleWriter
 }
 
 func (lw *FileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err error) {
 	if level.String() == lw.level.String() {
-		return lw.Write(p)
+		return lw.writer.Write(p)
 	}
 	return 0, nil
 }
@@ -164,7 +166,7 @@ func getLogDir(logDir string) string {
 	return logDir
 }
 
-func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir string) *FileLevelWriter {
+func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
 	if level == zerolog.NoLevel {
 		strL = "assert"
@@ -189,13 +191,25 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir stri
 
 	//打开创建流
 	file1, _ := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0644)
-	return &FileLevelWriter{file1, level}
+	return &FileLevelWriter{file1, level, zerolog.ConsoleWriter{
+		Out:     file1,
+		NoColor: false,
+		FormatTimestamp: func(i interface{}) string {
+			return "[" + time.Now().Format(time.FmtYMdHmsSSS) + "]"
+		},
+		FormatLevel: func(i any) string {
+			return strings.ToUpper(fmt.Sprintf("[%s] [%-2s]", appName, i))
+		},
+		FormatCaller: func(i interface{}) string {
+			return isc.ToString(i)
+		},
+	}}
 
 }
 
 var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel}
 
-func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir string) {
+func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, name string) {
 	//关闭现有流
 	closeFileLevelWriter(oldWriter)
 	//修改listWriter
@@ -203,7 +217,7 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir st
 	//时间格式转换
 	strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
 	for _, level := range ls {
-		fw := createFileLeveWriter(level, strTime, idx, dir)
+		fw := createFileLeveWriter(level, strTime, idx, dir, name)
 		if fw != nil {
 			newWriter = append(newWriter, fw)
 		}
@@ -218,8 +232,8 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir st
 var oldWriter []io.Writer
 
 //initLogDir create log dir and file
-func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int) {
-	fileHandler := func() { updateOuters(out, 0, levels, dir) }
+func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int, name string) {
+	fileHandler := func() { updateOuters(out, 0, levels, dir, name) }
 	fileHandler()
 
 	//每天创建一个文件
@@ -244,7 +258,7 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 							} else if len(idxs) > 3 {
 								idx, _ = strconv.Atoi(idxs[len(idxs)-2])
 							}
-							updateOuters(out, idx+1, []zerolog.Level{fw.level}, dir)
+							updateOuters(out, idx+1, []zerolog.Level{fw.level}, dir, name)
 						}
 					}
 				}
