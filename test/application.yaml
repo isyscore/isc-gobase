@@ -40,7 +40,7 @@ base:
     level: info
     time:
       # 时间格式，time包中的内容
-      format: time.RFC3339
+      format: 2006-01-02 15:04:05
     # 日志颜色
     color:
       # 启用：true/false，默认：false

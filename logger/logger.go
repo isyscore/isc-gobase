@@ -108,7 +108,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 	zerolog.CallerMarshalFunc = callerMarshalFunc
 	//设置日志输出
 	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored, FormatTimestamp: func(i interface{}) string {
-		return "[" + time.Now().Format(time.FmtYMdHmsSSS) + "]"
+		return "[" + time.Now().Format(timeFmt) + "]"
 	}}
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
