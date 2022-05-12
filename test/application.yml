@@ -50,5 +50,9 @@ base:
       enable: false
       # 日志拆分的单位：MB
       size: 300
+    max:
+      history: 7
     dir: ./logs
+    panic: false
+
 

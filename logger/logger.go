@@ -27,7 +27,6 @@ package logger
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/isc"
 	"io"
 	"io/fs"
 	"os"
@@ -38,6 +37,8 @@ import (
 	"syscall"
 	t0 "time"
 
+	"github.com/isyscore/isc-gobase/isc"
+
 	l0 "log"
 
 	"github.com/isyscore/isc-gobase/cron"
@@ -46,6 +47,25 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
+
+type LoggerConfig struct {
+	Level string `yaml:"level"`
+	Time  struct {
+		Format string `yaml:"format"`
+	} `yaml:"time"`
+	Color struct {
+		Enable bool `yaml:"enable"`
+	} `yaml:"color"`
+	Split struct {
+		Enable bool  `yaml:"enable"`
+		Size   int64 `yaml:"size"`
+	} `yaml:"split"`
+	Dir string `yaml:"dir"`
+	Max struct {
+		History int `yaml:"history"`
+	} `yaml:"max"`
+	Panic bool `yaml:"panic"`
+}
 
 func Info(format string, v ...any) {
 	log.Info().Msgf(format, v...)
@@ -99,27 +119,43 @@ func callerMarshalFunc(file string, l int) string {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog(logLevel string, timeFmt string, colored bool, appName string, splitEnable bool, splitSize int64, logDir string, history int) {
+func InitLog(appName string, cfg *LoggerConfig) {
+	if cfg.Level == "" {
+		cfg.Level = "info"
+	}
+	if cfg.Time.Format == "" {
+		cfg.Time.Format = "2006-01-02 15:04:05"
+	}
+	if cfg.Split.Size == 0 {
+		cfg.Split.Size = 300
+	}
+	if cfg.Max.History == 0 {
+		cfg.Max.History = 7
+	}
+
 	//日志级别设置，默认Info
 	zerolog.ErrorHandler = func(err error) {
 		// do nothing
 	}
 
-	SetGlobalLevel(logLevel)
+	SetGlobalLevel(cfg.Level)
 
 	zerolog.CallerSkipFrameCount = 2
 	zerolog.CallerMarshalFunc = callerMarshalFunc
 	//时间格式设置
-	zerolog.TimeFieldFormat = timeFmt
+	zerolog.TimeFieldFormat = cfg.Time.Format
 	//设置日志输出
-	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored, FormatTimestamp: func(i interface{}) string {
-		return "[" + time.Now().Format(timeFmt) + "]"
+	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: cfg.Color.Enable, FormatTimestamp: func(i interface{}) string {
+		return "[" + time.Now().Format(cfg.Time.Format) + "]"
 	}}
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out, splitEnable, splitSize, logDir, history, appName)
-	initSystemPanicLog()
+	if cfg.Panic {
+		initSystemPanicLog()
+	} else {
+		initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName)
+	}
 }
 
 type FileLevelWriter struct {
