@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+.vscode/
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -18,4 +19,9 @@
 
 logs/
 go.sum
+
+# other language
+*.java
+*.class
+*.jar
 

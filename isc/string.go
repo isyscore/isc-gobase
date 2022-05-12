@@ -1,7 +1,9 @@
 package isc
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -13,6 +15,14 @@ func (s ISCString) At(index int) uint8 {
 
 func (s ISCString) Length() int {
 	return len(s)
+}
+
+func (s ISCString) Chars() ISCList[uint8] {
+	var list []uint8
+	for i := 0; i < len(s); i++ {
+		list = append(list, s[i])
+	}
+	return list
 }
 
 func (s ISCString) Count(substr string) int {
@@ -29,6 +39,10 @@ func (s ISCString) ContainsAny(chars string) bool {
 
 func (s ISCString) ContainsRune(r rune) bool {
 	return strings.ContainsRune(string(s), r)
+}
+
+func (s ISCString) IndexOf(substr string) int {
+	return strings.Index(string(s), substr)
 }
 
 func (s ISCString) LastIndexOf(substr string) int {
@@ -161,10 +175,6 @@ func (s ISCString) EqualFold(t string) bool {
 	return strings.EqualFold(string(s), t)
 }
 
-func (s ISCString) IndexOf(substr string) int {
-	return strings.Index(string(s), substr)
-}
-
 func (s ISCString) ToUpper() ISCString {
 	return ISCString(strings.ToUpper(string(s)))
 }
@@ -254,6 +264,18 @@ func (s ISCString) ToInt() int {
 	return ToInt(s)
 }
 
+func (s ISCString) ToInt8() int8 {
+	return ToInt8(s)
+}
+
+func (s ISCString) ToInt16() int16 {
+	return ToInt16(s)
+}
+
+func (s ISCString) ToInt32() int32 {
+	return ToInt32(s)
+}
+
 func (s ISCString) ToInt64() int64 {
 	return ToInt64(s)
 }
@@ -264,6 +286,14 @@ func (s ISCString) ToFloat() float32 {
 
 func (s ISCString) ToFloat64() float64 {
 	return ToFloat64(s)
+}
+
+func (s ISCString) ToIntRadix(radix int) (int64, error) {
+	if radix != 2 && radix != 8 && radix != 10 && radix != 16 {
+		return 0, fmt.Errorf("radix %d is not supported", radix)
+	}
+	size := strconv.IntSize
+	return strconv.ParseInt(string(s), radix, size)
 }
 
 func (s ISCString) ToJSONEncoded() ISCString {

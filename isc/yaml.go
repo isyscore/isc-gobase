@@ -47,10 +47,10 @@ var rangePattern = regexp.MustCompile("^(.*)\\[(\\d*)\\]$")
 type TypeEnum int8
 
 const (
-	YAML       TypeEnum = 0
-	PROPERTIES TypeEnum = 1
-	JSON       TypeEnum = 2
-	STRING     TypeEnum = 3
+	TeYAML       TypeEnum = 0
+	TePROPERTIES TypeEnum = 1
+	TeJSON       TypeEnum = 2
+	TeSTRING     TypeEnum = 3
 )
 
 type Properties struct {
@@ -393,17 +393,17 @@ func MapToProperties(dataMap map[string]any) (string, error) {
 
 func KvToProperties(key, value string, valueType TypeEnum) (string, error) {
 	switch valueType {
-	case YAML:
+	case TeYAML:
 		return YamlToPropertiesWithKey(key, value)
-	case JSON:
+	case TeJSON:
 		value, err := JsonToYaml(value)
 		if err != nil {
 			return "", err
 		}
 		return YamlToPropertiesWithKey(key, value)
-	case PROPERTIES:
+	case TePROPERTIES:
 		return propertiesAppendPrefixKey(key, value)
-	case STRING:
+	case TeSTRING:
 		return key + "=" + appendSpaceForArrayValue(value), nil
 	default:
 		break

@@ -35,7 +35,10 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	t0 "time"
+
+	l0 "log"
 
 	"github.com/isyscore/isc-gobase/cron"
 	f0 "github.com/isyscore/isc-gobase/file"
@@ -106,6 +109,8 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 
 	zerolog.CallerSkipFrameCount = 2
 	zerolog.CallerMarshalFunc = callerMarshalFunc
+	//时间格式设置
+	zerolog.TimeFieldFormat = timeFmt
 	//设置日志输出
 	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: colored, FormatTimestamp: func(i interface{}) string {
 		return "[" + time.Now().Format(timeFmt) + "]"
@@ -114,7 +119,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	initLogDir(out, splitEnable, splitSize, logDir, history, appName)
-
+	initSystemPanicLog()
 }
 
 type FileLevelWriter struct {
@@ -154,14 +159,30 @@ func getLogDir(logDir string) string {
 		// 创建日志目录
 		logDir = filepath.Join(pwd, "logs")
 	}
-
-	fmt.Println("日志目录", logDir)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, os.ModePerm); err != nil {
 			log.Fatal().Msgf("日志目录创建异常:%v", err)
 		}
 	}
 	return logDir
+}
+
+func initSystemPanicLog() {
+	dir, _ := os.Getwd()
+	logDir := filepath.Join(dir, "logs")
+	if !f0.DirectoryExists(logDir) {
+		_ = f0.MkDirs(logDir)
+	}
+	logFilePath := filepath.Join(logDir, "system_panic.log")
+	if logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660); err == nil {
+		if err = syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd())); err == nil {
+			log.Printf("system panic log redirect to %s", logFilePath)
+		} else {
+			log.Printf("system panic log redirect to %s failed:%v", logFilePath, err)
+		}
+	} else {
+		l0.Printf("system_panic.log创建异常:%v", err)
+	}
 }
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
@@ -271,11 +292,11 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 		})
 		c_check.Start()
 	}
-	log.Info().Msgf("开启定时日志清理任务")
+	// log.Info().Msgf("开启定时日志清理任务")
 	cClean := cron.New()
-	cClean.AddFunc("0 0 1 * * ?", func() {
+	_ = cClean.AddFunc("0 0 1 * * ?", func() {
 		log.Debug().Msg("定时每天日志清理任务执行")
-		filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
+		_ = filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
 			now := time.Now()
 			if time.DaysBetween(now, info.ModTime()) > history {
 				//remove file

@@ -78,6 +78,8 @@ base:
 | [coder](/coder)| 编解码（待更新） |
 | [database](/database)|数据库处理（待更新） |
 | [file](/file)| 文件处理（待更新） |
-| [http](/http)| http处理（待更新） |
+| [http](/http)| http处理 |
 | [server](/server)| 服务处理 |
+| [goid](/goid)| 局部id传递处理（theadlocal） |
+| [json](/json)| json字符串处理工具 |
 
