@@ -1,19 +1,26 @@
 ## redis
-对go-redis进行封装，用于在不同redis模式下进行直接运行
+对go-redis进行封装，用于简化配置使用
 
 ### 快速使用
 
 ```yaml
 base:
   redis:
-    password: 
+    enable: true
     standalone:
-      addr: 
-      database: 0
+      addr: localhost:16379
 ```
 
 ```go
-
+func TestConnect(t *testing.T) {
+    // 直接获取即可 
+    rdb, _ := redis.GetClient()
+    
+    ctx := context.Background()
+    rdb.Set(ctx, "k1", "vv", time.Hour)
+    rlt := rdb.Get(ctx, "k1")
+    fmt.Println(rlt.Result())
+}
 ```
 
 redis的全部配置如下
