@@ -26,6 +26,7 @@ type PagedData[T any] struct {
 	Total         int64 `json:"total"`
 	Size          int64 `json:"size"`
 	Current       int64 `json:"current"`
+	Pages         int64 `json:"pages"`
 	IsSearchCount bool  `json:"isSearchCount"`
 	Records       []T   `json:"records"`
 }
