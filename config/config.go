@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/isc"
@@ -17,9 +18,18 @@ import (
 
 var appProperty *ApplicationProperty
 var configExist = false
+var loadLock sync.Mutex
+var configLoaded = false
 
 func LoadConfig() {
+	loadLock.Lock()
+	defer loadLock.Unlock()
+	if configLoaded {
+		return
+	}
+
 	LoadConfigFromRelativePath("")
+	configLoaded = true
 }
 
 // LoadConfigFromRelativePath 加载相对文件路径
