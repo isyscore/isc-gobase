@@ -68,6 +68,10 @@ func Panic(format string, v ...any) {
 	log.WithLevel(zerolog.PanicLevel).Msgf(format, v...)
 }
 
+func Fatal(format string, v ...any) {
+	log.WithLevel(zerolog.FatalLevel).Msgf(format, v...)
+}
+
 // SetGlobalLevel sets the global override for log level. If this
 // values is raised, all Loggers will use at least this value.
 //
@@ -238,7 +242,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 
 }
 
-var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.FatalLevel, zerolog.PanicLevel, zerolog.Disabled}
+var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.PanicLevel, zerolog.FatalLevel, zerolog.Disabled}
 
 func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, name string) {
 	//关闭现有流
