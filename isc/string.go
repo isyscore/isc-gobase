@@ -415,7 +415,7 @@ func MiddleLine(word string) string {
 	return result
 }
 
-// 中划线到大驼峰：data-db-user -> DataBaseUser
+// MiddleLineToBigCamel 中划线到大驼峰：data-db-user -> DataBaseUser
 func MiddleLineToBigCamel(word string) string {
 	if word == "" {
 		return ""
@@ -423,7 +423,7 @@ func MiddleLineToBigCamel(word string) string {
 	return BigCamel(MiddleLineToSmallCamel(word))
 }
 
-// 中划线到小驼峰：data-base-user -> dataBaseUser
+// MiddleLineToSmallCamel 中划线到小驼峰：data-base-user -> dataBaseUser
 func MiddleLineToSmallCamel(word string) string {
 	if word == "" {
 		return ""
@@ -431,7 +431,7 @@ func MiddleLineToSmallCamel(word string) string {
 	return strings.ReplaceAll(ToUpperWord("(?<=-)[a-z]", word), "-", "")
 }
 
-// 小驼峰到后下划线：dataBaseUser -> data_base_user_
+// PostUnder 小驼峰到后下划线：dataBaseUser -> data_base_user_
 func PostUnder(word string) string {
 	if word == "" {
 		return ""
@@ -439,17 +439,18 @@ func PostUnder(word string) string {
 	return UnderLine(word) + "_"
 }
 
-//
-//// 小驼峰到添加前缀字符下划线：dataBaseUser -> pre_data_base_user
-//func preFixUnderLine(word string) string {
-//
-//}
-//
-//// 前缀字符下划线去掉到小驼峰：pre_data_base_user -> dataBaseUser
-//func preFixUnderToSmallCamel(word string) string {
-//
-//}
-//
+// PreFixUnderLine 小驼峰到添加前缀字符下划线：dataBaseUser -> pre_data_base_user
+func PreFixUnderLine(word, preFix string) string {
+	return preFix + UnderLine(word)
+}
+
+// PreFixUnderToSmallCamel 前缀字符下划线去掉到小驼峰：pre_data_base_user -> dataBaseUser
+func PreFixUnderToSmallCamel(word, preFix string) string {
+	if strings.HasPrefix(word, preFix) {
+		return UnderLineToSmallCamel(word[len(preFix):])
+	}
+	return UnderLineToSmallCamel(word)
+}
 
 // PrePostUnder 小驼峰到前后缀下划线：dataBaseUser -> _data_base_user_
 func PrePostUnder(word string) string {
@@ -459,7 +460,7 @@ func PrePostUnder(word string) string {
 	return "_" + UnderLine(word) + "_"
 }
 
-// 小驼峰到前下划线：dataBaseUser -> _data_base_user
+// PreUnder 小驼峰到前下划线：dataBaseUser -> _data_base_user
 func PreUnder(word string) string {
 	if word == "" {
 		return ""
@@ -467,7 +468,7 @@ func PreUnder(word string) string {
 	return "_" + UnderLine(word)
 }
 
-// 小驼峰到前下划线：dataBaseUser -> _data_base_user
+// UnderLine 小驼峰到下划线：非边缘单词开头大写变前下划线和后面大写：dataBaseUser -> data_base_user
 func UnderLine(word string) string {
 	if word == "" {
 		return ""
@@ -489,26 +490,35 @@ func UnderLine(word string) string {
 	return result
 }
 
-//
-//// 下划线到大驼峰：下划线后面小写变大写，下划线去掉
-//// data_base_user   -> DataBaseUser
-//// _data_base_user  -> DataBaseUser
-//// _data_base_user_ -> DataBaseUser
-//// data_base_user_  -> DataBaseUser
-//func underLineToBigCamel(word string) string {
-//
-//}
-//
-//// 大写下划线到小驼峰：DATA_BASE_USER -> dataBaseUser
-//func underLineToSmallCamel(word string) string {
-//
-//}
-//
-//// 大写中划线到大驼峰：DATA-BASE-USER -> DataBaseUser }
-//func upperMiddleToBigCamel(word string) string {
-//
-//}
-//
+// UnderLineToBigCamel 下划线到大驼峰：下划线后面小写变大写，下划线去掉
+// data_base_user   -> DataBaseUser
+// _data_base_user  -> DataBaseUser
+// _data_base_user_ -> DataBaseUser
+// data_base_user_  -> DataBaseUser
+func UnderLineToBigCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return BigCamel(strings.ReplaceAll(ToUpperWord("(?<=_)[a-z]", word), "_", ""))
+}
+
+// UnderLineToSmallCamel 下划线到小驼峰：下划线后面小写变大写，下划线去掉
+// data_base_user   -> dataBaseUser
+// _data_base_user  -> dataBaseUser
+// _data_base_user_ -> dataBaseUser
+// data_base_user_  -> dataBaseUser
+func UnderLineToSmallCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return BigCamelToSmallCamel(strings.ReplaceAll(ToUpperWord("(?<=_)[a-z]", word), "_", ""))
+}
+
+// 大写中划线到大驼峰：DATA-BASE-USER -> DataBaseUser
+func UpperMiddleToBigCamel(word string) string {
+	return BigCamel(UpperUnderMiddleToSmallCamel(word))
+}
+
 // 小驼峰到大写下划线：dataBaseUser -> DATA_BASE_USER
 func UpperUnder(word string) string {
 	if word == "" {
@@ -553,23 +563,31 @@ func UpperUnderMiddle(word string) string {
 	return result
 }
 
-//
-//// 大写中划线到大驼峰：DATA-BASE-USER -> DataBaseUser }
-//func upperUnderMiddleToSmallCamel(word string) string {
-//
-//}
-//
-//// 大写下划线到大驼峰：DATA_BASE_USER -> DataBaseUser
-//func upperUnderToBigCamel(word string) string {
-//
-//}
-//
-//// 大写下划线到小驼峰：DATA_BASE_USER -> dataBaseUser
-//func upperUnderToSmallCamel(word string) string {
-//
-//}
+// UpperUnderMiddleToSmallCamel 大写中划线到大驼峰：DATA-BASE-USER -> dataBaseUser
+func UpperUnderMiddleToSmallCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return MiddleLineToSmallCamel(strings.ToLower(word))
+}
 
-// 匹配的单词变为大写
+// 大写下划线到大驼峰：DATA_BASE_USER -> DataBaseUser
+func UpperUnderToBigCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return BigCamel(UpperUnderToSmallCamel(word))
+}
+
+// UpperUnderToSmallCamel 大写下划线到小驼峰：DATA_BASE_USER -> dataBaseUser
+func UpperUnderToSmallCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return UnderLineToSmallCamel(strings.ToLower(word))
+}
+
+// ToUpperWord 匹配的单词变为大写
 // regex: 正则表达式，主要用于匹配某些字符变为大写
 // word: 待匹配字段
 func ToUpperWord(regex, word string) string {
@@ -585,17 +603,18 @@ func ToUpperWord(regex, word string) string {
 	if err != nil {
 		return word
 	}
-	fmt.Println(matcherResult.GroupCount())
-	//
-	//subIndex := reg.FindAllStringSubmatchIndex(word, -1)
-	//var lastIndex = 0
-	//var result = ""
-	//for i := 0; i < len(subIndex); i++ {
-	//	result += word[lastIndex:subIndex[i][0]]
-	//	result += strings.ToUpper(word[subIndex[i][0]:subIndex[i][1]])
-	//	lastIndex = subIndex[i][1]
-	//}
-	//result += word[lastIndex:]
-	//return result
-	return ""
+
+	var result = ""
+	var lastIndex = 0
+	for matcherResult != nil {
+		result += word[lastIndex:matcherResult.Index]
+		result += strings.ToUpper(word[matcherResult.Index : matcherResult.Index+1])
+		lastIndex = matcherResult.Index + 1
+		matcherResult, err = regexResult.FindNextMatch(matcherResult)
+		if err != nil {
+			continue
+		}
+	}
+	result += word[lastIndex:]
+	return result
 }
