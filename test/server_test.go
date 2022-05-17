@@ -2,12 +2,10 @@ package test
 
 import (
 	"fmt"
-	"os"
+	"github.com/isyscore/isc-gobase/cron"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isyscore/isc-gobase/cron"
-
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/server"
 )
@@ -26,28 +24,15 @@ func TestServer(t *testing.T) {
 	)
 
 	logger.Info("server started")
-
 	go func() {
 		for i := 0; i < 100; i++ {
+			fmt.Println("准备好了吗，我要panic了")
+			//panic("panic了,打我吗？哈哈哈哈")
 			go func(idx int) {
 				c_s := cron.New()
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
-					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
-					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
-					logger.Error("协程ID=：%d,我是库陈胜Error", idx)
+					panic("panic了,打我吗？哈哈哈哈")
+
 				})
 				c_s.Start()
 			}(i)

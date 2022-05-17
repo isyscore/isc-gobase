@@ -27,6 +27,7 @@ package logger
 
 import (
 	"fmt"
+	f0 "github.com/isyscore/isc-gobase/file"
 	"github.com/isyscore/isc-gobase/isc"
 	"io"
 	"io/fs"
@@ -35,13 +36,9 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	t0 "time"
 
-	l0 "log"
-
 	"github.com/isyscore/isc-gobase/cron"
-	f0 "github.com/isyscore/isc-gobase/file"
 	"github.com/isyscore/isc-gobase/time"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -65,6 +62,10 @@ func Debug(format string, v ...any) {
 
 func Assert(format string, v ...any) {
 	log.WithLevel(zerolog.NoLevel).Msgf(format, v...)
+}
+
+func Panic(format string, v ...any) {
+	log.WithLevel(zerolog.PanicLevel).Msgf(format, v...)
 }
 
 // SetGlobalLevel sets the global override for log level. If this
@@ -119,7 +120,7 @@ func InitLog(logLevel string, timeFmt string, colored bool, appName string, spli
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	initLogDir(out, splitEnable, splitSize, logDir, history, appName)
-	initSystemPanicLog()
+	//initSystemPanicLog()
 }
 
 type FileLevelWriter struct {
@@ -167,23 +168,24 @@ func getLogDir(logDir string) string {
 	return logDir
 }
 
-func initSystemPanicLog() {
-	dir, _ := os.Getwd()
-	logDir := filepath.Join(dir, "logs")
-	if !f0.DirectoryExists(logDir) {
-		_ = f0.MkDirs(logDir)
-	}
-	logFilePath := filepath.Join(logDir, "system_panic.log")
-	if logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660); err == nil {
-		if err = syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd())); err == nil {
-			log.Printf("system panic log redirect to %s", logFilePath)
-		} else {
-			log.Printf("system panic log redirect to %s failed:%v", logFilePath, err)
-		}
-	} else {
-		l0.Printf("system_panic.log创建异常:%v", err)
-	}
-}
+//func initSystemPanicLog() {
+//	dir, _ := os.Getwd()
+//	logDir := filepath.Join(dir, "logs")
+//	if !f0.DirectoryExists(logDir) {
+//		_ = f0.MkDirs(logDir)
+//	}
+//	logFilePath := filepath.Join(logDir, "system_panic.log")
+//	if logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660); err == nil {
+//		if err = syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd())); err == nil {
+//			log.Printf("system panic log redirect to %s", logFilePath)
+//		} else {
+//			log.Printf("system panic log redirect to %s failed:%v", logFilePath, err)
+//		}
+//	} else {
+//		l0.Printf("system_panic.log创建异常:%v", err)
+//	}
+//}
+var panicHandler = Strategy{}
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
@@ -212,8 +214,9 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 	}
 
 	//打开创建流
-	file1, _ := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0644)
-	return &FileLevelWriter{file1, level, zerolog.ConsoleWriter{
+	file1, _ := os.OpenFile(logFile, os.O_CREATE|os.O_RDWR, 0666)
+
+	fw := &FileLevelWriter{file1, level, zerolog.ConsoleWriter{
 		Out:     file1,
 		NoColor: false,
 		FormatTimestamp: func(i interface{}) string {
@@ -226,6 +229,12 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 			return isc.ToString(i)
 		},
 	}}
+	if level == zerolog.PanicLevel {
+		if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
+			fmt.Fprintf(os.Stderr, "system panic log redirect to %s failed:%v", logFile, err)
+		}
+	}
+	return fw
 
 }
 
@@ -246,6 +255,11 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 		if level == zerolog.Disabled {
 			os.Stdout = fw.File
 			os.Stderr = fw.File
+		}
+		if level == zerolog.PanicLevel {
+			if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
+				fmt.Fprintf(os.Stderr, "system panic log redirect to %s file failed:%v", fw.level.String(), err)
+			}
 		}
 
 	}
