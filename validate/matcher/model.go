@@ -2,11 +2,11 @@ package matcher
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"reflect"
 	"regexp"
 	"strings"
 
-	"github.com/isyscore/isc-gobase/constant"
 	"github.com/isyscore/isc-gobase/logger"
 )
 

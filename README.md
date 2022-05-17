@@ -84,3 +84,8 @@ base:
 | [json](/json)| json字符串处理工具 |
 | [redis](/redis)| go-redis的封装 |
 
+### 项目测试
+根目录提供go_test.sh文件，统一执行所有gobase中的包
+```shell
+sh go_test.sh
+```

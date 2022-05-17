@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"github.com/isyscore/isc-gobase/test"
 	"testing"
 
 	"github.com/isyscore/isc-gobase/isc"
@@ -30,7 +31,7 @@ func TestMapToObject1(t *testing.T) {
 
 	var targetObj ValueInnerEntity1
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity2 struct {
@@ -51,7 +52,7 @@ func TestMapToObject2(t *testing.T) {
 
 	var targetObj ValueInnerEntity2
 	_ = isc.MapToObject(inner2, &targetObj)
-	Equal(t, "{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity3 struct {
@@ -77,7 +78,7 @@ func TestMapToObject3(t *testing.T) {
 
 	var targetObj ValueInnerEntity3
 	_ = isc.MapToObject(inner3, &targetObj)
-	Equal(t, "{\"Name\":\"inner_3\",\"Age\":3,\"Inner2\":{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_3\",\"Age\":3,\"Inner2\":{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity4 struct {
@@ -98,7 +99,7 @@ func TestMapToObject4(t *testing.T) {
 
 	var targetObj ValueInnerEntity4
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":\"name1\",\"k2\":\"name2\"}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":\"name1\",\"k2\":\"name2\"}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity5 struct {
@@ -127,7 +128,7 @@ func TestMapToObject5(t *testing.T) {
 
 	var targetObj ValueInnerEntity5
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":{\"Name\":\"inner_1\",\"Age\":1},\"k2\":{\"Name\":\"inner_2\",\"Age\":2}}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":{\"Name\":\"inner_1\",\"Age\":1},\"k2\":{\"Name\":\"inner_2\",\"Age\":2}}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity6 struct {
@@ -152,7 +153,7 @@ func TestMapToObject6(t *testing.T) {
 
 	var targetObj ValueInnerEntity6
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[12,13],\"k2\":[12,13]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[12,13],\"k2\":[12,13]}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity7 struct {
@@ -177,7 +178,7 @@ func TestMapToObject7(t *testing.T) {
 
 	var targetObj ValueInnerEntity7
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity1Tem struct {
@@ -207,7 +208,7 @@ func TestMapToObject8(t *testing.T) {
 
 	var targetObj ValueInnerEntity8
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}],\"k2\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}],\"k2\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}]}}", isc.ToJsonString(targetObj))
 }
 
 type ValueInnerEntity9Tem struct {
@@ -237,7 +238,7 @@ func TestMapToObject9(t *testing.T) {
 
 	var targetObj ValueInnerEntity9
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 type ConfigValueTypeEnum int
@@ -271,7 +272,7 @@ func TestMapToObject10(t *testing.T) {
 
 	var targetObj ValueInnerEntity9
 	_ = isc.MapToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 func TestMapToObject11(t *testing.T) {
@@ -282,7 +283,7 @@ func TestMapToObject11(t *testing.T) {
 	inner2 := map[string]any{}
 
 	_ = isc.MapToObject(inner1, &inner2)
-	Equal(t, isc.ToJsonString(inner2), "{\"age\":12,\"name\":\"inner_1\"}")
+	test.Equal(t, isc.ToJsonString(inner2), "{\"age\":12,\"name\":\"inner_1\"}")
 }
 
 func TestMapToObject12(t *testing.T) {
@@ -293,7 +294,7 @@ func TestMapToObject12(t *testing.T) {
 	inner2 := map[string]any{}
 
 	_ = isc.MapToObject(inner1, &inner2)
-	Equal(t, "{\"age\":\"12\",\"name\":\"inner_1\"}", isc.ToJsonString(inner2))
+	test.Equal(t, "{\"age\":\"12\",\"name\":\"inner_1\"}", isc.ToJsonString(inner2))
 }
 
 func TestMapToObject13(t *testing.T) {
@@ -303,7 +304,7 @@ func TestMapToObject13(t *testing.T) {
 	inner2 := map[string]int{}
 
 	_ = isc.MapToObject(inner1, &inner2)
-	Equal(t, "{\"age\":12}", isc.ToJsonString(inner2))
+	test.Equal(t, "{\"age\":12}", isc.ToJsonString(inner2))
 }
 
 // dataToObject
@@ -314,7 +315,7 @@ func TestDataToObject1(t *testing.T) {
 
 	var targetObj ValueInnerEntity1
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject2(t *testing.T) {
@@ -329,7 +330,7 @@ func TestDataToObject2(t *testing.T) {
 
 	var targetObj ValueInnerEntity2
 	_ = isc.DataToObject(inner2, &targetObj)
-	Equal(t, "{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject3(t *testing.T) {
@@ -349,7 +350,7 @@ func TestDataToObject3(t *testing.T) {
 
 	var targetObj ValueInnerEntity3
 	_ = isc.DataToObject(inner3, &targetObj)
-	Equal(t, "{\"Name\":\"inner_3\",\"Age\":3,\"Inner2\":{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_3\",\"Age\":3,\"Inner2\":{\"Name\":\"inner_2\",\"Age\":2,\"Inner1\":{\"Name\":\"inner_1\",\"Age\":1}}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject4(t *testing.T) {
@@ -364,7 +365,7 @@ func TestDataToObject4(t *testing.T) {
 
 	var targetObj ValueInnerEntity4
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":\"name1\",\"k2\":\"name2\"}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":\"name1\",\"k2\":\"name2\"}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject5(t *testing.T) {
@@ -387,7 +388,7 @@ func TestDataToObject5(t *testing.T) {
 
 	var targetObj ValueInnerEntity5
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":{\"Name\":\"inner_1\",\"Age\":1},\"k2\":{\"Name\":\"inner_2\",\"Age\":2}}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":{\"Name\":\"inner_1\",\"Age\":1},\"k2\":{\"Name\":\"inner_2\",\"Age\":2}}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject6(t *testing.T) {
@@ -406,7 +407,7 @@ func TestDataToObject6(t *testing.T) {
 
 	var targetObj ValueInnerEntity6
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[12,13],\"k2\":[12,13]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[12,13],\"k2\":[12,13]}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject7(t *testing.T) {
@@ -425,7 +426,7 @@ func TestDataToObject7(t *testing.T) {
 
 	var targetObj ValueInnerEntity7
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject8(t *testing.T) {
@@ -444,7 +445,7 @@ func TestDataToObject8(t *testing.T) {
 
 	var targetObj ValueInnerEntity8
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}],\"k2\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}],\"k2\":[{\"Name\":\"name1\",\"Address\":\"\"},{\"Name\":\"name2\",\"Address\":\"\"}]}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject9(t *testing.T) {
@@ -463,7 +464,7 @@ func TestDataToObject9(t *testing.T) {
 
 	var targetObj ValueInnerEntity9
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 func TestDataToObject10(t *testing.T) {
@@ -482,50 +483,50 @@ func TestDataToObject10(t *testing.T) {
 
 	var targetObj ValueInnerEntity9
 	_ = isc.DataToObject(inner1, &targetObj)
-	Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
+	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"DataMap\":{\"k1\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}],\"k2\":[{\"Name\":\"name1\",\"Age\":1},{\"Name\":\"name2\",\"Age\":2}]}}", isc.ToJsonString(targetObj))
 }
 
 // strToObject
 func TestStrToObject1(t *testing.T) {
 	var targetObj int
 	_ = isc.StrToObject("123", &targetObj)
-	Equal(t, targetObj, 123)
+	test.Equal(t, targetObj, 123)
 }
 
 func TestStrToObject2(t *testing.T) {
 	var targetObj string
 	_ = isc.StrToObject("ok", &targetObj)
-	Equal(t, targetObj, "ok")
+	test.Equal(t, targetObj, "ok")
 }
 
 func TestStrToObject3(t *testing.T) {
 	var targetObj string
 	_ = isc.StrToObject("{\"nihao\": \"haode\"}", &targetObj)
-	Equal(t, targetObj, "{\"nihao\": \"haode\"}")
+	test.Equal(t, targetObj, "{\"nihao\": \"haode\"}")
 }
 
 func TestStrToObject4(t *testing.T) {
 	var targetObj ValueInnerEntity1
 	_ = isc.StrToObject("{\"Age\": 12}", &targetObj)
-	Equal(t, isc.ToJsonString(targetObj), "{\"Name\":\"\",\"Age\":12}")
+	test.Equal(t, isc.ToJsonString(targetObj), "{\"Name\":\"\",\"Age\":12}")
 }
 
 func TestStrToObject5(t *testing.T) {
 	var targetObj ValueInnerEntity1
 	_ = isc.StrToObject("{\"age\": 12}", &targetObj)
-	Equal(t, isc.ToJsonString(targetObj), "{\"Name\":\"\",\"Age\":12}")
+	test.Equal(t, isc.ToJsonString(targetObj), "{\"Name\":\"\",\"Age\":12}")
 }
 
 func TestStrToObject6(t *testing.T) {
 	targetObj := map[string]any{}
 	_ = isc.StrToObject("{\"age\": 12}", &targetObj)
-	Equal(t, isc.ToJsonString(targetObj), "{\"age\":12}")
+	test.Equal(t, isc.ToJsonString(targetObj), "{\"age\":12}")
 }
 
 func TestStrToObject7(t *testing.T) {
 	var targetObj []ValueInnerEntity1
 	_ = isc.StrToObject("[{\"Age\": 12},{\"Age\":14}]", &targetObj)
-	Equal(t, isc.ObjectToJson(targetObj), "[{\"age\":12,\"name\":\"\"},{\"age\":14,\"name\":\"\"}]")
+	test.Equal(t, isc.ObjectToJson(targetObj), "[{\"age\":12,\"name\":\"\"},{\"age\":14,\"name\":\"\"}]")
 }
 
 type ValueInnerEntityStr1 struct {
@@ -539,7 +540,7 @@ func TestStrToObject8(t *testing.T) {
 
 	var targetObj ValueInnerEntityStr1
 	_ = isc.StrToObject(str, &targetObj)
-	Equal(t, isc.ObjectToJson(targetObj), str)
+	test.Equal(t, isc.ObjectToJson(targetObj), str)
 }
 
 // arrayToObject
@@ -549,7 +550,7 @@ func TestArrayToObject1(t *testing.T) {
 	targetObjs = append(targetObjs, ValueInnerEntity1{Name: "zhou", Age: 1})
 
 	_ = isc.ArrayToObject(targetObjs, &dstValues)
-	Equal(t, isc.ObjectToJson(dstValues), "[{\"age\":1,\"name\":\"zhou\"}]")
+	test.Equal(t, isc.ObjectToJson(dstValues), "[{\"age\":1,\"name\":\"zhou\"}]")
 }
 
 //todo 这个暂时还有点问题
@@ -583,7 +584,7 @@ type ValueObjectTest1 struct {
 
 func TestObjectToJson1(t *testing.T) {
 	entity := ValueObjectTest1{AppName: "zhou", Age: 12}
-	Equal(t, isc.ObjectToJson(entity), "{\"age\":12,\"appName\":\"zhou\"}")
+	test.Equal(t, isc.ObjectToJson(entity), "{\"age\":12,\"appName\":\"zhou\"}")
 }
 
 type ValueObjectTest2 struct {
@@ -626,7 +627,7 @@ func TestObjectToJson2(t *testing.T) {
 		CAge1:   3.2 + 12i,
 		CAge2:   5.2 + 13i,
 	}
-	Equal(t, isc.ObjectToJson(entity), "{\"age1\":12,\"age2\":12,\"age3\":12,\"age4\":12,\"age5\":12,\"appName\":\"zhou\",\"cAge1\":\"(3.2+12i)\",\"cAge2\":\"(5.2+13i)\",\"fAge1\":12.1,\"fAge2\":12.2,\"uAge1\":12,\"uAge2\":12,\"uAge3\":12,\"uAge4\":12,\"uAge5\":12}")
+	test.Equal(t, isc.ObjectToJson(entity), "{\"age1\":12,\"age2\":12,\"age3\":12,\"age4\":12,\"age5\":12,\"appName\":\"zhou\",\"cAge1\":\"(3.2+12i)\",\"cAge2\":\"(5.2+13i)\",\"fAge1\":12.1,\"fAge2\":12.2,\"uAge1\":12,\"uAge2\":12,\"uAge3\":12,\"uAge4\":12,\"uAge5\":12}")
 }
 
 type ValueObjectTest3 struct {
@@ -647,7 +648,7 @@ func TestObjectToJson3(t *testing.T) {
 		AppName: arrays,
 		Age1:    dataMap,
 	}
-	Equal(t, isc.ObjectToJson(entity), "{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}")
+	test.Equal(t, isc.ObjectToJson(entity), "{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}")
 }
 
 type ValueObjectTest4 struct {
@@ -672,7 +673,7 @@ func TestObjectToJson4(t *testing.T) {
 	var entity4 ValueObjectTest4
 	entity4.Inner = entity3
 	entity4.AppName = "zhou"
-	Equal(t, isc.ObjectToJson(entity4), "{\"appName\":\"zhou\",\"inner\":{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}}")
+	test.Equal(t, isc.ObjectToJson(entity4), "{\"appName\":\"zhou\",\"inner\":{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}}")
 }
 
 func TestObjectToJson5(t *testing.T) {
@@ -688,7 +689,7 @@ func TestObjectToJson5(t *testing.T) {
 		AppName: arrays,
 		Age1:    dataMap,
 	}
-	Equal(t, isc.ObjectToJson(act), "{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}")
+	test.Equal(t, isc.ObjectToJson(act), "{\"age1\":{\"a\":1,\"b\":2},\"appName\":[\"zhou\",\"wang\"]}")
 }
 
 func TestObjectToJson6(t *testing.T) {
@@ -696,7 +697,7 @@ func TestObjectToJson6(t *testing.T) {
 	var act []int
 	act = append(act, 1)
 	act = append(act, 2)
-	Equal(t, isc.ObjectToJson(act), expect)
+	test.Equal(t, isc.ObjectToJson(act), expect)
 }
 
 func TestObjectToJson7(t *testing.T) {
@@ -704,7 +705,7 @@ func TestObjectToJson7(t *testing.T) {
 	act = append(act, ValueInnerEntity1{Name: "zhou1", Age: 1})
 	act = append(act, ValueInnerEntity1{Name: "zhou2", Age: 2})
 	expect := "[{\"age\":1,\"name\":\"zhou1\"},{\"age\":2,\"name\":\"zhou2\"}]"
-	Equal(t, isc.ObjectToJson(act), expect)
+	test.Equal(t, isc.ObjectToJson(act), expect)
 }
 
 func TestObjectToJson8(t *testing.T) {
@@ -720,7 +721,7 @@ func TestObjectToJson8(t *testing.T) {
 
 	act = append(act, map1)
 	act = append(act, map2)
-	Equal(t, isc.ObjectToJson(act), "[{\"age\":1,\"name\":\"zhou1\"},{\"age\":2,\"name\":\"zhou2\"}]")
+	test.Equal(t, isc.ObjectToJson(act), "[{\"age\":1,\"name\":\"zhou1\"},{\"age\":2,\"name\":\"zhou2\"}]")
 }
 
 type PageRsp struct {
@@ -759,7 +760,7 @@ func TestObjectToJson10(t *testing.T) {
 		Data: &inner,
 	}
 
-	Equal(t, isc.ObjectToJson(entity), "{\"data\":{\"name\":\"ok\"}}")
+	test.Equal(t, isc.ObjectToJson(entity), "{\"data\":{\"name\":\"ok\"}}")
 }
 
 func TestObjectToJson11(t *testing.T) {
@@ -770,7 +771,7 @@ func TestObjectToJson11(t *testing.T) {
 	map1 := map[string]any{}
 	map1["data"] = &inner
 
-	Equal(t, isc.ObjectToJson(map1), "{\"data\":{\"name\":\"ok\"}}")
+	test.Equal(t, isc.ObjectToJson(map1), "{\"data\":{\"name\":\"ok\"}}")
 }
 
 // objectToMap
@@ -779,19 +780,19 @@ func TestObjectToJson11(t *testing.T) {
 
 // objectToData
 func TestObjectToData1(t *testing.T) {
-	Equal(t, isc.ObjectToData(1), 1)
+	test.Equal(t, isc.ObjectToData(1), 1)
 }
 
 func TestObjectToData2(t *testing.T) {
-	Equal(t, isc.ObjectToData("12"), "12")
+	test.Equal(t, isc.ObjectToData("12"), "12")
 }
 
 func TestObjectToData3(t *testing.T) {
-	Equal(t, isc.ObjectToData("ab"), "ab")
+	test.Equal(t, isc.ObjectToData("ab"), "ab")
 }
 
 func TestObjectToData4(t *testing.T) {
-	Equal(t, isc.ObjectToData(12.4), 12.4)
+	test.Equal(t, isc.ObjectToData(12.4), 12.4)
 }
 
 func TestObjectToData5(t *testing.T) {
@@ -799,7 +800,7 @@ func TestObjectToData5(t *testing.T) {
 	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData6(t *testing.T) {
@@ -808,7 +809,7 @@ func TestObjectToData6(t *testing.T) {
 	src["age"] = 12
 
 	dst := ValueInnerEntity1{Name: "zhou", Age: 12}
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData7(t *testing.T) {
@@ -819,13 +820,13 @@ func TestObjectToData7(t *testing.T) {
 	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData8(t *testing.T) {
 	src := ValueInnerEntity1{Name: "zhou", Age: 12}
 	dst := ValueInnerEntity1{Name: "zhou", Age: 12}
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 //type ValueInnerEntity1Json struct {
@@ -844,7 +845,7 @@ func TestObjectToData10(t *testing.T) {
 	dst := map[string]any{}
 	dst["name"] = "zhou"
 	dst["age"] = 12
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData11(t *testing.T) {
@@ -852,7 +853,7 @@ func TestObjectToData11(t *testing.T) {
 	var dst []ValueInnerEntity1
 	src = append(src, ValueInnerEntity1{Name: "zhou", Age: 12})
 	dst = append(dst, ValueInnerEntity1{Name: "zhou", Age: 12})
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData12(t *testing.T) {
@@ -865,7 +866,7 @@ func TestObjectToData12(t *testing.T) {
 	map1["age"] = 12
 	dst = append(dst, map1)
 
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func TestObjectToData13(t *testing.T) {
@@ -878,7 +879,7 @@ func TestObjectToData13(t *testing.T) {
 	map1["age"] = 12
 	src = append(src, map1)
 
-	Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
+	test.Equal(t, isc.ObjectToJson(isc.ObjectToData(src)), isc.ObjectToJson(dst))
 }
 
 func BenchmarkSprintfPress(b *testing.B) {
