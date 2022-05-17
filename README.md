@@ -12,6 +12,12 @@ isc-gobase定位是工具框架，包含各种各样的工具，并对开发中�
 ### web项目
 创建`main.go`文件和同目录的`application.yml` 文件
 
+```text
+├── application.yaml
+├── go.mod
+└── main.go
+```
+
 ```yaml
 # application.yml 内容
 api-module: app/sample
@@ -24,7 +30,7 @@ base:
     # 应用名称
     name: sample
   server:
-    # 是否启用，默认：true
+    # 是否启用，默认：false
     enable: true
     # 端口号
     port: 8080
@@ -57,21 +63,11 @@ func GetData(c *gin.Context) {
 root@user ~> curl http://localhost:8080/api/app/sample/group1/data
 {"code":"success","data":"ok","message":"成功"}
 ```
-### 非 web 项目
-对于非web项目，isc-gobase是作为一个纯工具使用。这时候要分情况
-- 不使用config包，则不需要添加 application.yml 文件
-- 使用config包，不启动server，则将base.server.enable关闭
-```yaml
-base:
-  server:
-    # 是否启用server，默认：true
-    enable: false
-```
 
 ### 各包的用法
 |包名        | 简介 |
 | --------   | :----: |
-| [isc](/isc)| 基础工具（待更新）|
+| [isc](/isc)| 基础工具（更新中）|
 | [config](/config)| 配置文件管理|
 | [validate](/validate)|校验核查 |
 | [logger](/logger)| 日志 |
@@ -85,7 +81,7 @@ base:
 | [redis](/redis)| go-redis的封装 |
 
 ### 项目测试
-根目录提供go_test.sh文件，统一执行所有gobase中的包
+根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块
 ```shell
 sh go_test.sh
 ```
