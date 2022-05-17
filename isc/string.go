@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	regexp2 "github.com/dlclark/regexp2"
 )
 
 type ISCString string
@@ -317,4 +319,283 @@ func (s ISCString) ToCookieMap() ISCMap[ISCString, ISCString] {
 func (s ISCString) ToPair() Pair[ISCString, ISCString] {
 	sa := s.TrimSpace().Split("=")
 	return NewPair(sa[0].TrimSpace(), sa[1].TrimSpace())
+}
+
+// BigCamel 小驼峰到大驼峰：首字母变成大写: dataBaseUser -> DateBaseUser
+func BigCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return strings.ToUpper(word[:1]) + word[1:]
+}
+
+// BigCamelToMiddleLine 大驼峰到中划线: DataBaseUser -> data-db-user
+func BigCamelToMiddleLine(word string) string {
+	if word == "" {
+		return ""
+	}
+	return MiddleLine(BigCamelToSmallCamel(word))
+}
+
+// BigCamelToPostUnder 大驼峰到后缀下划线: DataBaseUser -> data_base_user_
+func BigCamelToPostUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return PostUnder(BigCamelToSmallCamel(word))
+}
+
+// BigCamelToPrePostUnder 大驼峰到前后缀下划线: DataBaseUser -> _data_base_user_
+func BigCamelToPrePostUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return PrePostUnder(BigCamelToSmallCamel(word))
+}
+
+// bigCamelToPrePostUnder 大驼峰到前后缀下划线: DataBaseUser -> _data_base_user
+func BigCamelToPreUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return PreUnder(BigCamelToSmallCamel(word))
+}
+
+// BigCamelToSmallCamel 大驼峰到小驼峰：首字母变成小写：DataBaseUser -> dataBaseUser
+func BigCamelToSmallCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return strings.ToLower(word[:1]) + word[1:]
+}
+
+// BigCamelToUnderLine 大驼峰到下划线：DataBaseUser -> data_base_user
+func BigCamelToUnderLine(word string) string {
+	if word == "" {
+		return ""
+	}
+	return UnderLine(BigCamelToSmallCamel(word))
+}
+
+// 大驼峰到小写中划线：DataBaseUser -> DATA-BASE-USER
+func BigCamelToUpperMiddle(word string) string {
+	if word == "" {
+		return ""
+	}
+	return UpperUnderMiddle(BigCamelToSmallCamel(word))
+}
+
+// 大驼峰到大写下划线: DataBaseUser -> DATA_BASE_USER
+func BigCamelToUpperUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return UpperUnder(BigCamelToSmallCamel(word))
+}
+
+// MiddleLine 小驼峰到中划线：dataBaseUser -> data-db-user
+func MiddleLine(word string) string {
+	if word == "" {
+		return ""
+	}
+	reg, err := regexp.Compile("\\B[A-Z]")
+	if err != nil {
+		return word
+	}
+
+	subIndex := reg.FindAllStringSubmatchIndex(word, -1)
+	var lastIndex = 0
+	var result = ""
+	for i := 0; i < len(subIndex); i++ {
+		result += word[lastIndex:subIndex[i][0]]
+		result += "-" + strings.ToLower(word[subIndex[i][0]:subIndex[i][1]])
+		lastIndex = subIndex[i][1]
+	}
+	result += word[lastIndex:]
+	return result
+}
+
+// 中划线到大驼峰：data-db-user -> DataBaseUser
+func MiddleLineToBigCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return BigCamel(MiddleLineToSmallCamel(word))
+}
+
+// 中划线到小驼峰：data-base-user -> dataBaseUser
+func MiddleLineToSmallCamel(word string) string {
+	if word == "" {
+		return ""
+	}
+	return strings.ReplaceAll(ToUpperWord("(?<=-)[a-z]", word), "-", "")
+}
+
+// 小驼峰到后下划线：dataBaseUser -> data_base_user_
+func PostUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return UnderLine(word) + "_"
+}
+
+//
+//// 小驼峰到添加前缀字符下划线：dataBaseUser -> pre_data_base_user
+//func preFixUnderLine(word string) string {
+//
+//}
+//
+//// 前缀字符下划线去掉到小驼峰：pre_data_base_user -> dataBaseUser
+//func preFixUnderToSmallCamel(word string) string {
+//
+//}
+//
+
+// PrePostUnder 小驼峰到前后缀下划线：dataBaseUser -> _data_base_user_
+func PrePostUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return "_" + UnderLine(word) + "_"
+}
+
+// 小驼峰到前下划线：dataBaseUser -> _data_base_user
+func PreUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	return "_" + UnderLine(word)
+}
+
+// 小驼峰到前下划线：dataBaseUser -> _data_base_user
+func UnderLine(word string) string {
+	if word == "" {
+		return ""
+	}
+	reg, err := regexp.Compile("\\B[A-Z]")
+	if err != nil {
+		return word
+	}
+
+	subIndex := reg.FindAllStringSubmatchIndex(word, -1)
+	var lastIndex = 0
+	var result = ""
+	for i := 0; i < len(subIndex); i++ {
+		result += word[lastIndex:subIndex[i][0]]
+		result += "_" + strings.ToLower(word[subIndex[i][0]:subIndex[i][1]])
+		lastIndex = subIndex[i][1]
+	}
+	result += word[lastIndex:]
+	return result
+}
+
+//
+//// 下划线到大驼峰：下划线后面小写变大写，下划线去掉
+//// data_base_user   -> DataBaseUser
+//// _data_base_user  -> DataBaseUser
+//// _data_base_user_ -> DataBaseUser
+//// data_base_user_  -> DataBaseUser
+//func underLineToBigCamel(word string) string {
+//
+//}
+//
+//// 大写下划线到小驼峰：DATA_BASE_USER -> dataBaseUser
+//func underLineToSmallCamel(word string) string {
+//
+//}
+//
+//// 大写中划线到大驼峰：DATA-BASE-USER -> DataBaseUser }
+//func upperMiddleToBigCamel(word string) string {
+//
+//}
+//
+// 小驼峰到大写下划线：dataBaseUser -> DATA_BASE_USER
+func UpperUnder(word string) string {
+	if word == "" {
+		return ""
+	}
+	reg, err := regexp.Compile("\\B[A-Z]")
+	if err != nil {
+		return word
+	}
+
+	subIndex := reg.FindAllStringSubmatchIndex(word, -1)
+	var lastIndex = 0
+	var result = ""
+	for i := 0; i < len(subIndex); i++ {
+		result += strings.ToUpper(word[lastIndex:subIndex[i][0]])
+		result += "_" + strings.ToUpper(word[subIndex[i][0]:subIndex[i][1]])
+		lastIndex = subIndex[i][1]
+	}
+	result += strings.ToUpper(word[lastIndex:])
+	return result
+}
+
+// 小驼峰到大写中划线：dataBaseUser -> DATA-BASE-USER
+func UpperUnderMiddle(word string) string {
+	if word == "" {
+		return ""
+	}
+	reg, err := regexp.Compile("\\B[A-Z]")
+	if err != nil {
+		return word
+	}
+
+	subIndex := reg.FindAllStringSubmatchIndex(word, -1)
+	var lastIndex = 0
+	var result = ""
+	for i := 0; i < len(subIndex); i++ {
+		result += strings.ToUpper(word[lastIndex:subIndex[i][0]])
+		result += "-" + strings.ToUpper(word[subIndex[i][0]:subIndex[i][1]])
+		lastIndex = subIndex[i][1]
+	}
+	result += strings.ToUpper(word[lastIndex:])
+	return result
+}
+
+//
+//// 大写中划线到大驼峰：DATA-BASE-USER -> DataBaseUser }
+//func upperUnderMiddleToSmallCamel(word string) string {
+//
+//}
+//
+//// 大写下划线到大驼峰：DATA_BASE_USER -> DataBaseUser
+//func upperUnderToBigCamel(word string) string {
+//
+//}
+//
+//// 大写下划线到小驼峰：DATA_BASE_USER -> dataBaseUser
+//func upperUnderToSmallCamel(word string) string {
+//
+//}
+
+// 匹配的单词变为大写
+// regex: 正则表达式，主要用于匹配某些字符变为大写
+// word: 待匹配字段
+func ToUpperWord(regex, word string) string {
+	if word == "" {
+		return ""
+	}
+	regexResult, err := regexp2.Compile(regex, 0)
+	if err != nil {
+		return word
+	}
+
+	matcherResult, err := regexResult.FindStringMatch(word)
+	if err != nil {
+		return word
+	}
+	fmt.Println(matcherResult.GroupCount())
+	//
+	//subIndex := reg.FindAllStringSubmatchIndex(word, -1)
+	//var lastIndex = 0
+	//var result = ""
+	//for i := 0; i < len(subIndex); i++ {
+	//	result += word[lastIndex:subIndex[i][0]]
+	//	result += strings.ToUpper(word[subIndex[i][0]:subIndex[i][1]])
+	//	lastIndex = subIndex[i][1]
+	//}
+	//result += word[lastIndex:]
+	//return result
+	return ""
 }

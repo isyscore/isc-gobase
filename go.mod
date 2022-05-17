@@ -3,7 +3,9 @@ module github.com/isyscore/isc-gobase
 go 1.18
 
 require (
+	github.com/dlclark/regexp2 v1.4.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-playground/assert/v2 v2.0.1
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gorilla/websocket v1.5.0
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible

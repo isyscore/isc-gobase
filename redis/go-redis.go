@@ -27,45 +27,13 @@ func init() {
 }
 
 func GetClient() (goredis.UniversalClient, error) {
-	if config.RedisCfg.RedisMode == "sentinel" && config.RedisCfg.Sentinel.Master != "" {
+	if config.RedisCfg.Sentinel.Master != "" {
 		return goredis.NewFailoverClient(getSentinelConfig()), nil
-	} else if config.RedisCfg.RedisMode == "cluster" && len(config.RedisCfg.Cluster.Addrs) != 0 {
+	} else if len(config.RedisCfg.Cluster.Addrs) != 0 {
 		return goredis.NewClusterClient(getClusterConfig()), nil
 	} else {
 		return goredis.NewClient(getStandaloneConfig()), nil
 	}
-}
-
-func getSentinelConfig() *goredis.FailoverOptions {
-	redisConfig := &goredis.FailoverOptions{
-		SentinelAddrs: config.RedisCfg.Sentinel.Addrs,
-		MasterName:    config.RedisCfg.Sentinel.Master,
-
-		DB:               config.RedisCfg.Sentinel.Database,
-		Username:         config.RedisCfg.Username,
-		Password:         config.RedisCfg.Password,
-		SentinelUsername: config.RedisCfg.Sentinel.SentinelUser,
-		SentinelPassword: config.RedisCfg.Sentinel.SentinelPassword,
-
-		MaxRetries: config.RedisCfg.MaxRetries,
-		// todo
-		//MinRetryBackoff: config.RedisCfg.MinRetryBackoff * time.Second,
-		//MaxRetryBackoff: config.RedisCfg.MaxRetryBackoff,
-
-		//DialTimeout:  config.RedisCfg.DialTimeout,
-		//ReadTimeout:  config.RedisCfg.ReadTimeout,
-		//WriteTimeout: config.RedisCfg.WriteTimeout,
-
-		PoolFIFO:     config.RedisCfg.PoolFIFO,
-		PoolSize:     config.RedisCfg.PoolSize,
-		MinIdleConns: config.RedisCfg.MinIdleConns,
-		//MaxConnAge:         config.RedisCfg.MaxConnAge,
-		//PoolTimeout:        config.RedisCfg.PoolTimeout,
-		//IdleTimeout:        config.RedisCfg.IdleTimeout,
-		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
-	}
-
-	return redisConfig
 }
 
 func getStandaloneConfig() *goredis.Options {
@@ -98,6 +66,38 @@ func getStandaloneConfig() *goredis.Options {
 		//IdleTimeout:        config.RedisCfg.IdleTimeout,
 		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
 	}
+	return redisConfig
+}
+
+func getSentinelConfig() *goredis.FailoverOptions {
+	redisConfig := &goredis.FailoverOptions{
+		SentinelAddrs: config.RedisCfg.Sentinel.Addrs,
+		MasterName:    config.RedisCfg.Sentinel.Master,
+
+		DB:               config.RedisCfg.Sentinel.Database,
+		Username:         config.RedisCfg.Username,
+		Password:         config.RedisCfg.Password,
+		SentinelUsername: config.RedisCfg.Sentinel.SentinelUser,
+		SentinelPassword: config.RedisCfg.Sentinel.SentinelPassword,
+
+		MaxRetries: config.RedisCfg.MaxRetries,
+		// todo
+		//MinRetryBackoff: config.RedisCfg.MinRetryBackoff * time.Second,
+		//MaxRetryBackoff: config.RedisCfg.MaxRetryBackoff,
+
+		//DialTimeout:  config.RedisCfg.DialTimeout,
+		//ReadTimeout:  config.RedisCfg.ReadTimeout,
+		//WriteTimeout: config.RedisCfg.WriteTimeout,
+
+		PoolFIFO:     config.RedisCfg.PoolFIFO,
+		PoolSize:     config.RedisCfg.PoolSize,
+		MinIdleConns: config.RedisCfg.MinIdleConns,
+		//MaxConnAge:         config.RedisCfg.MaxConnAge,
+		//PoolTimeout:        config.RedisCfg.PoolTimeout,
+		//IdleTimeout:        config.RedisCfg.IdleTimeout,
+		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
+	}
+
 	return redisConfig
 }
 

@@ -15,7 +15,7 @@ type BaseConfig struct {
 }
 
 type BaseApi struct {
-	prefix string `yaml:"prefix"` // api前缀
+	Prefix string `yaml:"prefix"` // api前缀
 }
 
 type BaseApplication struct {
@@ -90,10 +90,8 @@ type StorageConnectionConfig struct {
 // ---------------------------- redis ----------------------------
 // base.redis前缀
 type RedisConfig struct {
-	// redis的模式：单机（standalone）、哨兵（sentinel）、集群（cluster）
-	RedisMode string `match:"value={standalone, sentinel, cluster}"  errMsg:"redisMode值不合法，只可为三个值：standalone, sentinel, cluster"`
-	Password  string
-	Username  string
+	Password string
+	Username string
 
 	// 单节点
 	Standalone RedisStandaloneConfig
