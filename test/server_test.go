@@ -27,7 +27,7 @@ func TestServer(t *testing.T) {
 	go func() {
 		for i := 0; i < 100; i++ {
 			fmt.Println("准备好了吗，我要panic了")
-			//panic("panic了,打我吗？哈哈哈哈")
+			panic("panic了,打我吗？哈哈哈哈")
 			go func(idx int) {
 				c_s := cron.New()
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {

@@ -13,7 +13,7 @@ var (
 )
 
 func setStdHandle(stdHandle int32, handle syscall.Handle) error {
-	r0, _, err := syscall.SyscallN(procSetStdHandle.Addr(), 2, uintptr(stdHandle), uintptr(handle), 0)
+	r0, _, err := syscall.Syscall(procSetStdHandle.Addr(), 2, uintptr(stdHandle), uintptr(handle), 0)
 	if r0 == 0 {
 		if err != 0 {
 			return error(err)
