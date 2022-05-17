@@ -170,7 +170,7 @@ func TestRangeInt1(t *testing.T) {
 	//测试 正常情况
 	value = RangeIntEntity1{Age: 3}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 3 没有命中只允许的范围 [1, 2]", result, false)
+	Equal(t, err, "属性 [Age] 值 [3] 没有命中只允许的范围 [[1, 2]]", result, false)
 }
 
 // 测试整数类型2
@@ -192,7 +192,7 @@ func TestRangeInt2(t *testing.T) {
 	//测试 异常情况
 	value = RangeIntEntity2{Age: 2}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 2 没有命中只允许的范围 [3，]", result, false)
+	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [[3，]]", result, false)
 }
 
 // 测试整数类型3
@@ -214,7 +214,7 @@ func TestRangeInt3(t *testing.T) {
 	//测试 异常情况
 	value = RangeIntEntity3{Age: 2}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 2 没有命中只允许的范围 [3,)", result, false)
+	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [[3,)]", result, false)
 }
 
 // 测试整数类型4
@@ -245,12 +245,12 @@ func TestRangeInt5(t *testing.T) {
 	//测试 异常情况
 	value = RangeIntEntity5{Age: 8}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 8 没有命中只允许的范围 (2, 7]", result, false)
+	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(2, 7]]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity5{Age: 2}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 2 没有命中只允许的范围 (2, 7]", result, false)
+	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [(2, 7]]", result, false)
 }
 
 // 测试整数类型6
@@ -267,17 +267,17 @@ func TestRangeInt6(t *testing.T) {
 	//测试 正常情况
 	value = RangeIntEntity6{Age: 7}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 7 没有命中只允许的范围 (2, 7)", result, false)
+	Equal(t, err, "属性 [Age] 值 [7] 没有命中只允许的范围 [(2, 7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity6{Age: 8}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 8 没有命中只允许的范围 (2, 7)", result, false)
+	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(2, 7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity6{Age: 2}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 2 没有命中只允许的范围 (2, 7)", result, false)
+	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [(2, 7)]", result, false)
 }
 
 // 测试整数类型7
@@ -299,12 +299,12 @@ func TestRangeInt7(t *testing.T) {
 	//测试 异常情况
 	value = RangeIntEntity7{Age: 7}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 7 没有命中只允许的范围 (,7)", result, false)
+	Equal(t, err, "属性 [Age] 值 [7] 没有命中只允许的范围 [(,7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity7{Age: 8}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 8 没有命中只允许的范围 (,7)", result, false)
+	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(,7)]", result, false)
 }
 
 // 测试中文逗号表示
@@ -326,12 +326,12 @@ func TestRangeIntChinaComma(t *testing.T) {
 	//测试 异常情况
 	value = RangeIntEntityChina{Age: 0}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 0 没有命中只允许的范围 [1，10]", result, false)
+	Equal(t, err, "属性 [Age] 值 [0] 没有命中只允许的范围 [[1，10]]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntityChina{Age: 12}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 12 没有命中只允许的范围 [1，10]", result, false)
+	Equal(t, err, "属性 [Age] 值 [12] 没有命中只允许的范围 [[1，10]]", result, false)
 }
 
 // 测试浮点数类型1
@@ -358,12 +358,12 @@ func TestRangeFloat1(t *testing.T) {
 	//测试 异常情况
 	value = RangeFloatEntity{Money: 10.01}
 	result, err = validate.Check(value, "money")
-	Equal(t, err, "属性 Money 值 10.01 没有命中只允许的范围 [10.37， 20.31]", result, false)
+	Equal(t, err, "属性 [Money] 值 [10.01] 没有命中只允许的范围 [[10.37， 20.31]]", result, false)
 
 	//测试 异常情况
 	value = RangeFloatEntity{Money: 20.32}
 	result, err = validate.Check(value, "money")
-	Equal(t, err, "属性 Money 值 20.32 没有命中只允许的范围 [10.37， 20.31]", result, false)
+	Equal(t, err, "属性 [Money] 值 [20.32] 没有命中只允许的范围 [[10.37， 20.31]]", result, false)
 }
 
 // 测试字符类型1
@@ -390,12 +390,12 @@ func TestRangeString(t *testing.T) {
 	//测试 异常情况
 	value = RangeStringEntity{Name: "zhou zhen yong"}
 	result, err = validate.Check(value, "name")
-	Equal(t, err, "属性 Name 值 zhou zhen yong 的长度没有命中只允许的范围 [2, 12]", result, false)
+	Equal(t, err, "属性 [Name] 值 [zhou zhen yong] 长度没有命中只允许的范围 [[2, 12]]", result, false)
 
 	//测试 异常情况
 	value = RangeStringEntity{Name: "z"}
 	result, err = validate.Check(value, "name")
-	Equal(t, err, "属性 Name 值 z 的长度没有命中只允许的范围 [2, 12]", result, false)
+	Equal(t, err, "属性 [Name] 值 [z] 长度没有命中只允许的范围 [[2, 12]]", result, false)
 }
 
 // 测试分片类型1
@@ -422,12 +422,12 @@ func TestRangeSlice(t *testing.T) {
 	//测试 异常情况
 	value = RangeSliceEntity{Age: []int{1, 2, 3, 4, 5, 6, 7}}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 [1 2 3 4 5 6 7] 的数组长度没有命中只允许的范围 [2, 6]", result, false)
+	Equal(t, err, "属性 [Age] 值 [[1 2 3 4 5 6 7]] 数组长度没有命中只允许的范围 [[2, 6]]", result, false)
 
 	//测试 异常情况
 	value = RangeSliceEntity{Age: []int{1}}
 	result, err = validate.Check(value, "age")
-	Equal(t, err, "属性 Age 值 [1] 的数组长度没有命中只允许的范围 [2, 6]", result, false)
+	Equal(t, err, "属性 [Age] 值 [[1]] 数组长度没有命中只允许的范围 [[2, 6]]", result, false)
 }
 
 // 测试时间类型1
@@ -444,12 +444,12 @@ func TestRangeTime1(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity1{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2019-06-14 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 [2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321] 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 
 	//测试 异常情况
 	value = RangeTimeEntity1{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2019-09-14 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 [2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321] 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2019-09-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 }
 
 // 测试时间类型2
@@ -471,7 +471,7 @@ func TestRangeTime2(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity2{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2019-06-14 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 [2019-07-13 12:00:23.321, ] 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, ]] 中", result, false)
 }
 
 // 测试时间类型3
@@ -488,7 +488,7 @@ func TestRangeTime3(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity3{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2019-07-24 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 (, 2019-07-23 12:00:23.321] 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2019-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [(, 2019-07-23 12:00:23.321]] 中", result, false)
 }
 
 // 测试时间类型4
@@ -505,12 +505,12 @@ func TestRangeTime4(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity4{CreateTime: time.Date(2018, 7, 24, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2018-07-24 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 [2019-07-23 12:00:23.321, now) 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 
 	//测试 异常情况
 	value = RangeTimeEntity4{CreateTime: time.Date(9018, 7, 24, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 9018-07-24 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 [2019-07-23 12:00:23.321, now) 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [9018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 }
 
 // 测试时间类型5
@@ -527,7 +527,7 @@ func TestRangeTime5(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity5{CreateTime: time.Date(2218, 7, 24, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 2218-07-24 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 past 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [2218-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [past] 中", result, false)
 }
 
 // 测试时间类型6
@@ -544,7 +544,7 @@ func TestRangeTime6(t *testing.T) {
 	//测试 异常情况
 	value = RangeTimeEntity6{CreateTime: time.Date(1918, 7, 24, 12, 0, 23, 321, time.Local)}
 	result, err = validate.Check(value, "createTime")
-	Equal(t, err, "属性 CreateTime 时间 1918-07-24 12:00:23.000000321 +0800 CST 没有命中只允许的时间段 future 中", result, false)
+	Equal(t, err, "属性 [CreateTime] 值 [1918-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [future] 中", result, false)
 }
 
 // 测试时间计算：年

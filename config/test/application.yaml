@@ -1,67 +1,19 @@
-# Default values for saservice.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-version: 2.1.0
-imagePullSecretsName: regsecret
-imagePullPolicy: IfNotPresent
-nodePortEnabled: true
-pvcName: common-pvc
-cephPvcName: cluster-pvc
-clusterMode: false
-pvcStorage: 500Gi
-public:
-  # 实现Jacoco覆盖率测试 新增字段 20210610
-  jacocoAgent:
-    imageName: 10.30.30.22:9080/library/jacocoagent
-    imageTag: 0.8.6-isc
-  mysql:
-    mysql_host: mysql-service
-    mysql_port: 23306
-    rootpassword: ZljIsysc0re123
-    username: isyscore
-    password: Isysc0re
-    flywaytable: isc_diop_history
-  app_mysql:
-    mysql_host: app-mysql-service
-    mysql_port: 33306
-    rootpassword: Isysc0re123
-    username: isyscore
-    password: Isysc0re
-  redis:
-    redis_host: redis-service
-    redis_port: 26379
-    password: ZljIsysc0re123
-  app_redis:
-    redis_host: app-redis-service
-    redis_port: 36379
-    password: Isysc0re123
-  ldap:
-    password: ZljIsys0re123
-    username: cn=admin,dc=openstack,dc=org
-    domain: openstack.org
-    basedn: dc=openstack,dc=org
-    organisation: openstack
-    host: openldap-service
-    port: 20389
-
-diop:
-  deploy: 1
-  version: 2.1.0
-  # 实现Jacoco覆盖率测试 新增字段 20210610
-  coverageTest: false
-
-  iscDiopService:
-    image: 10.30.30.22:9080/isyscore/isc-diop-service:3.0.0.20220315.alpha.2
-    limitsMemory: 2Gi
-    requestsMemory: 48Mi
-    limitsCpu:
-    requestsCpu:
-    svcName: isc-diop-service
-
-  iscDiopUi:
-    image: 10.30.30.22:9080/isyscore/isc-diop-ui:3.0.0.0.20220407.beta
-    appVersion: 3.0.0
-
-  DiopSql:
-    image: 10.30.30.22:9080/isyscore/diop-sql:2.1.1.1
+key1:
+  key2:
+    intdata: 12
+    strdata: "data"
+    booldata: true
+    int64data: 12
+    floatdata: 12.3
+    objdata:
+      field1: 1
+      field2: "value2"
+    arraydata:
+      - 1
+      - 2
+      - 3
+    arrayobjdata:
+      - field1: 1
+        field2: "name1"
+      - field1: 2
+        field2: "name2"
