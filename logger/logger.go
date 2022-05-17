@@ -61,7 +61,7 @@ func Debug(format string, v ...any) {
 }
 
 func Assert(format string, v ...any) {
-	log.WithLevel(zerolog.NoLevel).Msgf(format, v...)
+	log.WithLevel(zerolog.Disabled).Msgf(format, v...)
 }
 
 func Panic(format string, v ...any) {
@@ -172,30 +172,10 @@ func getLogDir(logDir string) string {
 	return logDir
 }
 
-//func initSystemPanicLog() {
-//	dir, _ := os.Getwd()
-//	logDir := filepath.Join(dir, "logs")
-//	if !f0.DirectoryExists(logDir) {
-//		_ = f0.MkDirs(logDir)
-//	}
-//	logFilePath := filepath.Join(logDir, "system_panic.log")
-//	if logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660); err == nil {
-//		if err = syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd())); err == nil {
-//			log.Printf("system panic log redirect to %s", logFilePath)
-//		} else {
-//			log.Printf("system panic log redirect to %s failed:%v", logFilePath, err)
-//		}
-//	} else {
-//		l0.Printf("system_panic.log创建异常:%v", err)
-//	}
-//}
 var panicHandler = Strategy{}
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
-	if level == zerolog.NoLevel {
-		strL = "assert"
-	}
 	if level == zerolog.Disabled {
 		strL = "console"
 	}
@@ -242,7 +222,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 
 }
 
-var levels = []zerolog.Level{zerolog.NoLevel, zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.PanicLevel, zerolog.FatalLevel, zerolog.Disabled}
+var levels = []zerolog.Level{zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.PanicLevel, zerolog.FatalLevel, zerolog.Disabled}
 
 func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, name string) {
 	//关闭现有流

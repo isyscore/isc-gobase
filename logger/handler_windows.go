@@ -27,11 +27,11 @@ type Strategy struct {
 }
 
 func (s Strategy) Dup2(newFile *FileLevelWriter, oldfd *os.File) (err error) {
-	if err := setStdHandle(syscall.STD_ERROR_HANDLE, syscall.Handle(newFile.Fd())); err != nil {
+	if err := setStdHandle(syscall.STD_ERROR_HANDLE, syscall.Handle(newFile.File.Fd())); err != nil {
 		return err
 	}
 	// SetStdHandle does not affect prior references to stde
-	os.Stderr = os.NewFile(newFile.Fd(), "/dev/stderr")
-	os.Stdout = os.NewFile(newFile.Fd(), "/dev/stdout")
+	os.Stderr = newFile.File
+	os.Stdout = newFile.File
 	return nil
 }
