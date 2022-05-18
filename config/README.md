@@ -95,6 +95,61 @@ base:
 config.getValueObject("base", &ServerCfg)
 ```
 
+说明：
+v1.0.12版本后，支持对配置的中划线支持，此外还支持更多配置
+- 中划线：比如：data-base-user
+- 小驼峰：比如：dataBaseUser
+- 大驼峰：比如：DataBaseUser
+- 下划线：比如：data_base_user
+
+比如：
+```yaml
+key1:
+  ok1:
+    hao-de-ok: 12
+    name-age: 32
+  ok2:
+    haoDeOk: 12
+    nameAge: 32
+  ok3:
+    HaoDeOk: 12
+    NameAge: 32
+  ok4:
+    hao_de_ok: 12
+    name_age: 32
+```
+```go
+type SmallEntity struct {
+    HaoDeOk int
+    NameAge int
+}
+
+// 可以读取到
+func TestSmall(t *testing.T) {
+    config.LoadConfig()
+
+    entity1 := SmallEntity{}
+    config.GetValueObject("key1.ok1", &entity1)
+    assert.Equal(t, entity1.NameAge, 32)
+    assert.Equal(t, entity1.HaoDeOk, 12)
+
+    entity2 := SmallEntity{}
+    config.GetValueObject("key1.ok2", &entity2)
+    assert.Equal(t, entity2.NameAge, 32)
+    assert.Equal(t, entity2.HaoDeOk, 12)
+
+    entity3 := SmallEntity{}
+    config.GetValueObject("key1.ok3", &entity3)
+    assert.Equal(t, entity3.NameAge, 32)
+    assert.Equal(t, entity3.HaoDeOk, 12)
+
+    entity4 := SmallEntity{}
+    config.GetValueObject("key1.ok4", &entity4)
+    assert.Equal(t, entity4.NameAge, 32)
+    assert.Equal(t, entity4.HaoDeOk, 12)
+}
+```
+
 ### 6. 支持文件的绝对和相对路径读取
 配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学约定的服务器路径位置
 ```go
