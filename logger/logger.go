@@ -137,7 +137,7 @@ func (lw *FileLevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err
 	if level.String() == lw.level.String() {
 		return lw.writer.Write(p)
 	}
-	return 0, nil
+	return len(p), nil
 }
 
 func closeFileLevelWriter(writers []io.Writer) {
