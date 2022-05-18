@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/magiconair/properties/assert"
@@ -53,9 +52,25 @@ func TestLoadConfig(t *testing.T) {
 func TestSmall(t *testing.T) {
 	config.LoadConfig()
 
-	entity := SmallEntity{}
-	config.GetValueObject("key1.ok", &entity)
-	fmt.Println(entity)
+	entity1 := SmallEntity{}
+	config.GetValueObject("key1.ok1", &entity1)
+	assert.Equal(t, entity1.NameAge, 32)
+	assert.Equal(t, entity1.HaoDeOk, 12)
+
+	entity2 := SmallEntity{}
+	config.GetValueObject("key1.ok2", &entity2)
+	assert.Equal(t, entity2.NameAge, 32)
+	assert.Equal(t, entity2.HaoDeOk, 12)
+
+	entity3 := SmallEntity{}
+	config.GetValueObject("key1.ok3", &entity3)
+	assert.Equal(t, entity3.NameAge, 32)
+	assert.Equal(t, entity3.HaoDeOk, 12)
+
+	entity4 := SmallEntity{}
+	config.GetValueObject("key1.ok4", &entity4)
+	assert.Equal(t, entity4.NameAge, 32)
+	assert.Equal(t, entity4.HaoDeOk, 12)
 }
 
 type SmallEntity struct {
