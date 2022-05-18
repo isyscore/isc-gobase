@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/magiconair/properties/assert"
@@ -46,4 +47,18 @@ func TestLoadConfig(t *testing.T) {
 	}
 	assert.Equal(t, actData, expectData)
 	assert.Equal(t, config.GetValueArrayInt("key1.key2.arraydata"), []int{1, 2, 3})
+}
+
+// 测试小驼峰
+func TestSmall(t *testing.T) {
+	config.LoadConfig()
+
+	entity := SmallEntity{}
+	config.GetValueObject("key1.ok", &entity)
+	fmt.Println(entity)
+}
+
+type SmallEntity struct {
+	HaoDeOk int
+	NameAge int
 }

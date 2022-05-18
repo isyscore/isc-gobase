@@ -583,24 +583,31 @@ func doInvokeValue(fieldMapValue reflect.Value, field reflect.StructField, field
 		fieldMapValue = fieldMapValue.Elem()
 	}
 
+	var fValue reflect.Value
 	if v, exist := getValueFromMapValue(fieldMapValue, field.Name); exist {
-		if v.Kind() == reflect.Ptr {
-			v = v.Elem()
-		}
-		targetValue := valueToTarget(v, field.Type)
-		if targetValue.IsValid() {
-			if fieldValue.Kind() == reflect.Ptr {
-				if targetValue.Kind() == reflect.Ptr {
-					fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Elem().Convert(field.Type))
-				} else {
-					fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Convert(field.Type))
-				}
+		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToMiddleLine(field.Name)); exist {
+		fValue = v
+	} else {
+		return
+	}
+
+	if fieldValue.Kind() == reflect.Ptr {
+		fValue = fValue.Elem()
+	}
+	targetValue := valueToTarget(fValue, field.Type)
+	if targetValue.IsValid() {
+		if fieldValue.Kind() == reflect.Ptr {
+			if targetValue.Kind() == reflect.Ptr {
+				fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Elem().Convert(field.Type))
 			} else {
-				if targetValue.Kind() == reflect.Ptr {
-					fieldValue.Set(targetValue.Elem().Convert(field.Type))
-				} else {
-					fieldValue.Set(targetValue.Convert(field.Type))
-				}
+				fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Convert(field.Type))
+			}
+		} else {
+			if targetValue.Kind() == reflect.Ptr {
+				fieldValue.Set(targetValue.Elem().Convert(field.Type))
+			} else {
+				fieldValue.Set(targetValue.Convert(field.Type))
 			}
 		}
 	}

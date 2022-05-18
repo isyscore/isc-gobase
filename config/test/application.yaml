@@ -17,3 +17,6 @@ key1:
         field2: "name1"
       - field1: 2
         field2: "name2"
+  ok:
+    hao-de-ok: 12
+    name-age: 32
