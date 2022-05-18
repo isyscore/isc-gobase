@@ -4,6 +4,8 @@ import (
 	goredis "github.com/go-redis/redis/v8"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
+	baseTime "github.com/isyscore/isc-gobase/time"
+	"time"
 )
 
 type ConfigError struct {
@@ -46,25 +48,25 @@ func getStandaloneConfig() *goredis.Options {
 		Addr: addr,
 
 		DB:       config.RedisCfg.Standalone.Database,
+		Network:  config.RedisCfg.Standalone.Network,
 		Username: config.RedisCfg.Username,
 		Password: config.RedisCfg.Password,
 
-		MaxRetries: config.RedisCfg.MaxRetries,
-		// todo
-		//MinRetryBackoff: config.RedisCfg.MinRetryBackoff,
-		//MaxRetryBackoff: config.RedisCfg.MaxRetryBackoff,
+		MaxRetries:      config.RedisCfg.MaxRetries,
+		MinRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MinRetryBackoff, time.Millisecond),
+		MaxRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MaxRetryBackoff, time.Millisecond),
 
-		//DialTimeout:  config.RedisCfg.DialTimeout,
-		//ReadTimeout:  config.RedisCfg.ReadTimeout,
-		//WriteTimeout: config.RedisCfg.WriteTimeout,
+		DialTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.DialTimeout, time.Millisecond),
+		ReadTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.ReadTimeout, time.Millisecond),
+		WriteTimeout: baseTime.NumToTimeDuration(config.RedisCfg.WriteTimeout, time.Millisecond),
 
-		PoolFIFO:     config.RedisCfg.PoolFIFO,
-		PoolSize:     config.RedisCfg.PoolSize,
-		MinIdleConns: config.RedisCfg.MinIdleConns,
-		//MaxConnAge:         config.RedisCfg.MaxConnAge,
-		//PoolTimeout:        config.RedisCfg.PoolTimeout,
-		//IdleTimeout:        config.RedisCfg.IdleTimeout,
-		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
+		PoolFIFO:           config.RedisCfg.PoolFIFO,
+		PoolSize:           config.RedisCfg.PoolSize,
+		MinIdleConns:       config.RedisCfg.MinIdleConns,
+		MaxConnAge:         baseTime.NumToTimeDuration(config.RedisCfg.MaxConnAge, time.Millisecond),
+		PoolTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.PoolTimeout, time.Millisecond),
+		IdleTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.IdleTimeout, time.Millisecond),
+		IdleCheckFrequency: baseTime.NumToTimeDuration(config.RedisCfg.IdleCheckFrequency, time.Millisecond),
 	}
 	return redisConfig
 }
@@ -80,22 +82,21 @@ func getSentinelConfig() *goredis.FailoverOptions {
 		SentinelUsername: config.RedisCfg.Sentinel.SentinelUser,
 		SentinelPassword: config.RedisCfg.Sentinel.SentinelPassword,
 
-		MaxRetries: config.RedisCfg.MaxRetries,
-		// todo
-		//MinRetryBackoff: config.RedisCfg.MinRetryBackoff * time.Second,
-		//MaxRetryBackoff: config.RedisCfg.MaxRetryBackoff,
+		MaxRetries:      config.RedisCfg.MaxRetries,
+		MinRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MinRetryBackoff, time.Millisecond),
+		MaxRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MaxRetryBackoff, time.Millisecond),
 
-		//DialTimeout:  config.RedisCfg.DialTimeout,
-		//ReadTimeout:  config.RedisCfg.ReadTimeout,
-		//WriteTimeout: config.RedisCfg.WriteTimeout,
+		DialTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.DialTimeout, time.Millisecond),
+		ReadTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.ReadTimeout, time.Millisecond),
+		WriteTimeout: baseTime.NumToTimeDuration(config.RedisCfg.WriteTimeout, time.Millisecond),
 
-		PoolFIFO:     config.RedisCfg.PoolFIFO,
-		PoolSize:     config.RedisCfg.PoolSize,
-		MinIdleConns: config.RedisCfg.MinIdleConns,
-		//MaxConnAge:         config.RedisCfg.MaxConnAge,
-		//PoolTimeout:        config.RedisCfg.PoolTimeout,
-		//IdleTimeout:        config.RedisCfg.IdleTimeout,
-		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
+		PoolFIFO:           config.RedisCfg.PoolFIFO,
+		PoolSize:           config.RedisCfg.PoolSize,
+		MinIdleConns:       config.RedisCfg.MinIdleConns,
+		MaxConnAge:         baseTime.NumToTimeDuration(config.RedisCfg.MaxConnAge, time.Millisecond),
+		PoolTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.PoolTimeout, time.Millisecond),
+		IdleTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.IdleTimeout, time.Millisecond),
+		IdleCheckFrequency: baseTime.NumToTimeDuration(config.RedisCfg.IdleCheckFrequency, time.Millisecond),
 	}
 
 	return redisConfig
@@ -117,22 +118,21 @@ func getClusterConfig() *goredis.ClusterOptions {
 		RouteByLatency: config.RedisCfg.Cluster.RouteByLatency,
 		RouteRandomly:  config.RedisCfg.Cluster.RouteRandomly,
 
-		MaxRetries: config.RedisCfg.MaxRetries,
-		// todo
-		//MinRetryBackoff: config.RedisCfg.MinRetryBackoff,
-		//MaxRetryBackoff: config.RedisCfg.MaxRetryBackoff,
+		MaxRetries:      config.RedisCfg.MaxRetries,
+		MinRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MinRetryBackoff, time.Millisecond),
+		MaxRetryBackoff: baseTime.NumToTimeDuration(config.RedisCfg.MaxRetryBackoff, time.Millisecond),
 
-		//DialTimeout:        config.RedisCfg.DialTimeout,
-		//ReadTimeout:        config.RedisCfg.ReadTimeout,
-		//WriteTimeout:       config.RedisCfg.WriteTimeout,
+		DialTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.DialTimeout, time.Millisecond),
+		ReadTimeout:  baseTime.NumToTimeDuration(config.RedisCfg.ReadTimeout, time.Millisecond),
+		WriteTimeout: baseTime.NumToTimeDuration(config.RedisCfg.WriteTimeout, time.Millisecond),
 		PoolFIFO:     config.RedisCfg.PoolFIFO,
 		PoolSize:     config.RedisCfg.PoolSize,
 		MinIdleConns: config.RedisCfg.MinIdleConns,
 
-		//MaxConnAge:         config.RedisCfg.MaxConnAge,
-		//PoolTimeout:        config.RedisCfg.PoolTimeout,
-		//IdleTimeout:        config.RedisCfg.IdleTimeout,
-		//IdleCheckFrequency: config.RedisCfg.IdleCheckFrequency,
+		MaxConnAge:         baseTime.NumToTimeDuration(config.RedisCfg.MaxConnAge, time.Millisecond),
+		PoolTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.PoolTimeout, time.Millisecond),
+		IdleTimeout:        baseTime.NumToTimeDuration(config.RedisCfg.IdleTimeout, time.Millisecond),
+		IdleCheckFrequency: baseTime.NumToTimeDuration(config.RedisCfg.IdleCheckFrequency, time.Millisecond),
 	}
 	return redisConfig
 }

@@ -12,19 +12,34 @@ base:
 ```
 
 ```go
-func TestConnect(t *testing.T) {
-    // 直接获取即可 
+import (
+    "context"
+    "github.com/magiconair/properties/assert"
+    "testing"
+    "time"
+
+    "github.com/isyscore/isc-gobase/redis"
+)
+
+func TestRedis(t *testing.T) {
+    // 客户端获取 
     rdb, _ := redis.GetClient()
     
+    // 添加和读取
+    key := "test_key"
+    value := "test_value"
+    
     ctx := context.Background()
-    rdb.Set(ctx, "k1", "vv", time.Hour)
-    rlt := rdb.Get(ctx, "k1")
-    fmt.Println(rlt.Result())
+    rdb.Set(ctx, key, value, time.Hour)
+    rlt := rdb.Get(ctx, key)
+
+    // 判断
+    actValue, _ := rlt.Result()
+    assert.Equal(t, actValue, value)
 }
 ```
 
-redis的全部配置如下
-
+### redis所有配置
 ```yaml
 base:
   redis:
@@ -41,14 +56,18 @@ base:
     # （主从高可用）哨兵模式
     sentinel: 
       master: string # 哨兵的集群名字
-      addrs: string,string # 哨兵节点地址
+      addrs:  # 哨兵节点地址
+        - string
+        - string
       database: int # 数据库节点
       sentinel-user: string # 哨兵用户
       sentinel-password: string # 哨兵密码
       slave-only: bool # 将所有命令路由到从属只读节点。
     # 集群模式
     cluster: 
-      addrs: string,string # 节点地址
+      addrs:  # 多个节点地址
+        - string
+        - string
       max-redirects: int # 最大重定向次数
       read-only: bool # 开启从节点的只读功能
       route-by-latency: bool # 允许将只读命令路由到最近的主节点或从节点，它会自动启用 ReadOnly
@@ -66,10 +85,13 @@ base:
 
     # 连接池相关配置
     pool-fifo: bool # 连接池类型：fifo：true;lifo：false;和lifo相比，fifo开销更高
-    poll-size: int # 最大连接池大小：默认每个cpu核是10个连接，cpu核数可以根据函数runtime.GOMAXPROCS来配置，默认是runtime.NumCpu
-    min-idleconns: int # 最小空闲连接数
+    pool-size: int # 最大连接池大小：默认每个cpu核是10个连接，cpu核数可以根据函数runtime.GOMAXPROCS来配置，默认是runtime.NumCpu
+    min-idle-conns: int # 最小空闲连接数
     max-conn-age: int #（单位毫秒） 连接存活时长，默认不关闭
     pool-timeout: int #（单位毫秒）获取链接池中的链接都在忙，则等待对应的时间，默认读超时+1秒
     idle-timeout: int #（单位毫秒）空闲链接时间，超时则关闭，注意：该时间要小于服务端的超时时间，否则会出现拿到的链接失效问题，默认5分钟，-1表示禁用超时检查
     idle-check-frequency: int #（单位毫秒）空闲链接核查频率，默认1分钟。-1禁止空闲链接核查，即使配置了IdleTime也不行
 ```
+
+说明：
+支持redis在不同模式下进行运行，比如配置了sentinel，则直接运行哨兵模式，配置了集群，则运行集群模式，如果都配置了，则优先运行哨兵，然后集群，然后再是单机

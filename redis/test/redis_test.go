@@ -2,18 +2,26 @@ package test
 
 import (
 	"context"
-	"fmt"
+	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
 
 	"github.com/isyscore/isc-gobase/redis"
 )
 
-func TestConnect(t *testing.T) {
+func TestRedis(t *testing.T) {
+	// 客户端获取
 	rdb, _ := redis.GetClient()
 
+	// 添加和读取
+	key := "test_key"
+	value := "test_value"
+
 	ctx := context.Background()
-	rdb.Set(ctx, "k1", "vv", time.Hour)
-	rlt := rdb.Get(ctx, "k1")
-	fmt.Println(rlt.Result())
+	rdb.Set(ctx, key, value, time.Hour)
+	rlt := rdb.Get(ctx, key)
+
+	// 判断
+	actValue, _ := rlt.Result()
+	assert.Equal(t, actValue, value)
 }

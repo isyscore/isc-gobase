@@ -2,6 +2,7 @@ package time
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/isc"
 	"log"
 	"math"
 	"regexp"
@@ -326,4 +327,8 @@ func ParseTime(timeStr string) t0.Time {
 
 func IsTimeEmpty(time t0.Time) bool {
 	return time == EmptyTime
+}
+
+func NumToTimeDuration(num int, duration t0.Duration) t0.Duration {
+	return t0.Duration(isc.ToInt64(num) * duration.Nanoseconds())
 }

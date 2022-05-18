@@ -1,0 +1,23 @@
+base:
+  redis:
+    enable: true
+    standalone:
+      addr: localhost:16379
+    # 命令执行失败配置
+    max-retries: 2 # 命令执行失败时候，最大重试次数，默认3次，-1（不是0）则不重试
+    min-retry-backoff: 8 #（单位毫秒） 命令执行失败时候，每次重试的最小回退时间，默认8毫秒，-1则禁止回退
+    max-retry-backoff: 512 # （单位毫秒）命令执行失败时候，每次重试的最大回退时间，默认512毫秒，-1则禁止回退
+
+    # 超时配置
+    dial-timeout: 14 # （单位毫秒）超时：创建新链接的拨号超时时间，默认15秒
+    read-timeout: 4 # （单位毫秒）超时：读超时，默认3秒，使用-1，使用-1则表示无超时，0的话是表示默认3秒
+    write-timeout: 4 # （单位毫秒）超时：写超时，默认是读超时3秒，使用-1，使用-1则表示无超时，0的话是表示默认3秒
+
+    # 连接池相关配置
+    pool-fifo: true # 连接池类型：fifo：true;lifo：false;和lifo相比，fifo开销更高
+    pool-size: 10 # 最大连接池大小：默认每个cpu核是10个连接，cpu核数可以根据函数runtime.GOMAXPROCS来配置，默认是runtime.NumCpu
+    min-idle-conns: 3 # 最小空闲连接数
+    max-conn-age: 1000 #（单位毫秒） 连接存活时长，默认不关闭
+    pool-timeout: 1000 #（单位毫秒）获取链接池中的链接都在忙，则等待对应的时间，默认读超时+1秒
+    idle-timeout: 5000 #（单位毫秒）空闲链接时间，超时则关闭，注意：该时间要小于服务端的超时时间，否则会出现拿到的链接失效问题，默认5分钟，-1表示禁用超时检查
+    idle-check-frequency: 60000 #（单位毫秒）空闲链接核查频率，默认1分钟。-1禁止空闲链接核查，即使配置了IdleTime也不行
