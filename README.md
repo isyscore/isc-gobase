@@ -64,7 +64,7 @@ root@user ~> curl http://localhost:8080/api/app/sample/group1/data
 {"code":"success","data":"ok","message":"成功"}
 ```
 
-### 各包的用法
+### 包列表
 |包名        | 简介 |
 | --------   | :----: |
 | [isc](/isc)| 基础工具（更新中）|
@@ -79,8 +79,13 @@ root@user ~> curl http://localhost:8080/api/app/sample/group1/data
 | [goid](/goid)| 局部id传递处理（theadlocal） |
 | [json](/json)| json字符串处理工具 |
 | [redis](/redis)| go-redis的封装 |
+| [cache](/cache)| 缓存工具 |
+| [time](/time)| 时间管理工具 |
+| [file](/file)| 文件管理 |
+| [coder](/coder)| 编解码加解密工具 |
+| [http](/http)| http的辅助工具 |
 
-### 项目测试
+### isc-gobase 项目测试
 根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块
 ```shell
 sh go_test.sh
