@@ -68,7 +68,7 @@ base:
       addrs:  # 多个节点地址
         - string
         - string
-      max-redirects: int # 最大重定向次数
+      max-redirects: int # 最大重定向次数，默认3次
       read-only: bool # 开启从节点的只读功能
       route-by-latency: bool # 允许将只读命令路由到最近的主节点或从节点，它会自动启用 ReadOnly
       route-randomly: bool # 允许将只读命令路由到随机的主节点或从节点，它会自动启用 ReadOnly
