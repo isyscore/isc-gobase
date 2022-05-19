@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
@@ -11,7 +12,11 @@ import (
 
 func TestRedis(t *testing.T) {
 	// 客户端获取
-	rdb, _ := redis.GetClient()
+	rdb, err := redis.GetClient()
+	if err != nil {
+		logger.Warn("连接redis错误 %v", err)
+		return
+	}
 
 	// 添加和读取
 	key := "test_key"
