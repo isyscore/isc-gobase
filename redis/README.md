@@ -3,6 +3,7 @@
 
 ### 快速使用
 
+#### 单机
 ```yaml
 base:
   redis:
@@ -11,31 +12,48 @@ base:
       addr: localhost:16379
 ```
 
+#### 哨兵
+```yaml
+base:
+  redis:
+    enable: true
+    sentinel:
+      master: mymaster
+      addrs:
+        - localhost:26379
+        - localhost:26380
+        - localhost:26381
+```
+
+#### 集群
+```yaml
+base:
+  redis:
+    enable: true
+    cluster:
+      addrs:  # 多个节点地址
+        - localhost:6381
+        - localhost:6382
+        - localhost:6383
+        - localhost:6384
+        - localhost:6385
+        - localhost:6386
+      max-redirects: 3
+```
+
+#### 代码
+只提供一个封装方法，其他的均是go-redis的api
+
 ```go
 import (
-    "context"
-    "github.com/magiconair/properties/assert"
     "testing"
-    "time"
-
     "github.com/isyscore/isc-gobase/redis"
 )
 
 func TestRedis(t *testing.T) {
-    // 客户端获取 
     rdb, _ := redis.GetClient()
     
-    // 添加和读取
-    key := "test_key"
-    value := "test_value"
-    
-    ctx := context.Background()
-    rdb.Set(ctx, key, value, time.Hour)
-    rlt := rdb.Get(ctx, key)
-
-    // 判断
-    actValue, _ := rlt.Result()
-    assert.Equal(t, actValue, value)
+    // ...
 }
 ```
 
@@ -93,5 +111,7 @@ base:
     idle-check-frequency: int #（单位毫秒）空闲链接核查频率，默认1分钟。-1禁止空闲链接核查，即使配置了IdleTime也不行
 ```
 
-说明：
-支持redis在不同模式下进行运行，比如配置了sentinel，则直接运行哨兵模式，配置了集群，则运行集群模式，如果都配置了，则优先运行哨兵，然后集群，然后再是单机
+说明：<br/>
+支持redis在不同模式下进行运行，配置也可以同时配置不过这里有优先级：<br/>
+ > 哨兵模式 > 集群模式 > 单机模式
+
