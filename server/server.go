@@ -81,15 +81,12 @@ func InitServer() {
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
 		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
 	}
-	level := config.GetValueStringDefault("base.logger.level", "info")
-	timeFieldFormat := config.GetValueStringDefault("base.logger.time.format", "2006-01-02 15:04:05")
-	colored := config.GetValueBoolDefault("base.logger.color.enable", false)
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
-	splitEnable := config.GetValueBoolDefault("base.logger.split.enable", false)
-	splitSize := config.GetValueInt64Default("base.logger.split.size", 300)
-	logDir := config.GetValueStringDefault("base.logger.dir", "")
-	maxHistory := config.GetValueIntDefault("base.logger.max.history", 7)
-	logger.InitLog(level, timeFieldFormat, colored, appName, splitEnable, splitSize, logDir, maxHistory)
+
+	var loggerCfg logger.LoggerConfig
+	config.GetValueObject("base.logger", &loggerCfg)
+
+	logger.InitLog(appName, &loggerCfg)
 }
 
 func Run() {
