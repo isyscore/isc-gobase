@@ -3,6 +3,7 @@ package validate
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"reflect"
 	"sort"
 	"strings"
@@ -10,7 +11,6 @@ import (
 	"unicode"
 
 	"github.com/antonmedv/expr"
-	"github.com/isyscore/isc-gobase/constant"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/validate/matcher"

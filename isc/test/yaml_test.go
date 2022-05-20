@@ -2,13 +2,13 @@ package test
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/test"
+	"github.com/magiconair/properties"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
-	"log"
 	"strings"
 	"testing"
-
-	"github.com/isyscore/isc-gobase/isc"
-	"github.com/magiconair/properties"
 )
 
 func TestMapToProperties1(t *testing.T) {
@@ -16,6 +16,7 @@ func TestMapToProperties1(t *testing.T) {
 	dataMap["a"] = 12
 	dataMap["b"] = 13
 	dataMap["c"] = 14
+	dataMap["c"] = ""
 
 	act, err := isc.MapToProperties(dataMap)
 	if err != nil {
@@ -118,15 +119,15 @@ func TestYamlToMap(t *testing.T) {
 }
 
 func TestPropertiesToYaml1(t *testing.T) {
-	propertiesToYamlTest(t, "./resources/properties/base.properties")
+	//propertiesToYamlTest(t, "./resources/properties/base.properties")
 	//propertiesToYamlTest(t, "./resources/properties/base1.properties")
 	//propertiesToYamlTest(t, "./resources/properties/base2.properties")
 	//propertiesToYamlTest(t, "./resources/properties/array1.properties")
 	//propertiesToYamlTest(t, "./resources/properties/array2.properties")
-	propertiesToYamlTest(t, "./resources/properties/array3.properties")
-	propertiesToYamlTest(t, "./resources/properties/array4.properties")
+	//propertiesToYamlTest(t, "./resources/properties/array3.properties")
+	//propertiesToYamlTest(t, "./resources/properties/array4.properties")
 	//propertiesToYamlTest(t, "./resources/properties/array5.properties")
-	propertiesToYamlTest(t, "./resources/properties/array6.properties")
+	//propertiesToYamlTest(t, "./resources/properties/array6.properties")
 	//propertiesToYamlTest(t, "./resources/properties/array7.properties")
 }
 
@@ -154,6 +155,7 @@ func TestYamlToPropertiesWithKey(t *testing.T) {
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array5.yml")
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array6.yml")
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array7.yml")
+	yamlToPropertiesWithKeyTest(t, "./resources/yml/test1.yml")
 }
 
 func TestPropertiesToMap5(t *testing.T) {
@@ -163,31 +165,25 @@ func TestPropertiesToMap5(t *testing.T) {
 	propertiesToMap(t, "./resources/properties/array1.properties")
 }
 
-func TestJsonToYaml1(t *testing.T) {
-	fmt.Println(isc.JsonToYaml("[]"))
-}
-
 func propertiesToMap(t *testing.T, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		Err(t, err)
+		test.Err(t, err)
 		return
 	}
 
 	expect := strings.TrimSpace(string(bytes))
-	actMap, err := isc.PropertiesToMap(expect)
+	_, err = isc.PropertiesToMap(expect)
 	if err != nil {
 		log.Printf("转换错误：%v", err)
 		return
 	}
-
-	fmt.Println(actMap)
 }
 
 func yamlToPropertiesWithKeyTest(t *testing.T, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		Err(t, err)
+		test.Err(t, err)
 		return
 	}
 
@@ -204,7 +200,7 @@ func yamlToPropertiesWithKeyTest(t *testing.T, filePath string) {
 func yamlToKvListTest(t *testing.T, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		Err(t, err)
+		test.Err(t, err)
 		return
 	}
 
@@ -243,7 +239,7 @@ func yamlToKvListTest(t *testing.T, filePath string) {
 func yamlToMapTest(t *testing.T, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		Err(t, err)
+		test.Err(t, err)
 		return
 	}
 	expect := strings.TrimSpace(string(bytes))
@@ -255,13 +251,13 @@ func yamlToMapTest(t *testing.T, filePath string) {
 
 	value, _ := isc.ObjectToYaml(dataMap)
 	act := strings.TrimSpace(value)
-	Equal(t, act, expect)
+	test.Equal(t, act, expect)
 }
 
 func propertiesToYamlTest(t *testing.T, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		Err(t, err)
+		test.Err(t, err)
 		return
 	}
 	expect := strings.TrimSpace(string(bytes))
@@ -274,5 +270,5 @@ func propertiesToYamlTest(t *testing.T, filePath string) {
 
 	act, err := isc.YamlToProperties(yamlContent)
 	act = strings.TrimSpace(act)
-	Equal(t, act, expect)
+	test.Equal(t, act, expect)
 }

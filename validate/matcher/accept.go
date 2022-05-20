@@ -1,7 +1,7 @@
 package matcher
 
 import (
-	"github.com/isyscore/isc-gobase/constant"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"reflect"
 	"strconv"
 	"strings"

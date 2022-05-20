@@ -2,6 +2,7 @@ package matcher
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -12,7 +13,6 @@ import (
 	"github.com/antonmedv/expr/compiler"
 	"github.com/antonmedv/expr/parser"
 	"github.com/antonmedv/expr/vm"
-	"github.com/isyscore/isc-gobase/constant"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/time"
 )

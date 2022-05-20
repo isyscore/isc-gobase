@@ -2,10 +2,10 @@ package matcher
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"reflect"
 	"strings"
 
-	"github.com/isyscore/isc-gobase/constant"
 	"github.com/isyscore/isc-gobase/logger"
 )
 

@@ -52,7 +52,7 @@ var testData = []struct{ utf8, other, otherEncoding string }{
 func TestDecode(t *testing.T) {
 	for _, data := range testData {
 		str := ""
-		str, err := encoding.Convert("UTF-8", data.otherEncoding, data.other)
+		str, err := encoding.Convert(data.other, data.otherEncoding, "UTF-8")
 		if err != nil {
 			t.Errorf("Could not create decoder for %v", err)
 			continue
@@ -67,7 +67,7 @@ func TestDecode(t *testing.T) {
 func TestUTF8To(t *testing.T) {
 	for _, data := range testData {
 		str := ""
-		str, err := encoding.UTF8ToString(data.otherEncoding, data.utf8)
+		str, err := encoding.UTF8ToString(data.utf8, data.otherEncoding)
 		if err != nil {
 			t.Errorf("Could not create decoder for %v", err)
 			continue
@@ -82,7 +82,7 @@ func TestUTF8To(t *testing.T) {
 func TestToUTF8(t *testing.T) {
 	for _, data := range testData {
 		str := ""
-		str, err := encoding.StringToUTF8(data.otherEncoding, data.other)
+		str, err := encoding.StringToUTF8(data.other, data.otherEncoding)
 		if err != nil {
 			t.Errorf("Could not create decoder for %v", err)
 			continue
@@ -97,7 +97,7 @@ func TestToUTF8(t *testing.T) {
 func TestEncode(t *testing.T) {
 	for _, data := range testData {
 		str := ""
-		str, err := encoding.Convert(data.otherEncoding, "UTF-8", data.utf8)
+		str, err := encoding.Convert(data.utf8, "UTF-8", data.otherEncoding)
 		if err != nil {
 			t.Errorf("Could not create decoder for %v", err)
 			continue
@@ -115,7 +115,7 @@ func TestConvert(t *testing.T) {
 	dstCharset := "gbk"
 	dst := "Hello \xb3\xa3\xd3\xc3\x87\xf8\xd7\xd6\x98\xcb\x9c\xca\xd7\xd6\xf3\x77\xb1\xed"
 
-	str, err := encoding.Convert(dstCharset, srcCharset, src)
+	str, err := encoding.Convert(src, srcCharset, dstCharset)
 	if err != nil {
 		t.Errorf("convert error. %v", err)
 		return

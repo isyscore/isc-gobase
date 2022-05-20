@@ -1,0 +1,31 @@
+key1:
+  key2:
+    intdata: 12
+    strdata: "data"
+    booldata: true
+    int64data: 12
+    floatdata: 12.3
+    objdata:
+      field1: 1
+      field2: "value2"
+    arraydata:
+      - 1
+      - 2
+      - 3
+    arrayobjdata:
+      - field1: 1
+        field2: "name1"
+      - field1: 2
+        field2: "name2"
+  ok1:
+    hao-de-ok: 12
+    name-age: 32
+  ok2:
+    haoDeOk: 12
+    nameAge: 32
+  ok3:
+    HaoDeOk: 12
+    NameAge: 32
+  ok4:
+    hao_de_ok: 12
+    name_age: 32

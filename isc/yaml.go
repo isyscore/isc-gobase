@@ -362,6 +362,9 @@ func ObjectToYaml(value any) (string, error) {
 func MapToProperties(dataMap map[string]any) (string, error) {
 	var propertyStrList []string
 	for key, value := range dataMap {
+		if value == nil {
+			continue
+		}
 		valueKind := reflect.TypeOf(value).Kind()
 		switch valueKind {
 		case reflect.Map:
@@ -590,13 +593,16 @@ func wordToNode(lineWordList []string, nodeList []YamlNode, parentNode *YamlNode
 }
 
 func doMapToProperties(propertyStrList []string, value any, prefix string) []string {
+	if value == nil {
+		return propertyStrList
+	}
 	valueKind := reflect.TypeOf(value).Kind()
 	switch valueKind {
 	case reflect.Map:
 		{
 			// map结构
 			if reflect.ValueOf(value).Len() == 0 {
-				return []string{}
+				return propertyStrList
 			}
 
 			for mapR := reflect.ValueOf(value).MapRange(); mapR.Next(); {
