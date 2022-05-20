@@ -583,24 +583,39 @@ func doInvokeValue(fieldMapValue reflect.Value, field reflect.StructField, field
 		fieldMapValue = fieldMapValue.Elem()
 	}
 
+	var fValue reflect.Value
 	if v, exist := getValueFromMapValue(fieldMapValue, field.Name); exist {
-		if v.Kind() == reflect.Ptr {
-			v = v.Elem()
-		}
-		targetValue := valueToTarget(v, field.Type)
-		if targetValue.IsValid() {
-			if fieldValue.Kind() == reflect.Ptr {
-				if targetValue.Kind() == reflect.Ptr {
-					fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Elem().Convert(field.Type))
-				} else {
-					fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Convert(field.Type))
-				}
+		// 兼容DataBaseUser格式读取
+		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToMiddleLine(field.Name)); exist {
+		// 兼容data-base-user格式读取
+		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToSmallCamel(field.Name)); exist {
+		// 兼容dataBaseUser格式读取
+		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToUnderLine(field.Name)); exist {
+		// 兼容data_base_user格式读取
+		fValue = v
+	} else {
+		return
+	}
+
+	if fieldValue.Kind() == reflect.Ptr {
+		fValue = fValue.Elem()
+	}
+	targetValue := valueToTarget(fValue, field.Type)
+	if targetValue.IsValid() {
+		if fieldValue.Kind() == reflect.Ptr {
+			if targetValue.Kind() == reflect.Ptr {
+				fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Elem().Convert(field.Type))
 			} else {
-				if targetValue.Kind() == reflect.Ptr {
-					fieldValue.Set(targetValue.Elem().Convert(field.Type))
-				} else {
-					fieldValue.Set(targetValue.Convert(field.Type))
-				}
+				fieldValue.Elem().FieldByName(field.Name).Set(targetValue.Convert(field.Type))
+			}
+		} else {
+			if targetValue.Kind() == reflect.Ptr {
+				fieldValue.Set(targetValue.Elem().Convert(field.Type))
+			} else {
+				fieldValue.Set(targetValue.Convert(field.Type))
 			}
 		}
 	}

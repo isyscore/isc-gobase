@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/file"
 	"io/ioutil"
 	"log"
 	"os"
@@ -10,17 +9,29 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/isyscore/isc-gobase/file"
+
 	"github.com/isyscore/isc-gobase/isc"
 	"gopkg.in/yaml.v2"
 )
 
 var appProperty *ApplicationProperty
 var configExist = false
+var loadLock sync.Mutex
+var configLoaded = false
 
 func LoadConfig() {
+	loadLock.Lock()
+	defer loadLock.Unlock()
+	if configLoaded {
+		return
+	}
+
 	LoadConfigFromRelativePath("")
+	configLoaded = true
 }
 
 // LoadConfigFromRelativePath 加载相对文件路径
@@ -157,40 +168,40 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 		}
 
 		// 默认配置
-		if "application.yaml" == fileName {
+		if fileName == "application.yaml" {
 			configExist = true
 			break
-		} else if "application.yml" == fileName {
+		} else if fileName == "application.yml" {
 			configExist = true
 			break
-		} else if "application.properties" == fileName {
+		} else if fileName == "application.properties" {
 			configExist = true
 			break
-		} else if "application.json" == fileName {
+		} else if fileName == "application.json" {
 			configExist = true
 			break
 		}
 
 		profile := getActiveProfile()
-		if "" != profile {
+		if profile != "" {
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
 				extend := getFileExtension(fileName)
 				extend = strings.ToLower(extend)
-				if "yaml" == extend {
+				if extend == "yaml" {
 					configExist = true
 					AppendYamlFile(resourceAbsPath + fileName)
 					break
-				} else if "yml" == extend {
+				} else if extend == "yml" {
 					configExist = true
 					AppendYamlFile(resourceAbsPath + fileName)
 					break
-				} else if "properties" == extend {
+				} else if extend == "properties" {
 					configExist = true
 					AppendPropertyFile(resourceAbsPath + fileName)
 					break
-				} else if "json" == extend {
+				} else if extend == "json" {
 					configExist = true
 					AppendJsonFile(resourceAbsPath + fileName)
 					break
@@ -204,12 +215,12 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 // 优先级：环境变量 > 本地配置
 func getActiveProfile() string {
 	profile := os.Getenv("base.profiles.active")
-	if "" != profile {
+	if profile != "" {
 		return profile
 	}
 
 	profile = GetValueString("base.profiles.active")
-	if "" != profile {
+	if profile != "" {
 		return profile
 	}
 	return ""
@@ -249,10 +260,16 @@ func LoadYamlFile(filePath string) {
 	}
 
 	property, err := isc.YamlToProperties(string(content))
+	if err != nil {
+		return
+	}
 	valueMap, _ := isc.PropertiesToMap(property)
 	appProperty.ValueMap = valueMap
 
 	yamlMap, err := isc.YamlToMap(string(content))
+	if err != nil {
+		return
+	}
 	appProperty.ValueDeepMap = yamlMap
 }
 
@@ -271,6 +288,9 @@ func AppendYamlFile(filePath string) {
 	}
 
 	property, err := isc.YamlToProperties(string(content))
+	if err != nil {
+		return
+	}
 	valueMap, _ := isc.PropertiesToMap(property)
 	for k, v := range valueMap {
 		SetValue(k, v)
@@ -357,7 +377,15 @@ func AppendJsonFile(filePath string) {
 	}
 
 	yamlStr, err := isc.JsonToYaml(string(content))
+	if err != nil {
+		log.Printf("JsonToYaml error: %v\n", err)
+		return
+	}
 	property, err := isc.YamlToProperties(yamlStr)
+	if err != nil {
+		log.Printf("YamlToProperties error: %v\n", err)
+		return
+	}
 	valueMap, _ := isc.PropertiesToMap(property)
 	for k, v := range valueMap {
 		SetValue(k, v)

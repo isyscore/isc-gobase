@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/isyscore/isc-gobase/goid"
+	"github.com/isyscore/isc-gobase/test"
 	"testing"
 	"time"
 )
@@ -29,7 +30,7 @@ func TestGoStorage(t *testing.T) {
 	stg.Set(variable)
 	goid.Go(func() {
 		v := stg.Get()
-		True(t, v != nil && v.(string) == variable)
+		test.True(t, v != nil && v.(string) == variable)
 	})
 	time.Sleep(time.Millisecond)
 	stg.Clear()

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 	t0 "time"
 
@@ -38,4 +39,9 @@ func TestTimeSpan(t *testing.T) {
 	t.Logf("minutes between: %v", time.MinuteSpan(anow, athen))
 	t.Logf("seconds between: %v", time.SecondSpan(anow, athen))
 	t.Logf("milliseconds between: %v", time.MilliSecondSpan(anow, athen))
+}
+
+func TestNumToTimeDuration(t *testing.T) {
+	data := time.NumToTimeDuration(3, t0.Hour)
+	fmt.Println(data.Milliseconds())
 }

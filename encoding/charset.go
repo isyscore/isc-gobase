@@ -3,13 +3,11 @@ package encoding
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"log"
-
-	"golang.org/x/text/transform"
-
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/ianaindex"
+	"golang.org/x/text/transform"
+	"io/ioutil"
+	"log"
 )
 
 const (

@@ -1,4 +1,4 @@
-package websocket
+package test
 
 import (
 	"log"
