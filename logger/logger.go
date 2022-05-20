@@ -244,11 +244,11 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 			return isc.ToString(i)
 		},
 	}}
-	//if level == zerolog.PanicLevel {
-	//	if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
-	//		_, _ = fmt.Fprintf(os.Stderr, "system panic log redirect to %s failed:%v", logFile, err)
-	//	}
-	//}
+	if level == zerolog.PanicLevel {
+		if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "system panic log redirect to %s failed:%v", logFile, err)
+		}
+	}
 	return fw
 
 }
