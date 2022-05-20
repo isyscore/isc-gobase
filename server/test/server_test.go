@@ -2,6 +2,8 @@ package test
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/cron"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -27,23 +29,22 @@ func TestServer(t *testing.T) {
 	////log.Fatal("")
 	go func() {
 		for i := 0; i < 100; i++ {
-			panic("打我吗？")
-			//go func(idx int) {
-			//	c_s := cron.New()
-			//	_ = c_s.AddFunc("*/1 * * * * ?", func() {
-			//		//fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-			//		//fmt.Fprintf(os.Stdout, "是真的\n")
-			//		//logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
-			//		//logger.Info("协程ID=：%d,我是库陈胜Info", idx)
-			//		//logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
-			//		//logger.Error("协程ID=：%d,我是库陈胜Error", idx)
-			//		//logger.Panic("我可以写入了吗?")
-			//		//logger.Fatal("我是fatal")
-			//		//log.Panic("是的，我可以写入了")
-			//		panic("打我吗？")
-			//	})
-			//	c_s.Start()
-			//}(i)
+			//panic("打我吗？")
+			go func(idx int) {
+				c_s := cron.New()
+				_ = c_s.AddFunc("*/1 * * * * ?", func() {
+					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					fmt.Fprintf(os.Stdout, "是真的\n")
+					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
+					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
+					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
+					logger.Error("协程ID=：%d,我是库陈胜Error", idx)
+					//logger.Panic("我可以写入了吗?")
+					//logger.Fatal("我是fatal")
+					//panic("打我吗？")
+				})
+				c_s.Start()
+			}(i)
 		}
 	}()
 
