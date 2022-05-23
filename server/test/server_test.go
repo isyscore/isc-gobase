@@ -80,6 +80,7 @@ func TestServerGet(t *testing.T) {
 		c.Data(200, "text/plain", []byte("hello"))
 	})
 
+	// 测试事件监听机制
 	listener.AddListener(listener.EventOfServerPost, func(event listener.BaseEvent) {
 		logger.Info("应用启动完成")
 	})

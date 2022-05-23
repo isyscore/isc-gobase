@@ -91,9 +91,11 @@ func InitServer() {
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
 	var loggerCfg logger.LoggerConfig
-	config.GetValueObject("base.logger", &loggerCfg)
-
-	logger.InitLog(appName, &loggerCfg)
+	if err := config.GetValueObject("base.logger", &loggerCfg); err != nil {
+		logger.Warn("获取配置失败", err)
+	} else {
+		logger.InitLog(appName, &loggerCfg)
+	}
 }
 
 func Run() {
@@ -113,25 +115,26 @@ func StartServer() {
 	port := config.GetValueIntDefault("base.server.port", 8080)
 	logger.Info("服务端口号: %d", port)
 
-	engineServer := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: engine}
+	graceRun(port)
+}
 
+func graceRun(port int) {
+	engineServer := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: engine}
 	go func() {
 		if err := engineServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("启动服务异常 (%v)", err)
 		} else {
-			// 服务器关闭
+			// 发送服务关闭事件
 			listener.PublishEvent(listener.ServerStopEvent{})
 		}
 	}()
 
+	// 发送服务启动事件
 	listener.PublishEvent(listener.ServerPostEvent{})
-	// 监听信号
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	logger.Warn("Shutdown Server ...")
-
-	// 创建一个5秒超时的context
+	logger.Warn("服务端准备关闭...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := engineServer.Shutdown(ctx); err != nil {
