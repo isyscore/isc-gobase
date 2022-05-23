@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/cron"
+	"github.com/isyscore/isc-gobase/listener"
 	"os"
 	"testing"
 
@@ -78,5 +79,10 @@ func TestServerGet(t *testing.T) {
 	server.Get("/info", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello"))
 	})
+
+	listener.AddListener(listener.EventOfServerPost, func(event listener.BaseEvent) {
+		logger.Info("应用启动完成")
+	})
+
 	server.StartServer()
 }
