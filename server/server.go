@@ -119,18 +119,17 @@ func StartServer() {
 		if err := engineServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("启动服务异常 (%v)", err)
 		} else {
-			listener.PublishEvent(listener.ServerPostEvent{})
+			// 服务器关闭
+			listener.PublishEvent(listener.ServerStopEvent{})
 		}
 	}()
 
+	listener.PublishEvent(listener.ServerPostEvent{})
 	// 监听信号
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	logger.Warn("Shutdown Server ...")
-
-	// 发送服务器关闭事件
-	listener.PublishEvent(listener.ServerStopEvent{})
 
 	// 创建一个5秒超时的context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -138,7 +137,7 @@ func StartServer() {
 	if err := engineServer.Shutdown(ctx); err != nil {
 		logger.Warn("服务关闭异常: ", err)
 	}
-	logger.Info("服务器退出")
+	logger.Info("服务端退出")
 }
 
 func RegisterStatic(relativePath string, rootPath string) gin.IRoutes {
