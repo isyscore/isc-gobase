@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
 	"log"
 	"os"
@@ -31,7 +30,6 @@ func LoadConfig() {
 		return
 	}
 
-	listener.PublishEvent(listener.ConfigInitPreEvent{})
 	LoadConfigFromRelativePath("")
 	configLoaded = true
 }
@@ -47,8 +45,6 @@ func LoadConfigFromRelativePath(resourceAbsPath string) {
 // LoadConfigFromAbsPath 加载绝对文件路径
 func LoadConfigFromAbsPath(resourceAbsPath string) {
 	doLoadConfigFromAbsPath(resourceAbsPath)
-
-	listener.PublishEvent(listener.ConfigInitPostEvent{})
 
 	// 读取cm文件
 	AppendConfigFromRelativePath("./config/application-default.yml")
