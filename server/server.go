@@ -130,7 +130,7 @@ func graceRun(port int) {
 	}()
 
 	// 发送服务启动事件
-	listener.PublishEvent(listener.ServerPostEvent{})
+	listener.PublishEvent(listener.ServerFinishEvent{})
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

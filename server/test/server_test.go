@@ -81,7 +81,7 @@ func TestServerGet(t *testing.T) {
 	})
 
 	// 测试事件监听机制
-	listener.AddListener(listener.EventOfServerPost, func(event listener.BaseEvent) {
+	listener.AddListener(listener.EventOfServerFinish, func(event listener.BaseEvent) {
 		logger.Info("应用启动完成")
 	})
 

@@ -64,3 +64,11 @@ func Event1Lister3(event listener.BaseEvent) {
 isc-gobase内置了几类事件
 - ServerPostEvent: 服务启动完成事件
 - ServerFinishEvent: 服务关闭事件
+
+常用示例：
+```go
+// 添加服务器启动完成事件监听
+listener.AddListener(listener.EventOfServerFinish, func(event listener.BaseEvent) {
+    logger.Info("应用启动完成")
+})
+```
