@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -112,41 +113,32 @@ func StartServer() {
 	port := config.GetValueIntDefault("base.server.port", 8080)
 	logger.Info("服务端口号: %d", port)
 
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: engine,
-	}
+	engineServer := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: engine}
+
 	go func() {
-		// 开启一个goroutine启动服务
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Warn("listen: %v\n", err)
+		if err := engineServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("启动服务异常 (%v)", err)
+		} else {
+			listener.PublishEvent(listener.ServerPostEvent{})
 		}
 	}()
 
-	// 等待中断信号来优雅地关闭服务器，为关闭服务器操作设置一个5秒的超时
-	quit := make(chan os.Signal, 1) // 创建一个接收信号的通道
-	// kill 默认会发送 syscall.SIGTERM 信号
-	// kill -2 发送 syscall.SIGINT 信号，我们常用的Ctrl+C就是触发系统SIGINT信号
-	// kill -9 发送 syscall.SIGKILL 信号，但是不能被捕获，所以不需要添加它
-	// signal.Notify把收到的 syscall.SIGINT或syscall.SIGTERM 信号转发给quit
-	signal.Notify(quit, syscall.SIGINT, os.Kill, syscall.SIGTERM) // 此处不会阻塞
-	<-quit                                                        // 阻塞在此，当接收到上述两种信号时才会往下执行
+	// 监听信号
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 	logger.Warn("Shutdown Server ...")
+
+	// 发送服务器关闭事件
+	listener.PublishEvent(listener.ServerStopEvent{})
+
 	// 创建一个5秒超时的context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	// 5秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过5秒就超时退出
-	if err := srv.Shutdown(ctx); err != nil {
-		logger.Warn("Server Shutdown: ", err)
+	if err := engineServer.Shutdown(ctx); err != nil {
+		logger.Warn("服务关闭异常: ", err)
 	}
-	logger.Info("Server exiting")
-	//
-	//// 发布服务启动事件
-	//listener.PublishEvent(listener.ServerPostEvent{})
-	//err := engine.Run(fmt.Sprintf(":%d", port))
-	//if err != nil {
-	//	logger.Error("启动服务异常 (%v)", err)
-	//}
+	logger.Info("服务器退出")
 }
 
 func RegisterStatic(relativePath string, rootPath string) gin.IRoutes {
