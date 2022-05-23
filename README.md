@@ -61,7 +61,7 @@ func GetData(c *gin.Context) {
 运行如下
 ```shell
 root@user ~> curl http://localhost:8080/api/app/sample/group1/data
-{"code":"success","data":"ok","message":"成功"}
+{"code":0,"data":"data","message":"success"}
 ```
 
 ### 包列表
