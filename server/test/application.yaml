@@ -55,6 +55,6 @@ base:
     dir: ./logs
     panic: false
     console:
-      writeFile: true
+      writeFile: false
 
 
