@@ -35,10 +35,10 @@ func TestServer(t *testing.T) {
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {
 					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
 					fmt.Fprintf(os.Stdout, "是真的\n")
-					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
+					//logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
 					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
-					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
-					logger.Error("协程ID=：%d,我是库陈胜Error", idx)
+					//logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
+					//logger.Error("协程ID=：%d,我是库陈胜Error", idx)
 					//logger.Panic("我可以写入了吗?")
 					//logger.Fatal("我是fatal")
 					//panic("打我吗？")

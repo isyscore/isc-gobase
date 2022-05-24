@@ -60,7 +60,9 @@ type LoggerConfig struct {
 	Max struct {
 		History int `yaml:"history"`
 	} `yaml:"max"`
-	Panic bool `yaml:"panic"`
+	Console struct {
+		WriteFile bool `yaml:"writeFile"`
+	} `yaml:"console"`
 }
 
 func Info(format string, v ...any) {
@@ -155,7 +157,7 @@ func InitLog(appName string, cfg *LoggerConfig) {
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
-	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName)
+	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName, cfg.Console.WriteFile)
 }
 
 type FileLevelWriter struct {
@@ -255,7 +257,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 
 var levels = []zerolog.Level{zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.PanicLevel, zerolog.FatalLevel, zerolog.Disabled}
 
-func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, name string) {
+func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, name string, write2File bool) {
 	//关闭现有流
 	closeFileLevelWriter(oldWriter)
 	//修改listWriter
@@ -267,9 +269,9 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 		if fw != nil {
 			newWriter = append(newWriter, fw)
 		}
-		if level == zerolog.Disabled {
-			os.Stdout = fw.File
+		if level == zerolog.Disabled && write2File {
 			os.Stderr = fw.File
+			os.Stdout = fw.File
 		}
 		if level == zerolog.PanicLevel {
 			if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
@@ -287,8 +289,8 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 var oldWriter []io.Writer
 
 //initLogDir create log dir and file
-func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int, name string) {
-	fileHandler := func() { updateOuters(out, 0, levels, dir, name) }
+func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int, name string, write2File bool) {
+	fileHandler := func() { updateOuters(out, 0, levels, dir, name, write2File) }
 	fileHandler()
 
 	//每天创建一个文件
@@ -313,7 +315,7 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 							} else if len(idxs) > 3 {
 								idx, _ = strconv.Atoi(idxs[len(idxs)-2])
 							}
-							updateOuters(out, idx+1, []zerolog.Level{fw.level}, dir, name)
+							updateOuters(out, idx+1, []zerolog.Level{fw.level}, dir, name, write2File)
 						}
 					}
 				}
