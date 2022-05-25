@@ -1,8 +1,15 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/isyscore/isc-gobase/server/rsp"
 
@@ -84,9 +91,11 @@ func InitServer() {
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
 	var loggerCfg logger.LoggerConfig
-	config.GetValueObject("base.logger", &loggerCfg)
-
-	logger.InitLog(appName, &loggerCfg)
+	if err := config.GetValueObject("base.logger", &loggerCfg); err != nil {
+		logger.Warn("获取配置失败", err)
+	} else {
+		logger.InitLog(appName, &loggerCfg)
+	}
 }
 
 func Run() {
@@ -105,10 +114,33 @@ func StartServer() {
 	logger.Info("开始启动服务")
 	port := config.GetValueIntDefault("base.server.port", 8080)
 	logger.Info("服务端口号: %d", port)
-	err := engine.Run(fmt.Sprintf(":%d", port))
-	if err != nil {
-		logger.Error("启动服务异常 (%v)", err)
+
+	graceRun(port)
+}
+
+func graceRun(port int) {
+	engineServer := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: engine}
+	go func() {
+		if err := engineServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("启动服务异常 (%v)", err)
+		} else {
+			// 发送服务关闭事件
+			listener.PublishEvent(listener.ServerStopEvent{})
+		}
+	}()
+
+	// 发送服务启动事件
+	listener.PublishEvent(listener.ServerFinishEvent{})
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Warn("服务端准备关闭...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := engineServer.Shutdown(ctx); err != nil {
+		logger.Warn("服务关闭异常: ", err)
 	}
+	logger.Info("服务端退出")
 }
 
 func RegisterStatic(relativePath string, rootPath string) gin.IRoutes {

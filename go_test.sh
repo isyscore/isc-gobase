@@ -11,3 +11,4 @@ go test ./goid/test
 go test ./i18n/test
 go test ./coder/test
 go test ./time/test
+go test ./listener/test
