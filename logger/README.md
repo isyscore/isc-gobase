@@ -46,5 +46,8 @@ base:
       history: 7
     ## 日志文件目录，默认工程目录的logs文件夹
     dir: ./logs/
+    ## 是否将console信息打印到文件app-console.log，默认false
+    console:
+      writeFile: false
 
 ```
