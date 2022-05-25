@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-    server.Get("group1/data", GetData)
+    server.Get("get/data", GetData)
     server.Run()
 }
 
@@ -21,7 +21,12 @@ func GetData(c *gin.Context) {
 ```
 
 ```yaml
+api-module: sample
+
 base:
+  api:
+    # api前缀
+    prefix: /api
   server:
     # 是否启用，默认：true
     enable: true
@@ -52,4 +57,12 @@ base:
       enable: true
 ```
 
+其中api和api-module这个配置最后的url前缀是<br/>
+{api.prefix}/{api-module}/业务代码
 
+比如如上：
+
+```shell
+root@user ~> curl http://localhost:8080/api/sample/get/data
+{"code":0,"data":"ok","message":"success"}
+```
