@@ -6,6 +6,10 @@ isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践
 ```shell
 go get github.com/isyscore/isc-gobase
 ```
+更新相关
+```shell
+go mod tidy
+```
 
 ## 快速入门
 isc-gobase定位是工具框架，包含各种各样的工具，并对开发中的各种常用的方法进行封装。也包括web方面的工具
@@ -20,24 +24,10 @@ isc-gobase定位是工具框架，包含各种各样的工具，并对开发中�
 
 ```yaml
 # application.yml 内容
-api-module: app/sample
-
 base:
-  api:
-    # api前缀
-    prefix: /api
-  application:
-    # 应用名称
-    name: sample
   server:
     # 是否启用，默认：false
     enable: true
-    # 端口号
-    port: 8080
-    # web框架gin的配置
-    gin:
-      # 有三种模式：debug/release/test
-      mode: debug
 ```
 ```go
 // main.go 文件
@@ -50,18 +40,21 @@ import (
 )
 
 func main() {
-    server.Get("group1/data", GetData)
+    server.Get("api/get", GetData)
     server.Run()
 }
 
 func GetData(c *gin.Context) {
-    rsp.SuccessOfStandard(c, "ok")
+    rsp.SuccessOfStandard(c, "value")
 }
 ```
 运行如下
 ```shell
 root@user ~> curl http://localhost:8080/api/app/sample/group1/data
 {"code":0,"data":"data","message":"success"}
+
+root@user ~> curl http://localhost:8080/api/get
+{"code":0,"data":"value","message":"success"}
 ```
 
 ### 包列表
