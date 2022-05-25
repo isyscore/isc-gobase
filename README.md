@@ -6,6 +6,10 @@ isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践
 ```shell
 go get github.com/isyscore/isc-gobase
 ```
+更新相关
+```shell
+go mod tidy
+```
 
 ## 快速入门
 isc-gobase定位是工具框架，包含各种各样的工具，并对开发中的各种常用的方法进行封装。也包括web方面的工具
