@@ -3,17 +3,16 @@ package validate
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/antonmedv/expr"
+	"github.com/isyscore/isc-gobase/goid"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/validate/matcher"
 	"reflect"
 	"sort"
 	"strings"
 	"sync"
-	"unicode"
-
-	"github.com/antonmedv/expr"
-	"github.com/isyscore/isc-gobase/goid"
-	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/validate/matcher"
 )
 
 var lock sync.Mutex
@@ -61,7 +60,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 		fieldValue := objValue.Field(index)
 
 		// 私有字段不处理
-		if !isStartUpper(field.Name) {
+		if !isc.IsPublic(field.Name) {
 			continue
 		}
 
@@ -197,7 +196,7 @@ func doCollectCollector(objType reflect.Type) {
 		fieldKind := field.Type.Kind()
 
 		// 不可访问字段不处理
-		if !isStartUpper(field.Name) {
+		if !isc.IsPublic(field.Name) {
 			continue
 		}
 
@@ -281,11 +280,6 @@ func doCollectCollector(objType reflect.Type) {
 			// Uintptr 类型不处理
 		}
 	}
-}
-
-// 判断首字母是否大写
-func isStartUpper(s string) bool {
-	return unicode.IsUpper([]rune(s)[0])
 }
 
 // 是否是选择的列，没有选择也认为是选择的
