@@ -69,7 +69,7 @@ func TestCallFun1(t *testing.T) {
     bean.AddBean("test", &tt)
 
     parameterMap := map[string]any{}
-    // 说明：参数map中的key只可为p0、p1、p2、p3...，用于表示参数的顺序
+    // 说明：参数map中的key只可为p1、p2、p3...，用于表示参数的顺序
     aparameterMap["p1"] = "name"
 
     // 函数调用
