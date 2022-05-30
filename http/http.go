@@ -402,11 +402,13 @@ func parseStandard(responseResult []byte, errs error) ([]byte, error) {
 		return nil, &NetError{ErrMsg: fmt.Sprintf("remote err, bizCode=%d, message=%s", standRsp.Code, standRsp.Message)}
 	}
 
-	if data, err := json.Marshal(standRsp.Data); err != nil {
-		return nil, err
-	} else {
-		return data, nil
-	}
+	return standRsp.Data, nil
+
+	//if data, err := json.Marshal(standRsp.Data); err != nil {
+	//	return nil, err
+	//} else {
+	//	return data, nil
+	//}
 }
 
 func urlWithParameter(url string, parameterMap map[string]string) string {
