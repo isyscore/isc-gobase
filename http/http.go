@@ -70,11 +70,11 @@ func SetHttpClient(httpClientOuter *http.Client) {
 
 // ------------------ get ------------------
 
-func GetSimple(url string) ([]byte, error) {
+func GetSimple(url string) (any, error) {
 	return Get(url, nil, nil)
 }
 
-func GetSimpleOfStandard(url string) ([]byte, error) {
+func GetSimpleOfStandard(url string) (any, error) {
 	return GetOfStandard(url, nil, nil)
 }
 
@@ -241,11 +241,11 @@ func PutOfStandard(url string, header http.Header, parameterMap map[string]strin
 
 // ------------------ delete ------------------
 
-func DeleteSimple(url string) ([]byte, error) {
+func DeleteSimple(url string) (any, error) {
 	return Get(url, nil, nil)
 }
 
-func DeleteSimpleOfStandard(url string) ([]byte, error) {
+func DeleteSimpleOfStandard(url string) (any, error) {
 	return GetOfStandard(url, nil, nil)
 }
 
