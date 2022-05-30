@@ -24,6 +24,15 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 
 ![img.png](img.png)
 
+#### 代码中读取指定环境配置
+```go
+// 配置环境
+os.Setenv("base.profiles.active", "local")
+
+// 然后再加载的时候就会加载local的配置文件
+config.LoadConfig()
+```
+
 ### 4. 内置的配置文件自动加载
 目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
 ```yaml

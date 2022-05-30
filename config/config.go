@@ -402,8 +402,10 @@ func SetValue(key string, value any) {
 	}
 
 	if oldValue, exist := appProperty.ValueMap[key]; exist {
-		if reflect.TypeOf(oldValue) != reflect.TypeOf(oldValue) {
-			return
+		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
+			if reflect.TypeOf(oldValue) != reflect.TypeOf(value) {
+				return
+			}
 		}
 		appProperty.ValueMap[key] = value
 	}
@@ -416,8 +418,10 @@ func doPutValue(key string, value any) {
 		if nil == oldValue {
 			return
 		}
-		if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
-			return
+		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
+			if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
+				return
+			}
 		}
 
 		lastIndex := strings.LastIndex(key, ".")

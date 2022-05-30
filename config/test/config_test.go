@@ -3,7 +3,9 @@ package test
 import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
+	"os"
 	"testing"
 )
 
@@ -76,4 +78,22 @@ func TestSmall(t *testing.T) {
 type SmallEntity struct {
 	HaoDeOk int
 	NameAge int
+}
+
+func TestRead(t *testing.T) {
+	os.Setenv("base.profiles.active", "local")
+	config.LoadConfig()
+
+	en := EntityTest{}
+	err := config.GetValueObject("entity", &en)
+	if err != nil {
+		logger.Warn("转换告警")
+		return
+	}
+
+	assert.Equal(t, en.Name, "name-change")
+}
+
+type EntityTest struct {
+	Name string
 }
