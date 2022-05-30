@@ -387,12 +387,12 @@ func callToStandard(httpRequest *http.Request, url string) (any, error) {
 	return parseStandard(call(httpRequest, url))
 }
 
-func parseStandard(responseResult []byte, errs error) (any, error) {
+func parseStandard(responseResult any, errs error) (any, error) {
 	if errs != nil {
 		return nil, errs
 	}
-	var standRsp DataResponse[any]
-	err := json.Unmarshal(responseResult, &standRsp)
+	var standRsp DataResponse
+	err := json.Unmarshal(responseResult.([]byte), &standRsp)
 	if err != nil {
 		return nil, err
 	}
