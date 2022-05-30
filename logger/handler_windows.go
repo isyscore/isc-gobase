@@ -31,7 +31,7 @@ func (s Strategy) Dup2(newFile *FileLevelWriter, oldfd *os.File) (err error) {
 		return err
 	}
 	// SetStdHandle does not affect prior references to stde
-	os.Stderr = newFile.File
-	os.Stdout = newFile.File
+	//os.Stderr = newFile.File
+	//os.Stdout = newFile.File
 	return nil
 }

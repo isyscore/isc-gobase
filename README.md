@@ -50,6 +50,9 @@ func GetData(c *gin.Context) {
 ```
 运行如下
 ```shell
+root@user ~> curl http://localhost:8080/api/app/sample/group1/data
+{"code":0,"data":"data","message":"success"}
+
 root@user ~> curl http://localhost:8080/api/get
 {"code":0,"data":"value","message":"success"}
 ```
@@ -71,6 +74,7 @@ root@user ~> curl http://localhost:8080/api/get
 | [file](/file)| 文件管理 |
 | [coder](/coder)| 编解码加解密工具 |
 | [http](/http)| http的辅助工具 |
+| [listener](/listener)| 事件监听机制 |
 
 ### isc-gobase 项目测试
 根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块

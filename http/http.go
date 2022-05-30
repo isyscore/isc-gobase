@@ -28,6 +28,7 @@ const (
 	ContentTypePng        string = "image/png"
 	ContentTypeGif        string = "image/gif"
 	ContentTypeAll        string = "*/*"
+	ContentPostForm       string = "application/x-www-form-urlencoded"
 )
 
 type NetError struct {
@@ -165,6 +166,35 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 	}
 	httpRequest.Header.Add("Content-Type", ContentTypeJson)
 	return callToStandard(httpRequest, url)
+}
+
+func PostForm(url string, header http.Header, parameterMap map[string]string) ([]byte, error) {
+	var httpRequest http.Request
+	_ = httpRequest.ParseForm()
+	if parameterMap != nil {
+		_ = httpRequest.ParseForm()
+		for k, v := range parameterMap {
+			httpRequest.Form.Add(k, v)
+		}
+	}
+	if header != nil {
+		httpRequest.Header = header
+	}
+	body := strings.NewReader(httpRequest.Form.Encode())
+	resp, err := httpClient.Post(url, ContentPostForm, body)
+	if err != nil {
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
 
 // ------------------ put ------------------

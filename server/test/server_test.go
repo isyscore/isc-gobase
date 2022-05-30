@@ -2,12 +2,12 @@ package test
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/cron"
+	"github.com/isyscore/isc-gobase/listener"
 	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isyscore/isc-gobase/cron"
-
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/server"
 )
@@ -26,28 +26,23 @@ func TestServer(t *testing.T) {
 	)
 
 	logger.Info("server started")
-
+	//panic("和水水水水")
+	////log.Fatal("")
 	go func() {
 		for i := 0; i < 100; i++ {
+			//panic("打我吗？")
 			go func(idx int) {
 				c_s := cron.New()
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {
 					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
 					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
-					logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
+					//logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
 					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
-					logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
-					logger.Error("协程ID=：%d,我是库陈胜Error", idx)
+					//logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
+					//logger.Error("协程ID=：%d,我是库陈胜Error", idx)
+					//logger.Panic("我可以写入了吗?")
+					//logger.Fatal("我是fatal")
+					//panic("打我吗？")
 				})
 				c_s.Start()
 			}(i)
@@ -84,5 +79,11 @@ func TestServerGet(t *testing.T) {
 	server.Get("/info", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("hello"))
 	})
+
+	// 测试事件监听机制
+	listener.AddListener(listener.EventOfServerFinish, func(event listener.BaseEvent) {
+		logger.Info("应用启动完成")
+	})
+
 	server.StartServer()
 }
