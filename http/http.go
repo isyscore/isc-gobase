@@ -391,7 +391,7 @@ func parseStandard(responseResult any, errs error) (any, error) {
 	if errs != nil {
 		return nil, errs
 	}
-	var standRsp DataResponse
+	var standRsp DataResponse[any]
 	err := json.Unmarshal(responseResult.([]byte), &standRsp)
 	if err != nil {
 		return nil, err
