@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
 	"log"
 	"os"
@@ -136,6 +137,9 @@ func UpdateConfig(c *gin.Context) {
 	}
 
 	SetValue(envProperty.Key, envProperty.Value)
+
+	// 发布配置变更事件
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
 }
 
 // 多种格式优先级：json > properties > yaml > yml

@@ -29,6 +29,7 @@ import (
 	"fmt"
 	f0 "github.com/isyscore/isc-gobase/file"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
 	"os"
@@ -158,6 +159,16 @@ func InitLog(appName string, cfg *LoggerConfig) {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
 	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName, cfg.Console.WriteFile)
+
+	// 添加配置变更事件的监听
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
+}
+
+func ConfigChangeListener(event listener.BaseEvent) {
+	ev := event.(listener.ConfigChangeEvent)
+	if ev.Key == "base.log.level" {
+		SetGlobalLevel(ev.Value)
+	}
 }
 
 type FileLevelWriter struct {

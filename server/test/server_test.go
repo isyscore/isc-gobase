@@ -77,6 +77,10 @@ func TestErrorPrint(t *testing.T) {
 
 func TestServerGet(t *testing.T) {
 	server.Get("/info", func(c *gin.Context) {
+		logger.Debug("debug的日志")
+		logger.Info("info的日志")
+		logger.Warn("warn的日志")
+		logger.Error("error的日志")
 		c.Data(200, "text/plain", []byte("hello"))
 	})
 
