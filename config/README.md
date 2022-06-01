@@ -184,7 +184,7 @@ config.AppendConfigFromAbsPath(xx)
 
 ### 9. 支持配置的在线查看以及实时变更
 
-如下配置配置开启后，就可以在线查看应用的所有配置了
+如下配置开启后，就可以在线查看应用的所有配置了
 ```yaml
 base:
   endpoint:
