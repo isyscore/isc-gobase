@@ -37,7 +37,7 @@ type PagedResponse[T any] struct {
 }
 
 func Success(ctx *gin.Context, object any) {
-	ctx.JSON(http.StatusOK, isc.ObjectToData(object))
+	ctx.JSON(http.StatusOK, object)
 }
 
 func SuccessOfStandard(ctx *gin.Context, v any) {
