@@ -79,6 +79,7 @@ type SmallEntity struct {
 	NameAge int
 }
 
+// 测试读取某个文件
 func TestRead(t *testing.T) {
 	config.LoadFile("./application-local.yaml")
 
