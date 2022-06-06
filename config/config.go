@@ -188,32 +188,33 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 		}
 
 		profile := getActiveProfile()
-		logger.Info("the profile of isc-gobase is {}", profile)
+		logger.Info("the profile of isc-gobase is %v", profile)
 		if profile != "" {
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
-				extend := getFileExtension(fileName)
-				extend = strings.ToLower(extend)
-				if extend == "yaml" {
-					configExist = true
-					AppendYamlFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "yml" {
-					configExist = true
-					AppendYamlFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "properties" {
-					configExist = true
-					AppendPropertyFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "json" {
-					configExist = true
-					AppendJsonFile(resourceAbsPath + fileName)
-					break
-				}
+				LoadFile(resourceAbsPath + fileName)
 			}
 		}
+	}
+}
+
+// LoadFile 加载某个
+func LoadFile(filePath string) {
+	extend := getFileExtension(filePath)
+	extend = strings.ToLower(extend)
+	if extend == "yaml" {
+		configExist = true
+		LoadYamlFile(filePath)
+	} else if extend == "yml" {
+		configExist = true
+		LoadYamlFile(filePath)
+	} else if extend == "properties" {
+		configExist = true
+		LoadPropertyFile(filePath)
+	} else if extend == "json" {
+		configExist = true
+		LoadJsonFile(filePath)
 	}
 }
 
@@ -245,8 +246,10 @@ func getProfileFromFileName(fileName string) string {
 
 func getFileExtension(fileName string) string {
 	if strings.Contains(fileName, ".") {
-		words := strings.SplitN(fileName, ".", 2)
-		return words[1]
+		lastIndex := strings.LastIndex(fileName, ".")
+		if lastIndex > -1 {
+			return fileName[lastIndex+1:]
+		}
 	}
 	return ""
 }
@@ -413,24 +416,25 @@ func SetValue(key string, value any) {
 				return
 			}
 		}
-		appProperty.ValueMap[key] = value
 	}
+	appProperty.ValueMap[key] = value
 	doPutValue(key, value)
 }
 
 func doPutValue(key string, value any) {
-	if value == nil {
-		return
-	}
 	if strings.Contains(key, ".") {
 		oldValue := GetValue(key)
-		if nil != oldValue {
-			if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
-				if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
-					return
-				}
+		if nil == oldValue && value != nil {
+			if appProperty.ValueDeepMap == nil {
+				appProperty.ValueDeepMap = make(map[string]any)
 			}
+			appProperty.ValueDeepMap[key] = value
 			return
+		}
+		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
+			if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
+				return
+			}
 		}
 
 		lastIndex := strings.LastIndex(key, ".")
@@ -445,9 +449,7 @@ func doPutValue(key string, value any) {
 
 		doPutValue(startKey, startValue)
 	}
-	if value != nil {
-		appProperty.ValueDeepMap[key] = value
-	}
+	appProperty.ValueDeepMap[key] = value
 }
 
 func GetValueString(key string) string {

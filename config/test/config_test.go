@@ -1,12 +1,10 @@
 package test
 
 import (
-	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
-	"os"
 	"testing"
 )
 
@@ -82,8 +80,7 @@ type SmallEntity struct {
 }
 
 func TestRead(t *testing.T) {
-	os.Setenv("base.profiles.active", "local")
-	config.LoadConfig()
+	config.LoadFile("./application-local.yaml")
 
 	en := EntityTest{}
 	err := config.GetValueObject("entity", &en)
@@ -101,10 +98,9 @@ type EntityTest struct {
 
 // 测试append
 func TestAppend(t *testing.T) {
-	config.LoadConfigFromRelativePath("./application-append.yaml")
+	config.LoadFile("./application-append-original.yaml")
 	config.AppendYamlFile("./application-append.yaml")
 
-	data := config.GetValueString("key1.ok5.hao_de_ok")
-
-	fmt.Println(data)
+	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
+	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
 }
