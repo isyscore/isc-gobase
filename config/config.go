@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/listener"
+	"github.com/isyscore/isc-gobase/logger"
 	"io/ioutil"
 	"log"
 	"os"
@@ -187,6 +188,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 		}
 
 		profile := getActiveProfile()
+		logger.Info("the profile of isc-gobase is {}", profile)
 		if profile != "" {
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
@@ -417,15 +419,18 @@ func SetValue(key string, value any) {
 }
 
 func doPutValue(key string, value any) {
+	if value == nil {
+		return
+	}
 	if strings.Contains(key, ".") {
 		oldValue := GetValue(key)
-		if nil == oldValue {
-			return
-		}
-		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
-			if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
-				return
+		if nil != oldValue {
+			if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
+				if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
+					return
+				}
 			}
+			return
 		}
 
 		lastIndex := strings.LastIndex(key, ".")
@@ -440,7 +445,9 @@ func doPutValue(key string, value any) {
 
 		doPutValue(startKey, startValue)
 	}
-	appProperty.ValueDeepMap[key] = value
+	if value != nil {
+		appProperty.ValueDeepMap[key] = value
+	}
 }
 
 func GetValueString(key string) string {

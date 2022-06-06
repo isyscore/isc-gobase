@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
@@ -96,4 +97,14 @@ func TestRead(t *testing.T) {
 
 type EntityTest struct {
 	Name string
+}
+
+// 测试append
+func TestAppend(t *testing.T) {
+	config.LoadConfigFromRelativePath("./application-append.yaml")
+	config.AppendYamlFile("./application-append.yaml")
+
+	data := config.GetValueString("key1.ok5.hao_de_ok")
+
+	fmt.Println(data)
 }
