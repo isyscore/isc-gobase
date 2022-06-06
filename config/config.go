@@ -333,10 +333,7 @@ func AppendYamlFile(filePath string) {
 	if err != nil {
 		return
 	}
-	valueMap, _ := isc.PropertiesToMap(property)
-	for k, v := range valueMap {
-		SetValue(k, v)
-	}
+	AppendValue(property)
 }
 
 func LoadPropertyFile(filePath string) {
@@ -373,7 +370,7 @@ func AppendPropertyFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		// log.Printf("读取文件失败(%v)", err)
+		logger.Error("读取文件失败(%v)", err)
 		return
 	}
 
@@ -387,10 +384,16 @@ func AppendPropertyFile(filePath string) {
 		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
-	valueMap, _ := isc.PropertiesToMap(string(content))
-	for k, v := range valueMap {
-		SetValue(k, v)
+	valueMap, err := isc.PropertiesToMap(string(content))
+	if err != nil {
+		return
 	}
+	propertiesValue, err := isc.MapToProperties(valueMap)
+	if err != nil {
+		return
+	}
+
+	AppendValue(propertiesValue)
 }
 
 func LoadJsonFile(filePath string) {
@@ -428,7 +431,7 @@ func AppendJsonFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Printf("fail to read file: %v\n", err)
+		logger.Error("读取文件失败(%v)", err)
 		return
 	}
 
@@ -444,18 +447,36 @@ func AppendJsonFile(filePath string) {
 
 	yamlStr, err := isc.JsonToYaml(string(content))
 	if err != nil {
-		log.Printf("JsonToYaml error: %v\n", err)
 		return
 	}
 	property, err := isc.YamlToProperties(yamlStr)
 	if err != nil {
-		log.Printf("YamlToProperties error: %v\n", err)
 		return
 	}
-	valueMap, _ := isc.PropertiesToMap(property)
-	for k, v := range valueMap {
-		SetValue(k, v)
+
+	AppendValue(property)
+}
+
+func AppendValue(propertiesNewValue string) {
+	pMap, err := isc.PropertiesToMap(propertiesNewValue)
+	for k, v := range pMap {
+		appProperty.ValueMap[k] = v
 	}
+
+	propertiesValueOfOriginal, err := isc.MapToProperties(appProperty.ValueMap)
+	if err != nil {
+		return
+	}
+
+	resultYaml, err := isc.PropertiesToYaml(propertiesValueOfOriginal)
+	if err != nil {
+		return
+	}
+	resultDeepMap, err := isc.YamlToMap(resultYaml)
+	if err != nil {
+		return
+	}
+	appProperty.ValueDeepMap = resultDeepMap
 }
 
 func SetValue(key string, value any) {
@@ -479,39 +500,32 @@ func SetValue(key string, value any) {
 			}
 		}
 	}
-	appProperty.ValueMap[key] = value
-	doPutValue(key, value)
-}
 
-func doPutValue(key string, value any) {
-	if strings.Contains(key, ".") {
-		oldValue := GetValue(key)
-		if nil == oldValue && value != nil {
-			if appProperty.ValueDeepMap == nil {
-				appProperty.ValueDeepMap = make(map[string]any)
-			}
-			appProperty.ValueDeepMap[key] = value
-			return
-		}
-		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
-			if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
-				return
-			}
-		}
-
-		lastIndex := strings.LastIndex(key, ".")
-		startKey := key[:lastIndex]
-		endKey := key[lastIndex+1:]
-
-		data := GetValue(startKey)
-		startValue := isc.ToMap(data)
-		if nil != startValue {
-			startValue[endKey] = value
-		}
-
-		doPutValue(startKey, startValue)
+	propertiesNewValue, err := isc.KvToProperties(key, isc.ToString(value), isc.TeSTRING)
+	if err != nil {
+		return
 	}
-	appProperty.ValueDeepMap[key] = value
+
+	propertiesValueOfOriginal, err := isc.MapToProperties(appProperty.ValueDeepMap)
+	if err != nil {
+		return
+	}
+	propertiesValueOfOriginal += "\n" + propertiesNewValue
+	resultMap, err := isc.PropertiesToMap(propertiesValueOfOriginal)
+	if err != nil {
+		return
+	}
+	appProperty.ValueMap = resultMap
+
+	resultYaml, err := isc.PropertiesToYaml(propertiesValueOfOriginal)
+	if err != nil {
+		return
+	}
+	resultDeepMap, err := isc.YamlToMap(resultYaml)
+	if err != nil {
+		return
+	}
+	appProperty.ValueDeepMap = resultDeepMap
 }
 
 func GetValueString(key string) string {

@@ -103,4 +103,5 @@ func TestAppend(t *testing.T) {
 
 	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
 	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
+	assert.Equal(t, config.GetValueString("a.b.e.f"), "f-value")
 }
