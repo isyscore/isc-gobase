@@ -1,11 +1,11 @@
-api-module: sample
+#api-module: sample
 
 base:
   profiles:
     # 激活环境配置
     active: default
-  api:
-    prefix: /api/app
+#  api:
+#    prefix: /api/app
   application:
     # 应用名称
     name: sample
@@ -18,12 +18,12 @@ base:
     # web框架gin的配置
     gin:
       # 有三种模式：debug/release/test
-      mode: release
+      mode: debug
     exception:
       # 异常返回打印
       print:
         # 是否启用：true, false；默认 true
-        enable: true
+        enable: false
         # 一些异常httpStatus不打印；默认可不填
         except:
           - 408

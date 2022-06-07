@@ -3,6 +3,7 @@ package rsp
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/isyscore/isc-gobase/config"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -23,10 +24,16 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-// ResponseHandler 日志记录到文件
-func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
-	//实例化
+func ResponseHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		reqPrint := config.GetValueBoolDefault("base.server.request.print.enable", false)
+		rspPrint := config.GetValueBoolDefault("base.server.response.print.enable", false)
+		expPrint := config.GetValueBoolDefault("base.server.exception.print.enable", false)
+
+		if !reqPrint && !rspPrint && !expPrint {
+			return
+		}
+
 		// 开始时间
 		startTime := time.Now()
 
@@ -69,30 +76,104 @@ func ResponseHandler(exceptCode ...int) gin.HandlerFunc {
 			Body:       body,
 		}
 
-		message := ErrorMessage{
+		errMessage := ErrorMessage{
 			Request:    request,
 			StatusCode: statusCode,
 			Cost:       time.Now().Sub(startTime).String(),
 		}
 
-		if statusCode != 200 {
-			for _, code := range exceptCode {
+		responseMessage := Response{
+			Request:    request,
+			StatusCode: statusCode,
+			Cost:       time.Now().Sub(startTime).String(),
+		}
+
+		if reqPrint && !rspPrint && !expPrint {
+			printReq(request.Uri, request)
+		}
+
+		if statusCode != 200 && statusCode != 0 {
+			config.GetValueArrayInt("base.server.exception.exclude")
+			datas := config.BaseCfg.Server.Exception.Print.Exclude
+			for _, code := range datas {
 				if code == statusCode {
 					return
 				}
 			}
-			logger.Error("请求异常, result：%v", isc.ObjectToJson(message))
+			if expPrint {
+				logger.Error("返回异常, result：%v", isc.ObjectToJson(errMessage))
+			}
 		} else {
 			var response DataResponse[any]
 			if err := json.Unmarshal([]byte(blw.body.String()), &response); err != nil {
 				return
 			} else {
 				if response.Code != 0 && response.Code != 200 {
-					message.Response = response
-					logger.Error("请求异常, result：%v", isc.ObjectToJson(message))
+					errMessage.Response = response
+					if expPrint {
+						logger.Error("返回异常, result：%v", isc.ObjectToJson(errMessage))
+					}
+				} else {
+					responseMessage.Response = response
+					if rspPrint {
+						printRsq(request.Uri, responseMessage)
+					}
 				}
 			}
 		}
+	}
+}
+
+func printReq(requestUri string, requestData Request) {
+	includeUri := config.GetValueArray("base.server.request.print.include-uri")
+	printFlag := true
+	if len(includeUri) != 0 {
+		for _, uri := range includeUri {
+			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = false
+			}
+		}
+	}
+
+	excludeUri := config.GetValueArray("base.server.request.print.exclude-uri")
+	if len(excludeUri) != 0 {
+		for _, uri := range excludeUri {
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = false
+				break
+			}
+		}
+	}
+
+	if printFlag {
+		logger.Info("请求：%v", isc.ObjectToJson(requestData))
+	}
+	return
+}
+
+func printRsq(requestUri string, responseMessage Response) {
+	includeUri := config.GetValueArray("base.server.response.print.include-uri")
+	printFlag := true
+	if len(includeUri) != 0 {
+		for _, uri := range includeUri {
+			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = false
+			}
+		}
+	}
+
+	excludeUri := config.GetValueArray("base.server.response.print.exclude-uri")
+	if len(excludeUri) != 0 {
+		for _, uri := range excludeUri {
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = false
+				break
+			}
+		}
+	}
+
+	if printFlag {
+		logger.Info("响应：%v", isc.ObjectToJson(responseMessage))
 	}
 }
 
@@ -106,6 +187,13 @@ type Request struct {
 }
 
 type ErrorMessage struct {
+	Request    Request
+	Response   DataResponse[any]
+	Cost       string
+	StatusCode int
+}
+
+type Response struct {
 	Request    Request
 	Response   DataResponse[any]
 	Cost       string

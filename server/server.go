@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -35,6 +36,7 @@ const (
 	HmGetPost
 )
 
+var GoBaseVersion = "1.1.0"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
@@ -42,6 +44,7 @@ var engine *gin.Engine = nil
 func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
+	printVersionAndProfile()
 
 	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", false) {
 		InitServer()
@@ -68,11 +71,7 @@ func InitServer() {
 
 	engine = gin.New()
 	engine.Use(Cors(), gin.Recovery())
-
-	// 注册 异常返回值打印
-	if config.GetValueBoolDefault("base.server.exception.print.enable", false) {
-		engine.Use(rsp.ResponseHandler(config.BaseCfg.Server.Exception.Print.Except...))
-	}
+	engine.Use(rsp.ResponseHandler())
 
 	ap := config.GetValueStringDefault("base.api.prefix", "")
 	if ap != "" {
@@ -96,6 +95,12 @@ func InitServer() {
 	} else {
 		logger.InitLog(appName, &loggerCfg)
 	}
+}
+
+func printVersionAndProfile() {
+	fmt.Printf("----------------------------- isc-gobase: %s --------------------------\n", GoBaseVersion)
+	fmt.Printf("profile：%s\n", config.CurrentProfile)
+	fmt.Printf("--------------------------------------------------------------------------\n")
 }
 
 func Run() {
@@ -369,5 +374,9 @@ func getPathAppendApiModel(path string) string {
 		ApiPrefix = "/" + string(ap)
 	}
 	p2 := isc.ISCString(path).Trim("/")
-	return fmt.Sprintf("/%s/%s/%s", ap, apiModel, p2)
+	if strings.HasPrefix(string(p2), "api") {
+		return fmt.Sprintf("/%s", p2)
+	} else {
+		return fmt.Sprintf("/%s/%s/%s", ApiPrefix, apiModel, p2)
+	}
 }

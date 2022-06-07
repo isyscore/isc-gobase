@@ -6,7 +6,7 @@ isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践
 ```shell
 go get github.com/isyscore/isc-gobase
 ```
-更新相关
+提示：更新相关依赖
 ```shell
 go mod tidy
 ```
@@ -68,10 +68,11 @@ root@user ~> curl http://localhost:8080/api/get
 | [redis](/redis)| go-redis的封装 |
 | [cache](/cache)| 缓存工具 |
 | [time](/time)| 时间管理工具 |
-| [file](/file)| 文件管理 |
+| [file](/file)| 文件管理工具 |
 | [coder](/coder)| 编解码加解密工具 |
 | [http](/http)| http的辅助工具 |
 | [listener](/listener)| 事件监听机制 |
+| [debug](/debug)| 线上调试工具统一介绍文档 |
 
 ### isc-gobase 项目测试
 根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块

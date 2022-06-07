@@ -51,8 +51,8 @@ type BaseException struct {
 }
 
 type ExceptionPrint struct {
-	Enable bool  `yaml:"enable"` // 是否启用
-	Except []int `yaml:"except"` // 排除的httpStatus；默认可不填
+	Enable  bool  `yaml:"enable"`  // 是否启用
+	Exclude []int `yaml:"exclude"` // 排除的httpStatus；默认可不填
 }
 
 type BaseLogger struct {

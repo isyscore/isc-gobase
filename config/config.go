@@ -24,6 +24,8 @@ var appProperty *ApplicationProperty
 var configExist = false
 var loadLock sync.Mutex
 var configLoaded = false
+var profileHavePrinted = false
+var CurrentProfile = ""
 
 func LoadConfig() {
 	loadLock.Lock()
@@ -194,8 +196,8 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 		}
 
 		profile := getActiveProfile()
-		logger.Info("the profile of isc-gobase is %v", profile)
 		if profile != "" {
+			CurrentProfile = profile
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
@@ -500,28 +502,26 @@ func SetValue(key string, value any) {
 			}
 		}
 	}
-
-	propertiesNewValue, err := isc.KvToProperties(key, isc.ToString(value), isc.TeSTRING)
-	if err != nil {
-		return
-	}
-
 	propertiesValueOfOriginal, err := isc.MapToProperties(appProperty.ValueDeepMap)
 	if err != nil {
 		return
 	}
-	propertiesValueOfOriginal += "\n" + propertiesNewValue
 	resultMap, err := isc.PropertiesToMap(propertiesValueOfOriginal)
 	if err != nil {
 		return
 	}
+	resultMap[key] = value
 	appProperty.ValueMap = resultMap
 
-	resultYaml, err := isc.PropertiesToYaml(propertiesValueOfOriginal)
+	mapProperties, err := isc.MapToProperties(resultMap)
 	if err != nil {
 		return
 	}
-	resultDeepMap, err := isc.YamlToMap(resultYaml)
+	mapYaml, err := isc.PropertiesToYaml(mapProperties)
+	if err != nil {
+		return
+	}
+	resultDeepMap, err := isc.YamlToMap(mapYaml)
 	if err != nil {
 		return
 	}
