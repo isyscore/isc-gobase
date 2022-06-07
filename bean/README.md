@@ -78,5 +78,24 @@ func TestCallFun1(t *testing.T) {
 }
 ```
 
+### 在线管理bean功能
+在运行中如果出现问题，需要查看某个对象的属性和函数的时候，就可以使用该功能，进行动态的查看、修改对应属性，以及动态的执行对应的函数
+
+```shell
+# 获取注册的所有bean
+curl http://localhost:xxx/{api-prefix}/{api-module}/bean/name/all'
+# 查询注册的某些bean 
+curl http://localhost:xxx/{api-prefix}/{api-module}/bean/name/list/:name'
+# 查询某个bean的属性值
+curl -X POST http://localhost:xxx/{api-prefix}/{api-module}/bean/field/get' -d '{"bean": "xx", "field": "xxx"}'
+# 修改某个bean的属性的值
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/bean/field/set' -d '{"bean": "xx", "field": "xxx", "value": "xxx"}'
+# 调用bean的某个函数
+curl -X POST http://localhost:xxx/{api-prefix}/{api-module}/bean/fun/call' -d '{"bean": "xx", "fun": "xxx", "parameter": {"p1":"xx", "p2": "xxx"}}'
+```
+
+提示：<br/>
+- 调用bean函数中，parameter的对应的map中的key只能是p1、p2、p3...这种表示的是第一个、第二个、第三个参数的值
+- 调用bean函数中，参数值暂时只适用于基本结构，对于实体类或者map类的暂时不支持，后续可以考虑支持
 
 

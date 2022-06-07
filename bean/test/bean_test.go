@@ -3,6 +3,7 @@ package test
 import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/server"
 	"github.com/magiconair/properties/assert"
 	"testing"
 )
@@ -146,6 +147,23 @@ func TestCallFun4(t *testing.T) {
 	bean.Clean()
 }
 
+//// error: 暂时参数中的json到结构体的转换
+//func TestCallFun4_1(t *testing.T) {
+//	tt := TestEntity{}
+//
+//	bean.AddBean("test", &tt)
+//
+//	parameterMap := map[string]any{}
+//	parameterMap["p1"] = "name"
+//	parameterMap["p2"] = 12
+//	parameterMap["p3"] = "{\"Address\": \"hangzhou\"}"
+//
+//	fv := bean.CallFun("test", "Fun4", parameterMap)
+//	assert.Equal(t, isc.ToString(fv[0]), "杭州")
+//
+//	bean.Clean()
+//}
+
 func TestCallFun4Ptr(t *testing.T) {
 	tt := TestEntity{}
 	inner := TestInnerEntity{Address: "杭州"}
@@ -251,6 +269,18 @@ func TestGetBeans(t *testing.T) {
 	assert.Equal(t, len(datas), 3)
 
 	bean.Clean()
+}
+
+func TestServerBean(t *testing.T) {
+	tt1 := TestEntity{Name: "t1", Age: 12}
+	tt2 := TestEntity{Name: "t2", Age: 13}
+	tt3 := TestEntity{Name: "t2", Age: 13}
+
+	bean.AddBean("t1-name", &tt1)
+	bean.AddBean("t2-name2", &tt2)
+	bean.AddBean("t3-change", &tt3)
+
+	server.Run()
 }
 
 type ValueInnerEntity struct {

@@ -1,8 +1,10 @@
 package bean
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
+	"github.com/isyscore/isc-gobase/server/rsp"
 	"reflect"
 	"strings"
 )
@@ -84,7 +86,11 @@ func CallFun(beanName, methodName string, parameterValueMap map[string]any) []an
 			in = append(in, reflect.ValueOf(beanValue))
 			for i := 1; i < parameterNum; i++ {
 				if v, exit := parameterValueMap["p"+isc.ToString(i)]; exit {
-					in = append(in, reflect.ValueOf(v))
+					pV, err := isc.ToValue(v, method.Type.In(i).Kind())
+					if err != nil {
+						continue
+					}
+					in = append(in, reflect.ValueOf(pV))
 				}
 			}
 
@@ -93,7 +99,7 @@ func CallFun(beanName, methodName string, parameterValueMap map[string]any) []an
 			}
 			vs := method.Func.Call(in)
 			for _, v := range vs {
-				result = append(result, v)
+				result = append(result, v.Interface())
 			}
 		}
 		return result
@@ -146,7 +152,64 @@ func SetField(beanName string, fieldName string, fieldValue any) {
 		}
 
 		if _, exist := fType.FieldByName(fieldName); exist {
-			fValue.FieldByName(fieldName).Set(reflect.ValueOf(fieldValue))
+			v, err := isc.ToValue(fieldValue, fValue.FieldByName(fieldName).Kind())
+			if err != nil {
+				return
+			}
+			fValue.FieldByName(fieldName).Set(reflect.ValueOf(v))
 		}
 	}
+}
+
+func DebugBeanAll(c *gin.Context) {
+	rsp.SuccessOfStandard(c, GetBeanNames(""))
+}
+
+func DebugBeanList(c *gin.Context) {
+	rsp.SuccessOfStandard(c, GetBeanNames(c.Param("name")))
+}
+
+func DebugBeanGetField(c *gin.Context) {
+	fieldGetReq := FieldGetReq{}
+	err := isc.DataToObject(c.Request.Body, &fieldGetReq)
+	if err != nil {
+		return
+	}
+	rsp.SuccessOfStandard(c, GetField(fieldGetReq.Bean, fieldGetReq.Field))
+}
+
+func DebugBeanSetField(c *gin.Context) {
+	fieldSetReq := FieldSetReq{}
+	err := isc.DataToObject(c.Request.Body, &fieldSetReq)
+	if err != nil {
+		return
+	}
+	SetField(fieldSetReq.Bean, fieldSetReq.Field, fieldSetReq.Value)
+	rsp.SuccessOfStandard(c, fieldSetReq.Value)
+}
+
+func DebugBeanFunCall(c *gin.Context) {
+	funCallReq := FunCallReq{}
+	err := isc.DataToObject(c.Request.Body, &funCallReq)
+	if err != nil {
+		return
+	}
+	rsp.SuccessOfStandard(c, CallFun(funCallReq.Bean, funCallReq.Fun, funCallReq.Parameter))
+}
+
+type FieldGetReq struct {
+	Bean  string
+	Field string
+}
+
+type FieldSetReq struct {
+	Bean  string
+	Field string
+	Value any
+}
+
+type FunCallReq struct {
+	Bean      string
+	Fun       string
+	Parameter map[string]any
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
 	"net/http"
@@ -88,6 +89,12 @@ func InitServer() {
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
 		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
 	}
+
+	// 注册 bean管理的功能
+	if config.GetValueBoolDefault("base.endpoint.bean.enable", false) {
+		RegisterBeanWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
+	}
+
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
 	var loggerCfg logger.LoggerConfig
@@ -188,6 +195,18 @@ func RegisterConfigWatchEndpoint(apiBase string) gin.IRoutes {
 	RegisterRoute(apiBase+"/config/values", HmGet, config.GetConfigValues)
 	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
 	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
+	return engine
+}
+
+func RegisterBeanWatchEndpoint(apiBase string) gin.IRoutes {
+	if "" == apiBase {
+		return nil
+	}
+	RegisterRoute(apiBase+"/bean/name/all", HmGet, bean.DebugBeanAll)
+	RegisterRoute(apiBase+"/bean/name/list/:name", HmGet, bean.DebugBeanList)
+	RegisterRoute(apiBase+"/bean/field/get", HmPost, bean.DebugBeanGetField)
+	RegisterRoute(apiBase+"/bean/field/set", HmPut, bean.DebugBeanSetField)
+	RegisterRoute(apiBase+"/bean/fun/call", HmPost, bean.DebugBeanFunCall)
 	return engine
 }
 

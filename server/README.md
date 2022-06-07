@@ -50,6 +50,9 @@ base:
     # 配置的管理（查看和变更），默认关闭，true/false
     config:
       enable: true
+    # bean的管理（属性查看、属性修改、函数调用），默认false
+    bean:
+      enable: true
 ```
 
 
