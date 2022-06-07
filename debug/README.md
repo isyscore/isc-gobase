@@ -1,15 +1,22 @@
-# 线上调试文档介绍
+## 线上调试文档介绍
 鉴于提供的一些调试工具比较分散，这里进行统一介绍。<br/>
 
 
 
-## 一、日志动态修改
-在出现问题时候，希望开启debug日志，这里提供了动态修改的功能，不过目前粒度较粗，会将所有的debug日志都打印出来
+### 一、日志动态修改
+在出现问题时候，希望开启debug日志，这里提供了动态修改的功能，如下
+```shell
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.logger.level", "value":"debug"}'
+```
 
-## 二、接口动态打印
+提示：<br/>
+目前日志级别粒度比较粗，比如修改了级别为debug后，则大于等于debug的级别都会打印，粒度还是比较粗，建议后续增加日志分组概念
+
+
+### 二、接口动态打印
 在出现问题时候如何确定接口是否正常，要开启请求和响应的话，就方便多了，这里提供了该功能
 
-### 指定uri
+#### 指定uri
 如果不指定uri则会默认打印所有的请求
 ```shell
 # 指定要打印的请求的uri
@@ -32,7 +39,7 @@ curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"k
 curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.server.request.print.include-uri[2]", "value":"/api/xx/xxz"}'
 ...
 ```
-### 开启打印
+#### 开启打印
 注意：开启打印的话，所有的接口都会打印，所以建议请先指定uri
 ```shell
 # 开启请求的打印

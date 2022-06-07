@@ -166,7 +166,7 @@ func InitLog(appName string, cfg *LoggerConfig) {
 
 func ConfigChangeListener(event listener.BaseEvent) {
 	ev := event.(listener.ConfigChangeEvent)
-	if ev.Key == "base.log.level" {
+	if ev.Key == "base.logger.level" {
 		SetGlobalLevel(ev.Value)
 	}
 }
