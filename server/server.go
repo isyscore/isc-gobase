@@ -354,6 +354,12 @@ func AllWith(path string, header []string, versionName []string, handler gin.Han
 	return RegisterRouteWithHeaders(getPathAppendApiModel(path), HmAll, header, versionName, handler)
 }
 
+func Use(middleware ...gin.HandlerFunc) {
+	if engine != nil {
+		engine.Use(middleware...)
+	}
+}
+
 func getPathAppendApiModel(path string) string {
 	// 获取 api-module
 	apiModel := isc.ISCString(config.GetValueString("api-module")).Trim("/")
