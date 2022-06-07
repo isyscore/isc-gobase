@@ -1,0 +1,7 @@
+a:
+  b:
+    d: "d-value"
+    c: "c-value-change"
+    e:
+      f:
+        "f-value"

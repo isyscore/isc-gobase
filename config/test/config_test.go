@@ -3,6 +3,7 @@ package test
 import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
 	"testing"
 )
@@ -76,4 +77,32 @@ func TestSmall(t *testing.T) {
 type SmallEntity struct {
 	HaoDeOk int
 	NameAge int
+}
+
+// 测试读取某个文件
+func TestRead(t *testing.T) {
+	config.LoadFile("./application-local.yaml")
+
+	en := EntityTest{}
+	err := config.GetValueObject("entity", &en)
+	if err != nil {
+		logger.Warn("转换告警")
+		return
+	}
+
+	assert.Equal(t, en.Name, "name-change")
+}
+
+type EntityTest struct {
+	Name string
+}
+
+// 测试append
+func TestAppend(t *testing.T) {
+	config.LoadFile("./application-append-original.yaml")
+	config.AppendFile("./application-append.yaml")
+
+	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
+	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
+	assert.Equal(t, config.GetValueString("a.b.e.f"), "f-value")
 }

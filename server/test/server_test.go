@@ -3,7 +3,10 @@ package test
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/cron"
+	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/listener"
+	"github.com/isyscore/isc-gobase/server/rsp"
+	"github.com/isyscore/isc-gobase/server/test/pojo"
 	"os"
 	"testing"
 
@@ -77,6 +80,10 @@ func TestErrorPrint(t *testing.T) {
 
 func TestServerGet(t *testing.T) {
 	server.Get("/info", func(c *gin.Context) {
+		logger.Debug("debug的日志")
+		logger.Info("info的日志")
+		logger.Warn("warn的日志")
+		logger.Error("error的日志")
 		c.Data(200, "text/plain", []byte("hello"))
 	})
 
@@ -86,4 +93,30 @@ func TestServerGet(t *testing.T) {
 	})
 
 	server.StartServer()
+}
+
+func TestServer2(t *testing.T) {
+	server.Get("/test/req1", func(c *gin.Context) {
+		c.Data(200, "text/plain", []byte("hello"))
+	})
+
+	server.Get("/test/req2", func(c *gin.Context) {
+		rsp.SuccessOfStandard(c, "value")
+	})
+
+	server.Get("/test/req3/:key", func(c *gin.Context) {
+		rsp.SuccessOfStandard(c, c.Param("key"))
+	})
+
+	server.Post("/test/rsp1", func(c *gin.Context) {
+		testReq := pojo.TestReq{}
+		isc.DataToObject(c.Request.Body, &testReq)
+		rsp.SuccessOfStandard(c, testReq)
+	})
+
+	server.Get("/test/err", func(c *gin.Context) {
+		rsp.FailedOfStandard(c, 500, "异常")
+	})
+
+	server.Run()
 }

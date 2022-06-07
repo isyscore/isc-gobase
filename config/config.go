@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/listener"
+	"github.com/isyscore/isc-gobase/logger"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,6 +24,8 @@ var appProperty *ApplicationProperty
 var configExist = false
 var loadLock sync.Mutex
 var configLoaded = false
+var profileHavePrinted = false
+var CurrentProfile = ""
 
 func LoadConfig() {
 	loadLock.Lock()
@@ -136,6 +140,9 @@ func UpdateConfig(c *gin.Context) {
 	}
 
 	SetValue(envProperty.Key, envProperty.Value)
+
+	// 发布配置变更事件
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
 }
 
 // 多种格式优先级：json > properties > yaml > yml
@@ -150,6 +157,12 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	LoadYamlFile(resourceAbsPath + "application.yaml")
@@ -184,30 +197,47 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 
 		profile := getActiveProfile()
 		if profile != "" {
+			CurrentProfile = profile
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
-				extend := getFileExtension(fileName)
-				extend = strings.ToLower(extend)
-				if extend == "yaml" {
-					configExist = true
-					AppendYamlFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "yml" {
-					configExist = true
-					AppendYamlFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "properties" {
-					configExist = true
-					AppendPropertyFile(resourceAbsPath + fileName)
-					break
-				} else if extend == "json" {
-					configExist = true
-					AppendJsonFile(resourceAbsPath + fileName)
-					break
-				}
+				AppendFile(resourceAbsPath + fileName)
 			}
 		}
+	}
+}
+
+// LoadFile 载入配置
+func LoadFile(filePath string) {
+	extend := getFileExtension(filePath)
+	extend = strings.ToLower(extend)
+	if extend == "yaml" {
+		configExist = true
+		LoadYamlFile(filePath)
+	} else if extend == "yml" {
+		configExist = true
+		LoadYamlFile(filePath)
+	} else if extend == "properties" {
+		configExist = true
+		LoadPropertyFile(filePath)
+	} else if extend == "json" {
+		configExist = true
+		LoadJsonFile(filePath)
+	}
+}
+
+// AppendFile 追加配置
+func AppendFile(filePath string) {
+	extend := getFileExtension(filePath)
+	extend = strings.ToLower(extend)
+	if extend == "yaml" {
+		AppendYamlFile(filePath)
+	} else if extend == "yml" {
+		AppendYamlFile(filePath)
+	} else if extend == "properties" {
+		AppendPropertyFile(filePath)
+	} else if extend == "json" {
+		AppendJsonFile(filePath)
 	}
 }
 
@@ -239,8 +269,10 @@ func getProfileFromFileName(fileName string) string {
 
 func getFileExtension(fileName string) string {
 	if strings.Contains(fileName, ".") {
-		words := strings.SplitN(fileName, ".", 2)
-		return words[1]
+		lastIndex := strings.LastIndex(fileName, ".")
+		if lastIndex > -1 {
+			return fileName[lastIndex+1:]
+		}
 	}
 	return ""
 }
@@ -257,6 +289,12 @@ func LoadYamlFile(filePath string) {
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	property, err := isc.YamlToProperties(string(content))
@@ -285,16 +323,19 @@ func AppendYamlFile(filePath string) {
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	property, err := isc.YamlToProperties(string(content))
 	if err != nil {
 		return
 	}
-	valueMap, _ := isc.PropertiesToMap(property)
-	for k, v := range valueMap {
-		SetValue(k, v)
-	}
+	AppendValue(property)
 }
 
 func LoadPropertyFile(filePath string) {
@@ -309,6 +350,12 @@ func LoadPropertyFile(filePath string) {
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	valueMap, _ := isc.PropertiesToMap(string(content))
@@ -325,18 +372,30 @@ func AppendPropertyFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		// log.Printf("读取文件失败(%v)", err)
+		logger.Error("读取文件失败(%v)", err)
 		return
 	}
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
-	valueMap, _ := isc.PropertiesToMap(string(content))
-	for k, v := range valueMap {
-		SetValue(k, v)
+	valueMap, err := isc.PropertiesToMap(string(content))
+	if err != nil {
+		return
 	}
+	propertiesValue, err := isc.MapToProperties(valueMap)
+	if err != nil {
+		return
+	}
+
+	AppendValue(propertiesValue)
 }
 
 func LoadJsonFile(filePath string) {
@@ -351,6 +410,12 @@ func LoadJsonFile(filePath string) {
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	yamlStr, _ := isc.JsonToYaml(string(content))
@@ -368,28 +433,52 @@ func AppendJsonFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Printf("fail to read file: %v\n", err)
+		logger.Error("读取文件失败(%v)", err)
 		return
 	}
 
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	yamlStr, err := isc.JsonToYaml(string(content))
 	if err != nil {
-		log.Printf("JsonToYaml error: %v\n", err)
 		return
 	}
 	property, err := isc.YamlToProperties(yamlStr)
 	if err != nil {
-		log.Printf("YamlToProperties error: %v\n", err)
 		return
 	}
-	valueMap, _ := isc.PropertiesToMap(property)
-	for k, v := range valueMap {
-		SetValue(k, v)
+
+	AppendValue(property)
+}
+
+func AppendValue(propertiesNewValue string) {
+	pMap, err := isc.PropertiesToMap(propertiesNewValue)
+	for k, v := range pMap {
+		appProperty.ValueMap[k] = v
 	}
+
+	propertiesValueOfOriginal, err := isc.MapToProperties(appProperty.ValueMap)
+	if err != nil {
+		return
+	}
+
+	resultYaml, err := isc.PropertiesToYaml(propertiesValueOfOriginal)
+	if err != nil {
+		return
+	}
+	resultDeepMap, err := isc.YamlToMap(resultYaml)
+	if err != nil {
+		return
+	}
+	appProperty.ValueDeepMap = resultDeepMap
 }
 
 func SetValue(key string, value any) {
@@ -398,41 +487,45 @@ func SetValue(key string, value any) {
 	}
 	if appProperty == nil {
 		appProperty = &ApplicationProperty{}
-		appProperty.ValueMap = make(map[string]any)
+		appProperty.ValueMap = make(map[string]interface{})
+		appProperty.ValueDeepMap = make(map[string]interface{})
+	} else if appProperty.ValueMap == nil {
+		appProperty.ValueMap = make(map[string]interface{})
+	} else if appProperty.ValueDeepMap == nil {
+		appProperty.ValueDeepMap = make(map[string]interface{})
 	}
 
 	if oldValue, exist := appProperty.ValueMap[key]; exist {
-		if reflect.TypeOf(oldValue) != reflect.TypeOf(oldValue) {
-			return
+		if !isc.IsBaseType(reflect.TypeOf(oldValue)) {
+			if reflect.TypeOf(oldValue) != reflect.TypeOf(value) {
+				return
+			}
 		}
-		appProperty.ValueMap[key] = value
 	}
-	doPutValue(key, value)
-}
-
-func doPutValue(key string, value any) {
-	if strings.Contains(key, ".") {
-		oldValue := GetValue(key)
-		if nil == oldValue {
-			return
-		}
-		if reflect.TypeOf(oldValue).Kind() != reflect.TypeOf(value).Kind() {
-			return
-		}
-
-		lastIndex := strings.LastIndex(key, ".")
-		startKey := key[:lastIndex]
-		endKey := key[lastIndex+1:]
-
-		data := GetValue(startKey)
-		startValue := isc.ToMap(data)
-		if nil != startValue {
-			startValue[endKey] = value
-		}
-
-		doPutValue(startKey, startValue)
+	propertiesValueOfOriginal, err := isc.MapToProperties(appProperty.ValueDeepMap)
+	if err != nil {
+		return
 	}
-	appProperty.ValueDeepMap[key] = value
+	resultMap, err := isc.PropertiesToMap(propertiesValueOfOriginal)
+	if err != nil {
+		return
+	}
+	resultMap[key] = value
+	appProperty.ValueMap = resultMap
+
+	mapProperties, err := isc.MapToProperties(resultMap)
+	if err != nil {
+		return
+	}
+	mapYaml, err := isc.PropertiesToYaml(mapProperties)
+	if err != nil {
+		return
+	}
+	resultDeepMap, err := isc.YamlToMap(mapYaml)
+	if err != nil {
+		return
+	}
+	appProperty.ValueDeepMap = resultDeepMap
 }
 
 func GetValueString(key string) string {

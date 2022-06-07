@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/listener"
+	"github.com/magiconair/properties/assert"
 	"testing"
 )
 
@@ -22,9 +23,15 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublish2(t *testing.T) {
-	listener.AddListener("event1", Event1Lister1)
-	listener.AddListener("event1", Event1Lister2)
-	listener.AddListener("event1", Event1Lister3)
+	listener.AddListener("event1", func(event listener.BaseEvent) {
+		assert.Equal(t, "公司", event.(Event1).Company)
+	})
+	listener.AddListener("event1", func(event listener.BaseEvent) {
+		assert.Equal(t, "公司", event.(Event1).Company)
+	})
+	listener.AddListener("event1", func(event listener.BaseEvent) {
+		assert.Equal(t, "公司", event.(Event1).Company)
+	})
 
 	listener.PublishEvent(Event1{Company: "公司"})
 }

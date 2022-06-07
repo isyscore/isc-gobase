@@ -1,7 +1,7 @@
 key1:
   key2:
     intdata: 12
-    strdata: "data"
+    strdata: "data-local"
     booldata: true
     int64data: 12
     floatdata: 12.3
@@ -30,4 +30,4 @@ key1:
     hao_de_ok: 12
     name_age: 32
 entity:
-  name: 'name-original'
+  name: 'name-change'

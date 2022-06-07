@@ -24,6 +24,15 @@ config包主要用于加载和管理项目中配置文件中的内容，配置�
 
 ![img.png](img.png)
 
+#### 代码中读取指定环境配置
+```go
+// 配置环境
+os.Setenv("base.profiles.active", "local")
+
+// 然后再加载的时候就会加载local的配置文件
+config.LoadConfig()
+```
+
 ### 4. 内置的配置文件自动加载
 目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
 ```yaml
@@ -175,7 +184,7 @@ config.AppendConfigFromAbsPath(xx)
 
 ### 9. 支持配置的在线查看以及实时变更
 
-如下配置配置开启后，就可以在线查看应用的所有配置了
+如下配置开启后，就可以在线查看应用的所有配置了
 ```yaml
 base:
   endpoint:
@@ -186,13 +195,30 @@ base:
 
 ```shell
 // 查看应用所有配置
-curl http://localhost:xxx/{api-module}config/values
+curl http://localhost:xxx/{api-prefix}/{api-module}/config/values
 
 // 查看应用的某个配置
-curl http://localhost:xxx/{api-module}config/value/{key}
+curl http://localhost:xxx/{api-prefix}/{api-module}/config/value/{key}
 
 // 修改应用的配置
-curl -X PUT http://localhost:xxx/{api-module}config/update -d '{"key":"xxx", "value":"yyyy"}'
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"xxx", "value":"yyyy"}'
+```
+
+提示：<br/>
+修改应用的配置会发送配置变更事件"event_of_config_change"，如果想要对配置变更进行监听，请监听，示例：
+```go
+func xxxx() {
+    // 添加配置变更事件的监听，listener.EventOfConfigChange是内置的"event_of_config_change"
+    listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
+}
+
+func ConfigChangeListener(event listener.BaseEvent) {
+    ev := event.(listener.ConfigChangeEvent)
+    if ev.Key == "xxx" {
+        value := ev.Value
+        // 你的配置变更处理代码
+    }
+}
 ```
 
 ---

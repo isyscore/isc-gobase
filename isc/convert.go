@@ -68,22 +68,32 @@ func ToMap(data any) map[string]any {
 func IsNumber(fieldKing reflect.Kind) bool {
 	switch fieldKing {
 	case reflect.Int:
+		return true
 	case reflect.Int8:
+		return true
 	case reflect.Int16:
+		return true
 	case reflect.Int32:
+		return true
 	case reflect.Int64:
+		return true
 	case reflect.Uint:
+		return true
 	case reflect.Uint8:
+		return true
 	case reflect.Uint16:
+		return true
 	case reflect.Uint32:
+		return true
 	case reflect.Uint64:
+		return true
 	case reflect.Float32:
+		return true
 	case reflect.Float64:
 		return true
 	default:
 		return false
 	}
-	return false
 }
 
 // IsBaseType 是否是常见基本类型
@@ -95,18 +105,31 @@ func IsBaseType(fieldType reflect.Type) bool {
 
 	switch fieldKind {
 	case reflect.Int:
+		return true
 	case reflect.Int8:
+		return true
 	case reflect.Int16:
+		return true
 	case reflect.Int32:
+		return true
 	case reflect.Int64:
+		return true
 	case reflect.Uint:
+		return true
 	case reflect.Uint8:
+		return true
 	case reflect.Uint16:
+		return true
 	case reflect.Uint32:
+		return true
 	case reflect.Uint64:
+		return true
 	case reflect.Float32:
+		return true
 	case reflect.Float64:
+		return true
 	case reflect.Bool:
+		return true
 	case reflect.String:
 		return true
 	default:
@@ -115,7 +138,6 @@ func IsBaseType(fieldType reflect.Type) bool {
 		}
 		return false
 	}
-	return false
 }
 
 func ToJsonString(value any) string {

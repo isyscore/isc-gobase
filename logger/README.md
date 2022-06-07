@@ -21,7 +21,6 @@ func main() {
     logger.Info("my test info %s","i am info")
 	logger.Warn("my test warn %s","i am warn")
 	logger.Error("my test error %s","i am error")
-	
 }
 ```
 ```yaml
@@ -51,3 +50,12 @@ base:
       writeFile: false
 
 ```
+
+### 线上日志级别动态修改
+支持线上动态的日志修改
+```shell
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.logger.level", "value":"debug"}'
+```
+
+提示：<br/>
+目前日志级别粒度比较粗，比如修改了级别为debug后，则大于等于debug的级别都会打印，粒度还是比较粗，建议后续增加日志分组概念
