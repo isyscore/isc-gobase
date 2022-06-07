@@ -403,12 +403,6 @@ func parseStandard(responseResult any, errs error) (any, error) {
 	}
 
 	return standRsp.Data, nil
-
-	//if data, err := json.Marshal(standRsp.Data); err != nil {
-	//	return nil, err
-	//} else {
-	//	return data, nil
-	//}
 }
 
 func urlWithParameter(url string, parameterMap map[string]string) string {

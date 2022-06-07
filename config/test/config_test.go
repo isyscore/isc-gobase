@@ -100,7 +100,7 @@ type EntityTest struct {
 // 测试append
 func TestAppend(t *testing.T) {
 	config.LoadFile("./application-append-original.yaml")
-	config.AppendYamlFile("./application-append.yaml")
+	config.AppendFile("./application-append.yaml")
 
 	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
 	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
