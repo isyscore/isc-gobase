@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/isyscore/isc-gobase/system/common"
+	"github.com/yusufpapurcu/wmi"
 	"golang.org/x/sys/windows"
 	"strings"
 	"unsafe"
@@ -21,7 +22,7 @@ type Win32_Processor struct {
 	LoadPercentage *uint16
 }
 
-// LoadPercentage takes a linearly more time as the number of sockets increases.
+// Win32_ProcessorWithoutLoadPct LoadPercentage takes a linearly more time as the number of sockets increases.
 // For vSphere by default corespersocket = 1, meaning for a 40 vCPU VM Get Processor Info
 // could take more than half a minute.
 type Win32_ProcessorWithoutLoadPct struct {
@@ -88,18 +89,18 @@ func TimesWithContext(ctx context.Context, percpu bool) ([]TimesStat, error) {
 		return ret, windows.GetLastError()
 	}
 
-	LOT := float64(0.0000001)
-	HIT := (LOT * 4294967296.0)
-	idle := ((HIT * float64(lpIdleTime.DwHighDateTime)) + (LOT * float64(lpIdleTime.DwLowDateTime)))
-	user := ((HIT * float64(lpUserTime.DwHighDateTime)) + (LOT * float64(lpUserTime.DwLowDateTime)))
-	kernel := ((HIT * float64(lpKernelTime.DwHighDateTime)) + (LOT * float64(lpKernelTime.DwLowDateTime)))
-	system := (kernel - idle)
+	LOT := 0.0000001
+	HIT := LOT * 4294967296.0
+	idle := (HIT * float64(lpIdleTime.DwHighDateTime)) + (LOT * float64(lpIdleTime.DwLowDateTime))
+	user := (HIT * float64(lpUserTime.DwHighDateTime)) + (LOT * float64(lpUserTime.DwLowDateTime))
+	kernel := (HIT * float64(lpKernelTime.DwHighDateTime)) + (LOT * float64(lpKernelTime.DwLowDateTime))
+	system := kernel - idle
 
 	ret = append(ret, TimesStat{
 		CPU:    "cpu-total",
-		Idle:   float64(idle),
-		User:   float64(user),
-		System: float64(system),
+		Idle:   idle,
+		User:   user,
+		System: system,
 	})
 	return ret, nil
 }

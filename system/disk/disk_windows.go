@@ -60,10 +60,6 @@ func UsageWithContext(ctx context.Context, path string) (*UsageStat, error) {
 		Free:        uint64(lpTotalNumberOfFreeBytes),
 		Used:        uint64(lpTotalNumberOfBytes) - uint64(lpTotalNumberOfFreeBytes),
 		UsedPercent: (float64(lpTotalNumberOfBytes) - float64(lpTotalNumberOfFreeBytes)) / float64(lpTotalNumberOfBytes) * 100,
-		// InodesTotal: 0,
-		// InodesFree: 0,
-		// InodesUsed: 0,
-		// InodesUsedPercent: 0,
 	}
 	return ret, nil
 }
@@ -160,7 +156,9 @@ func IOCountersWithContext(ctx context.Context, names ...string) (map[string]IOC
 				}
 				return drivemap, err
 			}
-			defer windows.CloseHandle(h)
+			defer func(handle windows.Handle) {
+				_ = windows.CloseHandle(handle)
+			}(h)
 
 			var diskPerformanceSize uint32
 			err = windows.DeviceIoControl(h, IOCTL_DISK_PERFORMANCE, nil, 0, (*byte)(unsafe.Pointer(&diskPerformance)), uint32(unsafe.Sizeof(diskPerformance)), &diskPerformanceSize, nil)

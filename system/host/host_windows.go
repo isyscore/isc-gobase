@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/system/common"
 	"github.com/isyscore/isc-gobase/system/process"
+	"github.com/yusufpapurcu/wmi"
 	"golang.org/x/sys/windows"
 	"math"
 	"strconv"

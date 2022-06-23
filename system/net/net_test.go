@@ -5,7 +5,6 @@ import (
 	"github.com/isyscore/isc-gobase/system/common"
 	"math"
 	"os"
-	"runtime"
 	"testing"
 )
 
@@ -162,47 +161,6 @@ func TestNetInterfaces(t *testing.T) {
 	}
 }
 
-func TestNetProtoCountersStatsAll(t *testing.T) {
-	v, err := ProtoCounters(nil)
-	skipIfNotImplementedErr(t, err)
-	if err != nil {
-		t.Fatalf("Could not get NetProtoCounters: %v", err)
-	}
-	if len(v) == 0 {
-		t.Fatalf("Could not get NetProtoCounters: %v", err)
-	}
-	for _, vv := range v {
-		if vv.Protocol == "" {
-			t.Errorf("Invalid NetProtoCountersStat: %v", vv)
-		}
-		if len(vv.Stats) == 0 {
-			t.Errorf("Invalid NetProtoCountersStat: %v", vv)
-		}
-	}
-}
-
-func TestNetProtoCountersStats(t *testing.T) {
-	v, err := ProtoCounters([]string{"tcp", "ip"})
-	skipIfNotImplementedErr(t, err)
-	if err != nil {
-		t.Fatalf("Could not get NetProtoCounters: %v", err)
-	}
-	if len(v) == 0 {
-		t.Fatalf("Could not get NetProtoCounters: %v", err)
-	}
-	if len(v) != 2 {
-		t.Fatalf("Go incorrect number of NetProtoCounters: %v", err)
-	}
-	for _, vv := range v {
-		if vv.Protocol != "tcp" && vv.Protocol != "ip" {
-			t.Errorf("Invalid NetProtoCountersStat: %v", vv)
-		}
-		if len(vv.Stats) == 0 {
-			t.Errorf("Invalid NetProtoCountersStat: %v", vv)
-		}
-	}
-}
-
 func TestNetConnections(t *testing.T) {
 	if ci := os.Getenv("CI"); ci != "" { // skip if test on drone.io
 		return
@@ -219,34 +177,6 @@ func TestNetConnections(t *testing.T) {
 	for _, vv := range v {
 		if vv.Family == 0 {
 			t.Errorf("invalid NetConnections: %v", vv)
-		}
-	}
-
-}
-
-func TestNetFilterCounters(t *testing.T) {
-	if ci := os.Getenv("CI"); ci != "" { // skip if test on drone.io
-		return
-	}
-
-	if runtime.GOOS == "linux" {
-		// some test environment has not the path.
-		if !common.PathExists("/proc/sys/net/netfilter/nf_conntrackCount") {
-			t.SkipNow()
-		}
-	}
-
-	v, err := FilterCounters()
-	skipIfNotImplementedErr(t, err)
-	if err != nil {
-		t.Errorf("could not get NetConnections: %v", err)
-	}
-	if len(v) == 0 {
-		t.Errorf("could not get NetConnections: %v", v)
-	}
-	for _, vv := range v {
-		if vv.ConnTrackMax == 0 {
-			t.Errorf("nf_conntrackMax needs to be greater than zero: %v", vv)
 		}
 	}
 

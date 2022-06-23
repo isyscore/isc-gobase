@@ -81,7 +81,7 @@ type systemInfo struct {
 	wProcessorRevision          uint16
 }
 
-// Memory_info_ex is different between OSes
+// MemoryInfoExStat Memory_info_ex is different between OSes
 type MemoryInfoExStat struct {
 }
 
@@ -213,7 +213,7 @@ type winDWord uint32
 func init() {
 	var systemInfo systemInfo
 
-	procGetNativeSystemInfo.Call(uintptr(unsafe.Pointer(&systemInfo)))
+	_, _, _ = procGetNativeSystemInfo.Call(uintptr(unsafe.Pointer(&systemInfo)))
 	processorArchitecture = uint(systemInfo.wProcessorArchitecture)
 
 	// enable SeDebugPrivilege https://github.com/midstar/proci/blob/6ec79f57b90ba3d9efa2a7b16ef9c9369d4be875/proci_windows.go#L80-L119
@@ -227,7 +227,9 @@ func init() {
 	if err != nil {
 		return
 	}
-	defer token.Close()
+	defer func(token syscall.Token) {
+		_ = token.Close()
+	}(token)
 
 	tokenPriviledges := winTokenPriviledges{PrivilegeCount: 1}
 	lpName := syscall.StringToUTF16("SeDebugPrivilege")
@@ -241,11 +243,11 @@ func init() {
 
 	tokenPriviledges.Privileges[0].Attributes = 0x00000002 // SE_PRIVILEGE_ENABLED
 
-	procAdjustTokenPrivileges.Call(
+	_, _, _ = procAdjustTokenPrivileges.Call(
 		uintptr(token),
 		0,
 		uintptr(unsafe.Pointer(&tokenPriviledges)),
-		uintptr(unsafe.Sizeof(tokenPriviledges)),
+		unsafe.Sizeof(tokenPriviledges),
 		0,
 		0)
 }
@@ -308,7 +310,9 @@ func PidExistsWithContext(ctx context.Context, pid int32) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer syscall.CloseHandle(syscall.Handle(h))
+	defer func(handle syscall.Handle) {
+		_ = syscall.CloseHandle(handle)
+	}(syscall.Handle(h))
 	var exitCode uint32
 	err = windows.GetExitCodeProcess(h, &exitCode)
 	return exitCode == STILL_ACTIVE, err
@@ -356,7 +360,9 @@ func (p *Process) ExeWithContext(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 	buf := make([]uint16, syscall.MAX_LONG_PATH)
 	size := uint32(syscall.MAX_LONG_PATH)
 	if err := procQueryFullProcessImageNameW.Find(); err == nil { // Vista+
@@ -411,7 +417,9 @@ func (p *Process) CwdWithContext(_ context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer syscall.CloseHandle(syscall.Handle(h))
+	defer func(handle syscall.Handle) {
+		_ = syscall.CloseHandle(handle)
+	}(syscall.Handle(h))
 
 	procIs32Bits := is32BitProcess(h)
 
@@ -470,14 +478,18 @@ func (p *Process) UsernameWithContext(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 
 	var token syscall.Token
 	err = syscall.OpenProcessToken(syscall.Handle(c), syscall.TOKEN_QUERY, &token)
 	if err != nil {
 		return "", err
 	}
-	defer token.Close()
+	defer func(token syscall.Token) {
+		_ = token.Close()
+	}(token)
 	tokenUser, err := token.GetTokenUser()
 	if err != nil {
 		return "", err
@@ -520,7 +532,9 @@ func (p *Process) NiceWithContext(ctx context.Context) (int32, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 	ret, _, err := procGetPriorityClass.Call(uintptr(c))
 	if ret == 0 {
 		return 0, err
@@ -549,7 +563,9 @@ func (p *Process) IOCountersWithContext(ctx context.Context) (*IOCountersStat, e
 	if err != nil {
 		return nil, err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 	var ioCounters ioCounters
 	ret, _, err := procGetProcessIoCounters.Call(uintptr(c), uintptr(unsafe.Pointer(&ioCounters)))
 	if ret == 0 {
@@ -627,8 +643,8 @@ func (p *Process) MemoryInfoWithContext(ctx context.Context) (*MemoryInfoStat, e
 	}
 
 	ret := &MemoryInfoStat{
-		RSS: uint64(mem.WorkingSetSize),
-		VMS: uint64(mem.PagefileUsage),
+		RSS: mem.WorkingSetSize,
+		VMS: mem.PagefileUsage,
 	}
 
 	return ret, nil
@@ -643,12 +659,14 @@ func (p *Process) PageFaultsWithContext(ctx context.Context) (*PageFaultsStat, e
 }
 
 func (p *Process) ChildrenWithContext(ctx context.Context) ([]*Process, error) {
-	out := []*Process{}
+	var out []*Process
 	snap, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, uint32(0))
 	if err != nil {
 		return out, err
 	}
-	defer windows.CloseHandle(snap)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(snap)
 	var pe32 windows.ProcessEntry32
 	pe32.Size = uint32(unsafe.Sizeof(pe32))
 	if err := windows.Process32First(snap, &pe32); err != nil {
@@ -783,7 +801,9 @@ func (p *Process) SuspendWithContext(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 
 	r1, _, _ := procNtSuspendProcess.Call(uintptr(c))
 	if r1 != 0 {
@@ -799,7 +819,9 @@ func (p *Process) ResumeWithContext(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 
 	r1, _, _ := procNtResumeProcess.Call(uintptr(c))
 	if r1 != 0 {
@@ -816,7 +838,7 @@ func (p *Process) TerminateWithContext(ctx context.Context) error {
 		return err
 	}
 	err = windows.TerminateProcess(proc, 0)
-	windows.CloseHandle(proc)
+	_ = windows.CloseHandle(proc)
 	return err
 }
 
@@ -856,7 +878,9 @@ func getFromSnapProcess(pid int32) (int32, int32, string, error) {
 	if err != nil {
 		return 0, 0, "", err
 	}
-	defer windows.CloseHandle(snap)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(snap)
 	var pe32 windows.ProcessEntry32
 	pe32.Size = uint32(unsafe.Sizeof(pe32))
 	if err = windows.Process32First(snap, &pe32); err != nil {
@@ -875,7 +899,7 @@ func getFromSnapProcess(pid int32) (int32, int32, string, error) {
 }
 
 func ProcessesWithContext(ctx context.Context) ([]*Process, error) {
-	out := []*Process{}
+	var out []*Process
 
 	pids, err := PidsWithContext(ctx)
 	if err != nil {
@@ -900,7 +924,9 @@ func getRusage(pid int32) (*windows.Rusage, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 
 	if err := windows.GetProcessTimes(c, &CPU.CreationTime, &CPU.ExitTime, &CPU.KernelTime, &CPU.UserTime); err != nil {
 		return nil, err
@@ -915,7 +941,9 @@ func getMemoryInfo(pid int32) (PROCESS_MEMORY_COUNTERS, error) {
 	if err != nil {
 		return mem, err
 	}
-	defer windows.CloseHandle(c)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(c)
 	if err := getProcessMemoryInfo(c, &mem); err != nil {
 		return mem, err
 	}
@@ -949,7 +977,9 @@ func getProcessCPUTimes(pid int32) (SYSTEM_TIMES, error) {
 	if err != nil {
 		return times, err
 	}
-	defer windows.CloseHandle(h)
+	defer func(handle windows.Handle) {
+		_ = windows.CloseHandle(handle)
+	}(h)
 
 	err = syscall.GetProcessTimes(
 		syscall.Handle(h),
@@ -1026,7 +1056,7 @@ func is32BitProcess(h windows.Handle) bool {
 			uintptr(h),
 			uintptr(common.ProcessWow64Information),
 			uintptr(unsafe.Pointer(&wow64)),
-			uintptr(unsafe.Sizeof(wow64)),
+			unsafe.Sizeof(wow64),
 			uintptr(0),
 		)
 		if int(ret) >= 0 {
@@ -1059,7 +1089,9 @@ func getProcessEnvironmentVariables(pid int32, ctx context.Context) ([]string, e
 	if err != nil {
 		return nil, err
 	}
-	defer syscall.CloseHandle(syscall.Handle(h))
+	defer func(handle syscall.Handle) {
+		_ = syscall.CloseHandle(handle)
+	}(syscall.Handle(h))
 
 	procIs32Bits := is32BitProcess(h)
 
@@ -1143,7 +1175,9 @@ func getProcessCommandLine(pid int32) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer syscall.CloseHandle(syscall.Handle(h))
+	defer func(handle syscall.Handle) {
+		_ = syscall.CloseHandle(handle)
+	}(syscall.Handle(h))
 
 	procIs32Bits := is32BitProcess(h)
 

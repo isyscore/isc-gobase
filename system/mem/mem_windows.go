@@ -135,7 +135,7 @@ func SwapDevices() ([]*SwapDevice, error) {
 func SwapDevicesWithContext(ctx context.Context) ([]*SwapDevice, error) {
 	pageSizeOnce.Do(func() {
 		var sysInfo systemInfo
-		procGetNativeSystemInfo.Call(uintptr(unsafe.Pointer(&sysInfo)))
+		_, _, _ = procGetNativeSystemInfo.Call(uintptr(unsafe.Pointer(&sysInfo)))
 		pageSize = uint64(sysInfo.dwPageSize)
 	})
 

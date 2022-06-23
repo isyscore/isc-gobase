@@ -15,19 +15,19 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// for double values
+// PDH_FMT_COUNTERVALUE_DOUBLE for double values
 type PDH_FMT_COUNTERVALUE_DOUBLE struct {
 	CStatus     uint32
 	DoubleValue float64
 }
 
-// for 64 bit integer values
+// PDH_FMT_COUNTERVALUE_LARGE for 64 bit integer values
 type PDH_FMT_COUNTERVALUE_LARGE struct {
 	CStatus    uint32
 	LargeValue int64
 }
 
-// for long values
+// PDH_FMT_COUNTERVALUE_LONG for long values
 type PDH_FMT_COUNTERVALUE_LONG struct {
 	CStatus   uint32
 	LongValue int32
@@ -92,7 +92,7 @@ type FILETIME struct {
 	DwHighDateTime uint32
 }
 
-// borrowed from net/interface_windows.go
+// BytePtrToString borrowed from net/interface_windows.go
 func BytePtrToString(p *uint8) string {
 	a := (*[10000]uint8)(unsafe.Pointer(p))
 	i := 0
@@ -216,10 +216,13 @@ func WMIQueryWithContext(ctx context.Context, query string, dst interface{}, con
 	}
 }
 
-// Convert paths using native DOS format like:
-//   "\Device\HarddiskVolume1\Windows\systemew\file.txt"
+// ConvertDOSPath Convert paths using native DOS format like:
+//
+//	"\Device\HarddiskVolume1\Windows\systemew\file.txt"
+//
 // into:
-//   "C:\Windows\systemew\file.txt"
+//
+//	"C:\Windows\systemew\file.txt"
 func ConvertDOSPath(p string) string {
 	rawDrive := strings.Join(strings.Split(p, `\`)[:3], `\`)
 

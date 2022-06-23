@@ -154,14 +154,14 @@ func IOCountersWithContext(ctx context.Context, pernic bool) ([]IOCountersStat, 
 			if ret != 0 {
 				return nil, os.NewSyscallError("GetIfEntry2", err)
 			}
-			c.BytesSent = uint64(row.OutOctets)
-			c.BytesRecv = uint64(row.InOctets)
-			c.PacketsSent = uint64(row.OutUcastPkts)
-			c.PacketsRecv = uint64(row.InUcastPkts)
-			c.Errin = uint64(row.InErrors)
-			c.Errout = uint64(row.OutErrors)
-			c.Dropin = uint64(row.InDiscards)
-			c.Dropout = uint64(row.OutDiscards)
+			c.BytesSent = row.OutOctets
+			c.BytesRecv = row.InOctets
+			c.PacketsSent = row.OutUcastPkts
+			c.PacketsRecv = row.InUcastPkts
+			c.Errin = row.InErrors
+			c.Errout = row.OutErrors
+			c.Dropin = row.InDiscards
+			c.Dropout = row.OutDiscards
 
 			counters = append(counters, c)
 		}
@@ -195,7 +195,7 @@ func IOCountersWithContext(ctx context.Context, pernic bool) ([]IOCountersStat, 
 	return counters, nil
 }
 
-// NetIOCountersByFile is a method which is added just a compatibility for linux.
+// IOCountersByFile NetIOCountersByFile is a method which is added just a compatibility for linux.
 func IOCountersByFile(pernic bool, filename string) ([]IOCountersStat, error) {
 	return IOCountersByFileWithContext(context.Background(), pernic, filename)
 }
@@ -204,9 +204,10 @@ func IOCountersByFileWithContext(ctx context.Context, pernic bool, filename stri
 	return IOCounters(pernic)
 }
 
-// Return a list of network connections
+// Connections Return a list of network connections
 // Available kind:
-//   reference to netConnectionKindMap
+//
+//	reference to netConnectionKindMap
 func Connections(kind string) ([]ConnectionStat, error) {
 	return ConnectionsWithContext(context.Background(), kind)
 }
@@ -271,7 +272,7 @@ func getNetStatWithKind(kindType netConnectionKindType) ([]ConnectionStat, error
 	return nil, fmt.Errorf("invalid kind filename, %s", kindType.filename)
 }
 
-// Return a list of network connections opened returning at most `max`
+// ConnectionsMax Return a list of network connections opened returning at most `max`
 // connections for each running process.
 func ConnectionsMax(kind string, max int) ([]ConnectionStat, error) {
 	return ConnectionsMaxWithContext(context.Background(), kind, max)
@@ -281,7 +282,7 @@ func ConnectionsMaxWithContext(ctx context.Context, kind string, max int) ([]Con
 	return []ConnectionStat{}, common.ErrNotImplementedError
 }
 
-// Return a list of network connections opened, omitting `Uids`.
+// ConnectionsWithoutUids Return a list of network connections opened, omitting `Uids`.
 // WithoutUids functions are reliant on implementation details. They may be altered to be an alias for Connections or be
 // removed from the API in the future.
 func ConnectionsWithoutUids(kind string) ([]ConnectionStat, error) {
@@ -332,7 +333,7 @@ func ConntrackStatsWithContext(ctx context.Context, percpu bool) ([]ConntrackSta
 	return nil, common.ErrNotImplementedError
 }
 
-// NetProtoCounters returns network statistics for the entire system
+// ProtoCounters NetProtoCounters returns network statistics for the entire system
 // If protocols is empty then all protocols are returned, otherwise
 // just the protocols in the list are returned.
 // Not Implemented for Windows
@@ -762,7 +763,7 @@ func parseIPv4HexString(addr uint32) string {
 func parseIPv6HexString(addr [16]byte) string {
 	var ret [16]byte
 	for i := 0; i < 16; i++ {
-		ret[i] = uint8(addr[i])
+		ret[i] = addr[i]
 	}
 
 	// convert []byte to net.IP

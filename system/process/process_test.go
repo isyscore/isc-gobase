@@ -128,19 +128,6 @@ func Test_Process_Ppid(t *testing.T) {
 	}
 }
 
-func Test_Process_Status(t *testing.T) {
-	p := testGetProcess()
-
-	v, err := p.Status()
-	skipIfNotImplementedErr(t, err)
-	if err != nil {
-		t.Errorf("getting status error %v", err)
-	}
-	if v != "R" && v != "S" {
-		t.Errorf("could not get state %v", v)
-	}
-}
-
 func Test_Process_Nice(t *testing.T) {
 	p := testGetProcess()
 
