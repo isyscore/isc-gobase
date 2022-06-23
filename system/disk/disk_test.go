@@ -3,7 +3,6 @@ package disk
 import (
 	"fmt"
 	"runtime"
-	"sync"
 	"testing"
 
 	"github.com/isyscore/isc-gobase/system/common"
@@ -67,21 +66,6 @@ func TestDisk_io_counters(t *testing.T) {
 	}
 }
 
-func TestDisk_io_counters_concurrency_on_darwin_cgo(t *testing.T) {
-	if runtime.GOOS != "darwin" {
-		t.Skip("darwin only")
-	}
-	var wg sync.WaitGroup
-	const max = 1000
-	for i := 1; i < max; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			IOCounters()
-		}()
-	}
-	wg.Wait()
-}
 
 func TestDiskUsageStat_String(t *testing.T) {
 	v := UsageStat{
