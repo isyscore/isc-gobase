@@ -155,7 +155,6 @@ func TestYamlToPropertiesWithKey(t *testing.T) {
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array5.yml")
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array6.yml")
 	yamlToPropertiesWithKeyTest(t, "./resources/yml/array7.yml")
-	yamlToPropertiesWithKeyTest(t, "./resources/yml/test1.yml")
 }
 
 func TestPropertiesToMap5(t *testing.T) {

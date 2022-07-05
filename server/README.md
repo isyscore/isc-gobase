@@ -36,6 +36,7 @@ root@user ~> curl http://localhost:8080/api/get
 
 ## 全部配置
 
+isc-gobase项目内置的一些server的配置
 ```yaml
 api-module: sample
 
@@ -51,6 +52,9 @@ base:
     gin:
       # 有三种模式：debug/release/test，默认 release
       mode: debug
+      pprof:
+        # pprof开关是否可以开启，默认false
+        enable: false
     request:
       print:
         # 是否打印：true, false；默认 false
@@ -86,6 +90,10 @@ base:
           - 409
     # 版本号设置,默认值:unknown
     version: 1.0.0
+```
+isc-gobase项目内置的一些endpoint端口
+```shell
+base:
   # 内部开放的 endpoint
   endpoint:
     # 健康检查处理，默认关闭，true/false

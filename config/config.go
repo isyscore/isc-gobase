@@ -24,7 +24,6 @@ var appProperty *ApplicationProperty
 var configExist = false
 var loadLock sync.Mutex
 var configLoaded = false
-var profileHavePrinted = false
 var CurrentProfile = ""
 
 func LoadConfig() {
@@ -109,6 +108,14 @@ func ExistConfigFile() bool {
 func GetConfigValues(c *gin.Context) {
 	if nil != appProperty {
 		c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(appProperty.ValueMap)))
+	} else {
+		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
+	}
+}
+
+func GetConfigDeepValues(c *gin.Context) {
+	if nil != appProperty {
+		c.Data(200, "application/json; charset=utf-8", []byte(isc.ObjectToJson(appProperty.ValueDeepMap)))
 	} else {
 		c.Data(200, "application/json; charset=utf-8", []byte("{}"))
 	}

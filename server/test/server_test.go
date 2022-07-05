@@ -120,3 +120,12 @@ func TestServer2(t *testing.T) {
 
 	server.Run()
 }
+
+// 环境变量请使用：base.profiles.active=pprof
+func TestServerOnProfileIsPprof(t *testing.T) {
+	server.Get("data", func(c *gin.Context) {
+		rsp.SuccessOfStandard(c, "data")
+	})
+
+	server.Run()
+}

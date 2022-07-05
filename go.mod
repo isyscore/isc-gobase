@@ -18,6 +18,7 @@ require (
 )
 
 require (
+	github.com/gin-contrib/pprof v1.3.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 )
