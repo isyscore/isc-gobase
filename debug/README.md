@@ -15,22 +15,29 @@ curl http://localhost:xxx/{api-prefix}/{api-module}/debug/help
 示例：<br/>
 ```json
 {
-  "1.帮助": "------------------------- curl http://localhost:8080/api/demo/debug/help",
-  "2.-========= 动态修改日志 ============": " ----------------------------------------------------------------------------------------------------------------------------------------------------------",
-  "2.1 动态修改日志": "----------------- curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.logger.level\", \"value\":\"debug\"}'",
-  "3.-====== 动态打印接口出入参 ==========": " ----------------------------------------------------------------------------------------------------------------------------------------------------------",
-  "3.1 指定url打印请求": "-------------- curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.request.print.include-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
-  "3.2 指定url不打印请求": "------------ curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.request.print.exclude-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
-  "3.3 指定url打印请求和响应": "--------- curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.response.print.include-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
-  "3.4 指定url不打印请求和响应": "------- curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.response.print.exclude-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
-  "4.-========= 动态查看bean ============": " ---------------------------------------------------------------------------------------------------------------------------------------------------------",
-  "4.1 获取注册的所有bean": "----------- curl http://localhost:8080/api/demo/bean/name/all",
-  "4.2 查询注册的bean": "-------------- curl http://localhost:8080/api/demo/bean/name/list/:name",
-  "4.3 查询bean的属性值": "------------- curl -X POST http://localhost:8080/api/demo/bean/field/get' -d '{\"bean\": \"xx\", \"field\":\"xxx\"}'",
-  "4.4 修改bean的属性值": "------------- curl -X POST http://localhost:8080/api/demo/bean/field/set' -d '{\"bean\": \"xx\", \"field\": \"xxx\", \"value\": \"xxx\"}'",
-  "4.5 调用bean的函数": "-------------- curl -X POST http://localhost:8080/api/demo/bean/fun/call' -d '{\"bean\": \"xx\", \"fun\": \"xxx\", \"parameter\": {\"p1\":\"xx\", \"p2\": \"xxx\"}}'",
-  "5.-========= 动态pprof ==============": "----------------------------------------------------------------------------------------------------------------------------------------------------------",
-  "5.1 动态启用pprof": "--------------- curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.gin.pprof.enable\", \"value\":\"true\"}'"
+  "-============================================================================================================================================================================================": "",
+  "1.-【帮助】": "---------------------: curl http://localhost:8080/api/demo/debug/help",
+  "2.-": "========================【日志】===========================================================================================================================================================",
+  "2.1 动态修改日志": "-----------------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.logger.level\", \"value\":\"debug\"}'",
+  "3.-": "===================【接口出入参】===========================================================================================================================================================",
+  "3.1 指定url打印请求": "--------------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.request.print.include-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
+  "3.2 指定url不打印请求": "------------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.request.print.exclude-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
+  "3.3 指定url打印请求和响应": "---------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.response.print.include-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
+  "3.4 指定url不打印请求和响应": "-------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.response.print.exclude-uri[0]\", \"value\":\"/api/xx/xxx\"}'",
+  "4.-": "===================【bean管理】============================================================================================================================================================",
+  "4.1 获取注册的所有bean": "-----------: curl http://localhost:8080/api/demo/bean/name/all",
+  "4.2 查询注册的bean": "--------------: curl http://localhost:8080/api/demo/bean/name/list/{name}",
+  "4.3 查询bean的属性值": "-------------: curl -X POST http://localhost:8080/api/demo/bean/field/get' -d '{\"bean\": \"xx\", \"field\":\"xxx\"}'",
+  "4.4 修改bean的属性值": "-------------: curl -X POST http://localhost:8080/api/demo/bean/field/set' -d '{\"bean\": \"xx\", \"field\": \"xxx\", \"value\": \"xxx\"}'",
+  "4.5 调用bean的函数": "--------------: curl -X POST http://localhost:8080/api/demo/bean/fun/call' -d '{\"bean\": \"xx\", \"fun\": \"xxx\", \"parameter\": {\"p1\":\"xx\", \"p2\": \"xxx\"}}'",
+  "5.-": "=====================【pprof】============================================================================================================================================================",
+  "5.1 动态启用pprof": "---------------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"base.server.gin.pprof.enable\", \"value\":\"true\"}'",
+  "6.-": "===================【配置处理】=============================================================================================================================================================",
+  "6.1 服务所有配置": "----------------: curl http://localhost:8080/api/demo/config/values",
+  "6.2 服务所有配置(yaml结构)": "-------: curl http://localhost:8080/api/demo/config/values/yaml",
+  "6.3 服务某个配置": "----------------: curl http://localhost:8080/api/demo/config/value/{key}",
+  "6.4 修改服务的配置": "--------------: curl -X PUT http://localhost:8080/api/demo/config/update -d '{\"key\":\"xxx\", \"value\":\"yyy\"}'",
+  "===============================================================================================================================================================================================": ""
 }
 ```
 
