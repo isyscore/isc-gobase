@@ -14,6 +14,7 @@ func TestFile(t *testing.T) {
 	path := filepath.Join(dir, "sample.txt")
 
 	file.AppendFile(path, "ccc")
+	file.DeleteFile("sample.txt")
 }
 
 func TestExtract(t *testing.T) {
