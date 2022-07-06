@@ -92,10 +92,12 @@ func (c *cache) DeleteExpired() {
 	if l < 1 {
 		return
 	}
-	cloneMap := make(map[string]Item, c.Cap())
+	cloneMap := map[string]Item{}
+	c.mu.Lock()
 	for k, v := range c.items {
 		cloneMap[k] = v
 	}
+	c.mu.Unlock()
 
 	ch := make(chan int8, len(c.items))
 	for key, item := range cloneMap {

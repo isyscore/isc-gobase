@@ -11,8 +11,15 @@ require (
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/magiconair/properties v1.8.5
 	github.com/rs/zerolog v1.26.1
+	github.com/tklauser/go-sysconf v0.3.10
+	github.com/yusufpapurcu/wmi v1.2.2
 	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
+	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/tklauser/numcpus v0.4.0 // indirect
 )
 
 require (
@@ -32,7 +39,7 @@ require (
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
