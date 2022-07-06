@@ -48,7 +48,7 @@ func LoadConfigFromRelativePath(resourceAbsPath string) {
 func LoadConfigFromAbsPath(resourceAbsPath string) {
 	doLoadConfigFromAbsPath(resourceAbsPath)
 
-	cmPath := os.Getenv("base.config.cm.path")
+	cmPath := os.Getenv("base.config.additional-location")
 	if cmPath == "" {
 		cmPath = "./config/application-default.yml"
 	}
