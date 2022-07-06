@@ -88,9 +88,9 @@ curl http://localhost:xxx/{api-prefix}/{api-module}/bean/name/all'
 curl http://localhost:xxx/{api-prefix}/{api-module}/bean/name/list/:name'
 # 查询某个bean的属性值
 curl -X POST http://localhost:xxx/{api-prefix}/{api-module}/bean/field/get' -d '{"bean": "xx", "field": "xxx"}'
-# 修改某个bean的属性的值
+# 修改某个bean的属性的值（暂时只支持基本类型）
 curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/bean/field/set' -d '{"bean": "xx", "field": "xxx", "value": "xxx"}'
-# 调用bean的某个函数
+# 调用bean的某个函数（参数暂时只支持基本类型）
 curl -X POST http://localhost:xxx/{api-prefix}/{api-module}/bean/fun/call' -d '{"bean": "xx", "fun": "xxx", "parameter": {"p1":"xx", "p2": "xxx"}}'
 ```
 

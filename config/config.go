@@ -38,7 +38,6 @@ func LoadConfig() {
 	configLoaded = true
 }
 
-// LoadConfigFromRelativePath 加载相对文件路径
 func LoadConfigFromRelativePath(resourceAbsPath string) {
 	dir, _ := os.Getwd()
 	pkg := strings.Replace(dir, "\\", "/", -1)
@@ -46,23 +45,22 @@ func LoadConfigFromRelativePath(resourceAbsPath string) {
 	LoadConfigFromAbsPath(path.Join(pkg, "", resourceAbsPath))
 }
 
-// LoadConfigFromAbsPath 加载绝对文件路径
 func LoadConfigFromAbsPath(resourceAbsPath string) {
 	doLoadConfigFromAbsPath(resourceAbsPath)
 
-	// 读取cm文件
-	AppendConfigFromRelativePath("./config/application-default.yml")
+	cmPath := os.Getenv("base.config.cm.path")
+	if cmPath == "" {
+		cmPath = "./config/application-default.yml"
+	}
+	AppendConfigFromRelativePath(cmPath)
 
-	// 加载ApiModule
 	ApiModule = GetValueString("api-module")
 
-	// 加载内部配置
 	if err := GetValueObject("base", &BaseCfg); err != nil {
 		log.Printf("加载 Base 配置失败(%v)", err)
 	}
 }
 
-// AppendConfigFromRelativePath 追加配置：相对路径的配置文件
 func AppendConfigFromRelativePath(fileName string) {
 	dir, _ := os.Getwd()
 	pkg := strings.Replace(dir, "\\", "/", -1)
@@ -81,7 +79,6 @@ func AppendConfigFromRelativePath(fileName string) {
 	}
 }
 
-// AppendConfigFromAbsPath 追加配置：绝对路径的配置文件
 func AppendConfigFromAbsPath(fileName string) {
 	extend := getFileExtension(fileName)
 	extend = strings.ToLower(extend)
@@ -207,7 +204,6 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	}
 }
 
-// LoadFile 载入配置
 func LoadFile(filePath string) {
 	extend := getFileExtension(filePath)
 	extend = strings.ToLower(extend)
@@ -226,7 +222,6 @@ func LoadFile(filePath string) {
 	}
 }
 
-// AppendFile 追加配置
 func AppendFile(filePath string) {
 	extend := getFileExtension(filePath)
 	extend = strings.ToLower(extend)

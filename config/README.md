@@ -32,38 +32,19 @@ os.Setenv("base.profiles.active", "local")
 // 然后再加载的时候就会加载local的配置文件
 config.LoadConfig()
 ```
-
-### 4. 内置的配置文件自动加载
-目前内置的自动加载的配置文件有如下这些，后续随着工程越来越大会越来越多
-```yaml
-api-module: sample
-base:
-  api:
-    # api前缀
-    prefix: /api
-  application:
-    # 应用名称
-    name: sample
-  server:
-    # 是否启用，默认：true
-    enable: true
-    # 端口号
-    port: 8080
-    # web框架gin的配置
-    gin:
-      # 有三种模式：debug/release/test
-      mode: debug
-  endpoint:
-    # 健康检查处理，默认关闭，true/false
-    health:
-      enable: true
-    # 配置的动态实时变更，默认关闭，true/false
-    config:
-      enable: true
+或者：直接加载对应{profile}的文件
+```go
+// 配置环境
+config.LoadFile("./application-local.yaml")
+```
+也支持叠加
+```go
+// 配置环境
+config.LoadFile("./application-local.yaml")
+config.AppendFile("./application-append.yaml")
 ```
 
-
-### 5. 支持直接获取配置值
+### 4. 支持直接获取配置值
 config包中提供了各种类型的api，方便实时获取
 ```go
 // 基本类型
@@ -159,17 +140,7 @@ func TestSmall(t *testing.T) {
 }
 ```
 
-### 6. 支持文件的绝对和相对路径读取
-配置路径默认是与main同目录，也支持绝对路径读取对应的配置，该api可以用于与运维同学约定的服务器路径位置
-```go
-// 相对路径
-config.LoadConfigFromRelativePath(xx)
-
-// 绝对路径
-config.LoadConfigFromAbsPath(xx)
-```
-
-### 7. 支持配置的叠加，相对路径和绝对路径
+### 6. 支持配置的叠加，相对路径和绝对路径
 在配置已经加载完毕后，需要对一些配置进行覆盖，比如运维这边有相关的需求时候
 ```go
 // 相对路径
@@ -179,10 +150,18 @@ config.AppendConfigFromRelativePath(xx)
 config.AppendConfigFromAbsPath(xx)
 ```
 
-### 8. 支持自动读取cm文件
+### 7. 支持自动读取cm文件
 应用启动会默认读取/home/{base.application.name}/config/application-default.yml对应的内容并覆盖应用的配置中
 
-### 9. 支持配置的在线查看以及实时变更
+也支持环境变量配置 `base.config.cm.path=xxx`
+
+示例：
+```go
+// 也可以代码中配置
+os.Setenv("base.config.cm.path", "./application-append.yaml")
+```
+
+### 8. 支持配置的在线查看以及实时变更
 
 如下配置开启后，就可以在线查看应用的所有配置了
 ```yaml
