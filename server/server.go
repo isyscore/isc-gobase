@@ -179,7 +179,7 @@ func RegisterPlugin(plugin gin.HandlerFunc) gin.IRoutes {
 	return engine
 }
 
-func Engine() gin.IRoutes {
+func Engine() *gin.Engine {
 	return engine
 }
 
