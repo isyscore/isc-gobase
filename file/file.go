@@ -165,3 +165,7 @@ func CreateFile(filePath string) bool {
 		return true
 	}
 }
+
+func Child(filePath string) ([]os.DirEntry, error) {
+	return os.ReadDir(filePath)
+}

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -35,4 +36,11 @@ func TestCreatFile(t *testing.T) {
 
 	file.DeleteFile("./test2.txt")
 	file.DeleteDirs("./file/")
+}
+
+func TestChild(t *testing.T) {
+	f, _ := file.Child("../")
+	for i := range f {
+		fmt.Println(f[i].Name())
+	}
 }
