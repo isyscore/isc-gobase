@@ -28,3 +28,11 @@ func TestExtract(t *testing.T) {
 	c0 := file.ChangeFileExt(path, "xyz")
 	t.Logf("c0: %s", c0)
 }
+
+func TestCreatFile(t *testing.T) {
+	file.CreateFile("./file/test.txt")
+	file.CreateFile("./test2.txt")
+
+	file.DeleteFile("./test2.txt")
+	file.DeleteDirs("./file/")
+}

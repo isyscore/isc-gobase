@@ -148,3 +148,20 @@ func RenameFile(srcFilePath string, destFilePath string) bool {
 	}
 	return os.Rename(srcFilePath, destFilePath) == nil
 }
+
+func CreateFile(filePath string) bool {
+	if FileExists(filePath) {
+		return true
+	}
+
+	p0 := ExtractFilePath(filePath)
+	if !DirectoryExists(p0) {
+		MkDirs(p0)
+	}
+
+	if _, err := os.OpenFile(filePath, os.O_CREATE, 0644); err != nil {
+		return false
+	} else {
+		return true
+	}
+}
