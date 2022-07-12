@@ -157,7 +157,7 @@ func YamlToPropertiesWithKey(key string, contentOfYaml string) (string, error) {
 }
 
 func JsonToMap(contentOfJson string) (map[string]any, error) {
-	if contentOfJson == "" || strings.HasPrefix(contentOfJson, "{") || strings.HasPrefix(contentOfJson, "[") {
+	if contentOfJson == "" || !strings.HasPrefix(contentOfJson, "{") || !strings.HasPrefix(contentOfJson, "[") {
 		return nil, &ChangeError{ErrMsg: "不符合json格式"}
 	}
 	resultMap := make(map[string]any)
