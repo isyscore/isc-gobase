@@ -68,6 +68,10 @@ func SetHttpClient(httpClientOuter *http.Client) {
 	httpClient = httpClientOuter
 }
 
+func GetClient() *http.Client {
+	return httpClient
+}
+
 // ------------------ get ------------------
 
 func GetSimple(url string) (any, error) {
