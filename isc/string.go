@@ -2,6 +2,7 @@ package isc
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/validate/constant"
 	"regexp"
 	"strconv"
 	"strings"
@@ -633,4 +634,23 @@ func ToUpperWord(regex, word string) string {
 	}
 	result += word[lastIndex:]
 	return result
+}
+
+func FormatSize(fileSize int64) (size string) {
+	if fileSize < constant.KB {
+		return fmt.Sprintf("%.2fB", float64(fileSize)/float64(constant.B))
+	} else if fileSize < constant.MB {
+		return fmt.Sprintf("%.2fKB", float64(fileSize)/float64(constant.KB))
+	} else if fileSize < constant.GB {
+		return fmt.Sprintf("%.2fMB", float64(fileSize)/float64(constant.MB))
+	} else if fileSize < constant.TB {
+		return fmt.Sprintf("%.2fGB", float64(fileSize)/float64(constant.GB))
+	} else if fileSize < constant.PB {
+		return fmt.Sprintf("%.2fTB", float64(fileSize)/float64(constant.TB))
+	} else if fileSize < constant.EB {
+		return fmt.Sprintf("%.2fPB", float64(fileSize)/float64(constant.PB))
+	} else {
+		// 不要加更多判断了，编译器报错
+		return fmt.Sprintf("%.2fEB", float64(fileSize)/float64(constant.EB))
+	}
 }

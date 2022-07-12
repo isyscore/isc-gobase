@@ -1,6 +1,8 @@
 package test
 
 import (
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/magiconair/properties/assert"
 	"os"
 	"path/filepath"
 	"testing"
@@ -27,4 +29,27 @@ func TestExtract(t *testing.T) {
 	t.Logf("e0: %s", e0)
 	c0 := file.ChangeFileExt(path, "xyz")
 	t.Logf("c0: %s", c0)
+}
+
+func TestCreatFile(t *testing.T) {
+	file.CreateFile("./file/test.txt")
+	file.CreateFile("./test2.txt")
+
+	file.DeleteFile("./test2.txt")
+	file.DeleteDirs("./file/")
+}
+
+func TestChild(t *testing.T) {
+	f, _ := file.Child("../")
+	for i := range f {
+		t.Logf("file_name: %s", f[i].Name())
+	}
+}
+
+func TestFileSize(t *testing.T) {
+	assert.Equal(t, isc.ToInt64(40), file.Size("./assert_file_size.txt"))
+}
+
+func TestFileFormatSize(t *testing.T) {
+	assert.Equal(t, "40.00B", file.SizeFormat("./assert_file_size.txt"))
 }
