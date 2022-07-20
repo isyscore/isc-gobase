@@ -108,3 +108,36 @@ func TestDSA(t *testing.T) {
 	}
 	t.Logf("%s dsa is %v", str, verify)
 }
+
+func TestAes(t *testing.T) {
+	// encrypt
+	content := "abcdefg"
+
+	// key的长度必须是 16，24，32
+	key := "isyscore12345678"
+	iv := "0102030405060708"
+	s1 := coder.AesEncrypt(content, key, iv)
+	t.Logf("%s aes is %s", content, s1)
+
+	// decrypt
+	s2 := coder.AesDecrypt(s1, key, iv)
+	t.Logf("%s aes is %s", s1, s2)
+}
+
+func TestAesJava(t *testing.T) {
+	content := "abcdefg"
+	key := "isyscore12345678"
+	s1 := coder.AesEncryptECB(content, key)
+	t.Logf("%s aes is %s", content, s1)
+	s2 := coder.AesDecryptECB(s1, key)
+	t.Logf("%s aes is %s", s1, s2)
+}
+
+func TestAesCBC(t *testing.T) {
+	content := "abcdefg"
+	key := "isyscore12345678"
+	s1 := coder.AesEncryptCBC(content, key)
+	t.Logf("%s aes is %s", content, s1)
+	s2 := coder.AesDecryptCBC(s1, key)
+	t.Logf("%s aes is %s", s1, s2)
+}

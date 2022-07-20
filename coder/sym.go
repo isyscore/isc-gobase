@@ -19,7 +19,7 @@ func AesDecrypt(content string, key string, iv string) string {
 	originData := make([]byte, len(b))
 	mode.CryptBlocks(originData, b)
 	origData := pkcs5UnPadding(originData)
-	return origData
+	return string(origData)
 }
 
 func AesEncrypt(content string, key string, iv string) string {
@@ -55,6 +55,31 @@ func AesEncryptECB(content string, key string) string {
 	return base64.StdEncoding.EncodeToString(d)
 }
 
+func AesEncryptCBC(content string, key string) string {
+	origData := []byte(content)
+	k := []byte(key)
+	// NewCipher该函数限制了输入k的长度必须为16, 24或者32
+	block, _ := aes.NewCipher(k)
+	blockSize := block.BlockSize()                            // 获取秘钥块的长度
+	origData = pkcs5Padding(origData, blockSize)              // 补全码
+	blockMode := cipher.NewCBCEncrypter(block, k[:blockSize]) // 加密模式
+	encrypted := make([]byte, len(origData))                  // 创建数组
+	blockMode.CryptBlocks(encrypted, origData)                // 加密
+	return hex.EncodeToString(encrypted)
+}
+
+func AesDecryptCBC(content string, key string) string {
+	encrypted, _ := hex.DecodeString(content)
+	k := []byte(key)
+	block, _ := aes.NewCipher(k)                              // 分组秘钥
+	blockSize := block.BlockSize()                            // 获取秘钥块的长度
+	blockMode := cipher.NewCBCDecrypter(block, k[:blockSize]) // 加密模式
+	decrypted := make([]byte, len(encrypted))                 // 创建数组
+	blockMode.CryptBlocks(decrypted, encrypted)               // 解密
+	decrypted = pkcs5UnPadding(decrypted)                     // 去除补全码
+	return string(decrypted)
+}
+
 func DESEncryptCBC(content string, key string, iv string) string {
 	block, _ := des.NewCipher([]byte(key))
 	data := pkcs5Padding([]byte(content), block.BlockSize())
@@ -71,7 +96,7 @@ func DESDecryptCBC(content string, key string, iv string) string {
 	originData := make([]byte, len(b))
 	blockMode.CryptBlocks(originData, b)
 	origData := pkcs5UnPadding(originData)
-	return origData
+	return string(origData)
 }
 
 func DESEncryptECB(content string, key string) string {
@@ -102,7 +127,7 @@ func DESDecryptECB(content string, key string) string {
 		b = b[size:]
 		dst = dst[size:]
 	}
-	return pkcs5UnPadding(out)
+	return string(pkcs5UnPadding(out))
 }
 
 func RC4Encrypt(content string, key string) string {
@@ -134,11 +159,10 @@ func pkcs5Padding(ciphertext []byte, blockSize int) []byte {
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(ciphertext, padtext...)
 }
-
-func pkcs5UnPadding(origData []byte) string {
+func pkcs5UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
-	return string(origData[:(length - unpadding)])
+	return origData[:(length - unpadding)]
 }
 
 func padding(src []byte) []byte {

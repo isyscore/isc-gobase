@@ -28,7 +28,6 @@ package logger
 import (
 	"fmt"
 	f0 "github.com/isyscore/isc-gobase/file"
-	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
@@ -158,6 +157,7 @@ func InitLog(appName string, cfg *LoggerConfig) {
 	out.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
 	}
+	out.FormatCaller = callerFormatter
 	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName, cfg.Console.WriteFile)
 
 	// 添加配置变更事件的监听
@@ -218,6 +218,16 @@ func getLogDir(logDir string) string {
 
 var panicHandler = Strategy{}
 
+func callerFormatter(i interface{}) string {
+	// 去除过多的目录层级信息
+	str := i.(string)
+	strs := strings.Split(str, string(os.PathSeparator))
+	ret := strs[len(strs)-1]
+	if len(strs) > 1 {
+		ret = strs[len(strs)-2] + string(os.PathSeparator) + ret
+	}
+	return ret
+}
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
 	if level == zerolog.Disabled {
@@ -253,9 +263,8 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 		FormatLevel: func(i any) string {
 			return strings.ToUpper(fmt.Sprintf("[%s] [%-2s]", appName, i))
 		},
-		FormatCaller: func(i interface{}) string {
-			return isc.ToString(i)
-		},
+
+		FormatCaller: callerFormatter,
 	}}
 	if level == zerolog.PanicLevel {
 		if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
