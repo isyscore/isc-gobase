@@ -130,15 +130,17 @@ func TestCallFun3(t *testing.T) {
 	bean.Clean()
 }
 
+//// error: 暂时参数中的json到结构体的转换
 //func TestCallFun4(t *testing.T) {
 //	tt := TestEntity{}
+//	inner := TestInnerEntity{Address: "杭州"}
 //
 //	bean.AddBean("test", &tt)
 //
 //	parameterMap := map[string]any{}
 //	parameterMap["p1"] = "name"
 //	parameterMap["p2"] = 12
-//	parameterMap["p3"] = TestInnerEntity{Address: "杭州"}
+//	parameterMap["p3"] = inner
 //
 //	fv := bean.CallFun("test", "Fun4", parameterMap)
 //	assert.Equal(t, isc.ToString(fv[0]), "杭州")
@@ -162,7 +164,7 @@ func TestCallFun3(t *testing.T) {
 //
 //	bean.Clean()
 //}
-
+//
 //func TestCallFun4Ptr(t *testing.T) {
 //	tt := TestEntity{}
 //	inner := TestInnerEntity{Address: "杭州"}

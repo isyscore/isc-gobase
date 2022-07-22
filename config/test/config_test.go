@@ -5,6 +5,7 @@ import (
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
+	"os"
 	"testing"
 )
 
@@ -101,6 +102,16 @@ type EntityTest struct {
 func TestAppend(t *testing.T) {
 	config.LoadFile("./application-append-original.yaml")
 	config.AppendFile("./application-append.yaml")
+
+	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
+	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
+	assert.Equal(t, config.GetValueString("a.b.e.f"), "f-value")
+}
+
+// 测试cm文件位置定制化
+func TestConfigInit(t *testing.T) {
+	os.Setenv("base.config.additional-location", "./application-append.yaml")
+	config.LoadConfigFromRelativePath("./application-append-original.yaml")
 
 	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")
 	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
