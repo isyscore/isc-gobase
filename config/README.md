@@ -197,6 +197,9 @@ base:
 // 查看应用所有配置
 curl http://localhost:xxx/{api-prefix}/{api-module}/config/values
 
+// 查看应用所有配置（yaml结构）
+curl http://localhost:xxx/{api-prefix}/{api-module}/config/values/yaml
+
 // 查看应用的某个配置
 curl http://localhost:xxx/{api-prefix}/{api-module}/config/value/{key}
 

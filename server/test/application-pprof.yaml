@@ -1,0 +1,8 @@
+api-module: demo
+base:
+  server:
+    enable: true
+    gin:
+      pprof:
+        # pprof开关是否可以开启，默认false
+        enable: false

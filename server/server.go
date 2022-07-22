@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/gin-contrib/pprof"
 	"github.com/isyscore/isc-gobase/bean"
+	"github.com/isyscore/isc-gobase/debug"
 	"github.com/isyscore/isc-gobase/listener"
 	"io/ioutil"
 	"net/http"
@@ -41,6 +43,7 @@ var GoBaseVersion = "1.2.0"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
+var pprofHave = false
 
 func init() {
 	isc.PrintBanner()
@@ -71,28 +74,34 @@ func InitServer() {
 	}
 
 	engine = gin.New()
+
+	if config.GetValueBoolDefault("base.server.gin.pprof.enable", false) {
+		pprofHave = true
+		pprof.Register(engine)
+	}
 	engine.Use(Cors(), gin.Recovery())
 	engine.Use(rsp.ResponseHandler())
 
-	ap := config.GetValueStringDefault("base.api.prefix", "")
-	if ap != "" {
-		ApiPrefix = ap
-	}
-
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
-		RegisterHealthCheckEndpoint(ApiPrefix + "/" + config.ApiModule)
+		RegisterHealthCheckEndpoint(apiPreAndModule())
 	}
 
 	// 注册 配置检测endpoint
 	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
-		RegisterConfigWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
+		RegisterConfigWatchEndpoint(apiPreAndModule())
 	}
 
 	// 注册 bean管理的功能
 	if config.GetValueBoolDefault("base.endpoint.bean.enable", false) {
-		RegisterBeanWatchEndpoint(ApiPrefix + "/" + config.ApiModule)
+		RegisterBeanWatchEndpoint(apiPreAndModule())
 	}
+
+	// 注册 debug的帮助命令
+	RegisterHelpEndpoint(apiPreAndModule())
+
+	// 添加配置变更事件的监听
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
 
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
@@ -102,6 +111,24 @@ func InitServer() {
 	} else {
 		logger.InitLog(appName, &loggerCfg)
 	}
+}
+
+func ConfigChangeListener(event listener.BaseEvent) {
+	ev := event.(listener.ConfigChangeEvent)
+	if ev.Key == "base.server.gin.pprof.enable" {
+		if isc.ToBool(ev.Value) && !pprofHave {
+			pprofHave = true
+			pprof.Register(engine)
+		}
+	}
+}
+
+func apiPreAndModule() string {
+	ap := config.GetValueStringDefault("base.api.prefix", "")
+	if ap != "" {
+		ApiPrefix = ap
+	}
+	return ApiPrefix + "/" + config.ApiModule
 }
 
 func printVersionAndProfile() {
@@ -198,6 +225,7 @@ func RegisterConfigWatchEndpoint(apiBase string) gin.IRoutes {
 		return nil
 	}
 	RegisterRoute(apiBase+"/config/values", HmGet, config.GetConfigValues)
+	RegisterRoute(apiBase+"/config/values/yaml", HmGet, config.GetConfigDeepValues)
 	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
 	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
 	return engine
@@ -212,6 +240,14 @@ func RegisterBeanWatchEndpoint(apiBase string) gin.IRoutes {
 	RegisterRoute(apiBase+"/bean/field/get", HmPost, bean.DebugBeanGetField)
 	RegisterRoute(apiBase+"/bean/field/set", HmPut, bean.DebugBeanSetField)
 	RegisterRoute(apiBase+"/bean/fun/call", HmPost, bean.DebugBeanFunCall)
+	return engine
+}
+
+func RegisterHelpEndpoint(apiBase string) gin.IRoutes {
+	if "" == apiBase {
+		return nil
+	}
+	RegisterRoute(apiBase+"/debug/help", HmGet, debug.Help)
 	return engine
 }
 

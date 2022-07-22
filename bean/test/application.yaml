@@ -1,6 +1,6 @@
 base:
   server:
-    enable: true
+    enable: false
     gin:
       # 有三种模式：debug/release/test，填错则使用release
       mode: debug
