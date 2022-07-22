@@ -1,11 +1,15 @@
 package listener
 
-var EventOfServerFinish = "event_of_server_finish"
+var EventOfServerRunStart = "event_of_server_run_start"
+var EventOfServerRunFinish = "event_of_server_run_finish"
 var EventOfServerStop = "event_of_server_stop"
 var EventOfConfigChange = "event_of_config_change"
 
-// ServerFinishEvent 服务启动完成事件, 对应：event_of_server_finish
-type ServerFinishEvent struct{}
+// ServerRunStartEvent 服务开始启动事件, 对应：event_of_server_run_start
+type ServerRunStartEvent struct{}
+
+// ServerRunFinishEvent 服务完成启动事件, 对应：event_of_server_run_finish
+type ServerRunFinishEvent struct{}
 
 // ServerStopEvent 服务关闭事件, 对应：event_of_server_stop
 type ServerStopEvent struct{}
@@ -16,8 +20,12 @@ type ConfigChangeEvent struct {
 	Value string
 }
 
-func (e ServerFinishEvent) Name() string {
-	return EventOfServerFinish
+func (e ServerRunStartEvent) Name() string {
+	return EventOfServerRunStart
+}
+
+func (e ServerRunFinishEvent) Name() string {
+	return EventOfServerRunFinish
 }
 
 func (e ServerStopEvent) Name() string {

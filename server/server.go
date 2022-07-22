@@ -146,6 +146,8 @@ func StartServer() {
 		return
 	}
 
+	listener.PublishEvent(listener.ServerRunStartEvent{})
+
 	if !config.GetValueBoolDefault("base.server.enable", true) {
 		return
 	}
@@ -169,7 +171,7 @@ func graceRun(port int) {
 	}()
 
 	// 发送服务启动事件
-	listener.PublishEvent(listener.ServerFinishEvent{})
+	listener.PublishEvent(listener.ServerRunFinishEvent{})
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
@@ -206,7 +208,7 @@ func RegisterPlugin(plugin gin.HandlerFunc) gin.IRoutes {
 	return engine
 }
 
-func Engine() gin.IRoutes {
+func Engine() *gin.Engine {
 	return engine
 }
 
