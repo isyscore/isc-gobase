@@ -37,6 +37,10 @@ func IsCheckedKing(fieldType reflect.Type) bool {
 		return true
 	case reflect.Float64:
 		return true
+	case reflect.Complex64:
+		return true
+	case reflect.Complex128:
+		return true
 	case reflect.Bool:
 		return true
 	case reflect.String:
