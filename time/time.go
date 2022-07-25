@@ -2,10 +2,10 @@ package time
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/isc"
 	"log"
 	"math"
 	"regexp"
+	"strconv"
 	"strings"
 	t0 "time"
 )
@@ -330,5 +330,6 @@ func IsTimeEmpty(time t0.Time) bool {
 }
 
 func NumToTimeDuration(num int, duration t0.Duration) t0.Duration {
-	return t0.Duration(isc.ToInt64(num) * duration.Nanoseconds())
+	int64Num, _ := strconv.ParseInt(fmt.Sprintf("%v", num), 10, 64)
+	return t0.Duration(int64Num * duration.Nanoseconds())
 }
