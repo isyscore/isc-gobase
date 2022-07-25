@@ -105,12 +105,7 @@ func InitServer() {
 
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
-	var loggerCfg logger.LoggerConfig
-	if err := config.GetValueObject("base.logger", &loggerCfg); err != nil {
-		logger.Warn("获取配置失败", err)
-	} else {
-		logger.InitLog(appName, &loggerCfg)
-	}
+	logger.InitLog(appName)
 }
 
 func ConfigChangeListener(event listener.BaseEvent) {

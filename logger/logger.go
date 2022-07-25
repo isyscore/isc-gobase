@@ -44,27 +44,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type LoggerConfig struct {
-	Level string `yaml:"level"`
-	Time  struct {
-		Format string `yaml:"format"`
-	} `yaml:"time"`
-	Color struct {
-		Enable bool `yaml:"enable"`
-	} `yaml:"color"`
-	Split struct {
-		Enable bool  `yaml:"enable"`
-		Size   int64 `yaml:"size"`
-	} `yaml:"split"`
-	Dir string `yaml:"dir"`
-	Max struct {
-		History int `yaml:"history"`
-	} `yaml:"max"`
-	Console struct {
-		WriteFile bool `yaml:"writeFile"`
-	} `yaml:"console"`
-}
-
 func Info(format string, v ...any) {
 	log.Info().Msgf(format, v...)
 }
@@ -125,7 +104,8 @@ func callerMarshalFunc(file string, l int) string {
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
 // it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
-func InitLog(appName string, cfg *LoggerConfig) {
+func InitLog(appName string) {
+	cfg := config.BaseCfg.Logger
 	if cfg.Level == "" {
 		cfg.Level = "info"
 	}
@@ -219,7 +199,8 @@ func getLogDir(logDir string) string {
 var panicHandler = Strategy{}
 
 func callerFormatter(i interface{}) string {
-	if logPath := config.GetValueStringDefault("base.logger.path", "short"); logPath == "short" {
+	loggerPath := config.BaseCfg.Logger.Path
+	if loggerPath == "" || loggerPath == "short" {
 		// 去除过多的目录层级信息
 		str := i.(string)
 		strs := strings.Split(str, string(os.PathSeparator))

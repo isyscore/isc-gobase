@@ -56,10 +56,18 @@ type ExceptionPrint struct {
 }
 
 type BaseLogger struct {
-	Level string      `yaml:"level"` // 日志root级别：trace/debug/info/warn/error/fatal/panic，默认：info
-	Time  LoggerTime  `yaml:"time"`  // 时间配置
-	Color LoggerColor `yaml:"color"` // 日志颜色
-	Split LoggerSplit `yaml:"split"` // 日志切分
+	Level string // 日志root级别：trace/debug/info/warn/error/fatal/panic，默认：info
+	Path  string
+	Time  LoggerTime  // 时间配置
+	Color LoggerColor // 日志颜色
+	Split LoggerSplit // 日志切分
+	Dir   string
+	Max   struct {
+		History int
+	}
+	Console struct {
+		WriteFile bool
+	}
 }
 
 type LoggerTime struct {
@@ -71,8 +79,8 @@ type LoggerColor struct {
 }
 
 type LoggerSplit struct {
-	Enable bool `yaml:"enable"` // 日志是否启用切分：true/false，默认false
-	Size   int  `yaml:"size"`   // 日志拆分的单位：MB
+	Enable bool  `yaml:"enable"` // 日志是否启用切分：true/false，默认false
+	Size   int64 `yaml:"size"`   // 日志拆分的单位：MB
 }
 
 type BaseProfile struct {
@@ -169,4 +177,26 @@ type RedisClusterConfig struct {
 	RouteByLatency bool
 	// 允许将只读命令路由到随机的主节点或从节点，它会自动启用 ReadOnly
 	RouteRandomly bool
+}
+
+type LoggerConfig struct {
+	Level string `yaml:"level"`
+	Path  string `yaml:"level"`
+	Time  struct {
+		Format string `yaml:"format"`
+	} `yaml:"time"`
+	Color struct {
+		Enable bool `yaml:"enable"`
+	} `yaml:"color"`
+	Split struct {
+		Enable bool  `yaml:"enable"`
+		Size   int64 `yaml:"size"`
+	} `yaml:"split"`
+	Dir string `yaml:"dir"`
+	Max struct {
+		History int `yaml:"history"`
+	} `yaml:"max"`
+	Console struct {
+		WriteFile bool `yaml:"writeFile"`
+	} `yaml:"console"`
 }
