@@ -197,6 +197,10 @@ func DebugBeanFunCall(c *gin.Context) {
 	rsp.SuccessOfStandard(c, CallFun(funCallReq.Bean, funCallReq.Fun, funCallReq.Parameter))
 }
 
+func BeanTest() {
+	logger.Warn("test, ttt")
+}
+
 type FieldGetReq struct {
 	Bean  string
 	Field string
