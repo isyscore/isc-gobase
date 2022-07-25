@@ -209,7 +209,7 @@ func callerFormatter(i interface{}) string {
 			ret = strs[len(strs)-2] + string(os.PathSeparator) + ret
 		}
 		return ret
-	} else {
+	} else if loggerPath == "full" {
 		//去除Jenkins或编译所在主机信息
 		str := i.(string)
 		strs := strings.Split(str, "@2/project")
@@ -219,6 +219,8 @@ func callerFormatter(i interface{}) string {
 		}
 
 		return str
+	} else {
+		return i.(string)
 	}
 }
 
