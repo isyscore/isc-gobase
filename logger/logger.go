@@ -318,7 +318,6 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 	}
 
 	outers := append(newWriter, out)
-	outers = append(outers, zerolog.ConsoleWriter{Out: os.Stderr})
 	writer := zerolog.MultiLevelWriter(outers...)
 	log.Logger = log.Logger.Output(writer).With().Caller().Logger()
 	oldWriter = newWriter
