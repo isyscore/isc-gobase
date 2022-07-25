@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/listener"
-	"github.com/isyscore/isc-gobase/logger"
 	"io/ioutil"
 	"log"
 	"os"
@@ -374,7 +373,7 @@ func AppendPropertyFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Error("读取文件失败(%v)", err)
+		log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
@@ -435,7 +434,7 @@ func AppendJsonFile(filePath string) {
 	}
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		logger.Error("读取文件失败(%v)", err)
+		log.Printf("读取文件失败(%v)", err)
 		return
 	}
 
