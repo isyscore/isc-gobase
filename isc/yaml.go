@@ -3,7 +3,7 @@ package isc
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/isyscore/isc-gobase/logger"
 	"reflect"
 	"regexp"
 	"sort"
@@ -112,7 +112,7 @@ func YamlToProperties(contentOfYaml string) (string, error) {
 	// yaml 到 map
 	dataMap, err := YamlToMap(contentOfYaml)
 	if err != nil {
-		log.Printf("YamlToPropertiesStr error: %v, content: %v", err, contentOfYaml)
+		logger.Warn("YamlToPropertiesStr error: %v, content: %v", err, contentOfYaml)
 		return "", err
 	}
 
@@ -135,7 +135,7 @@ func YamlToPropertiesWithKey(key string, contentOfYaml string) (string, error) {
 		dataMap := make(map[string]any)
 		kvList, err := YamlToList(contentOfYaml)
 		if err != nil {
-			log.Printf("YamlToPropertiesWithKey error: %v, content: %v", err, contentOfYaml)
+			logger.Warn("YamlToPropertiesWithKey error: %v, content: %v", err, contentOfYaml)
 			return "", err
 		}
 
@@ -149,7 +149,7 @@ func YamlToPropertiesWithKey(key string, contentOfYaml string) (string, error) {
 
 	property, err := YamlToProperties(contentOfYaml)
 	if err != nil {
-		log.Printf("YamlToPropertiesWithKey error: %v, content: %v", err, contentOfYaml)
+		logger.Warn("YamlToPropertiesWithKey error: %v, content: %v", err, contentOfYaml)
 		return "", err
 	}
 
@@ -163,7 +163,7 @@ func JsonToMap(contentOfJson string) (map[string]any, error) {
 	resultMap := make(map[string]any)
 	err := json.Unmarshal([]byte(contentOfJson), &resultMap)
 	if err != nil {
-		log.Printf("JsonToMap, error: %v, content: %v", err, contentOfJson)
+		logger.Warn("JsonToMap, error: %v, content: %v", err, contentOfJson)
 		return nil, err
 	}
 
@@ -174,7 +174,7 @@ func YamlToMap(contentOfYaml string) (map[string]any, error) {
 	resultMap := make(map[string]any)
 	err := yaml.Unmarshal([]byte(contentOfYaml), &resultMap)
 	if err != nil {
-		log.Printf("YamlToMap, error: %v, content: %v", err, contentOfYaml)
+		logger.Warn("YamlToMap, error: %v, content: %v", err, contentOfYaml)
 		return nil, err
 	}
 
@@ -189,7 +189,7 @@ func YamlToJson(contentOfYaml string) (string, error) {
 	var data any
 	err := yaml.Unmarshal([]byte(contentOfYaml), &data)
 	if err != nil {
-		log.Printf("YamlToList, error: %v, content: %v", err, contentOfYaml)
+		logger.Warn("YamlToList, error: %v, content: %v", err, contentOfYaml)
 		return "", err
 	}
 
@@ -231,7 +231,7 @@ func YamlToList(contentOfYaml string) ([]any, error) {
 	var resultList []any
 	err := yaml.Unmarshal([]byte(contentOfYaml), &resultList)
 	if err != nil {
-		log.Printf("YamlToList, error: %v, content: %v", err, contentOfYaml)
+		logger.Warn("YamlToList, error: %v, content: %v", err, contentOfYaml)
 		return nil, err
 	}
 
@@ -352,7 +352,7 @@ func PropertiesToYaml(contentOfProperties string) (string, error) {
 func ObjectToYaml(value any) (string, error) {
 	bytes2, err := yaml.Marshal(value)
 	if err != nil {
-		log.Printf("ObjectToYaml error: %v, content: %v", err, value)
+		logger.Warn("ObjectToYaml error: %v, content: %v", err, value)
 		return "", &ConvertError{errMsg: "ObjectToYaml error"}
 	}
 	return string(bytes2), nil
@@ -648,7 +648,7 @@ func peelArray(nodeName string) (string, int) {
 		if "" != indexStr {
 			index, err = strconv.Atoi(indexStr)
 			if err != nil {
-				log.Printf("解析错误, nodeName=" + nodeName)
+				logger.Warn("解析错误, nodeName=" + nodeName)
 				return "", -1
 			}
 		}
