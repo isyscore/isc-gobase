@@ -299,23 +299,23 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 	//修改listWriter
 	var newWriter []io.Writer
 	//时间格式转换
-	strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
-	for _, level := range ls {
-		fw := createFileLeveWriter(level, strTime, idx, dir, name)
-		if fw != nil {
-			newWriter = append(newWriter, fw)
-		}
-		if level == zerolog.Disabled && write2File {
-			os.Stderr = fw.File
-			os.Stdout = fw.File
-		}
-		if level == zerolog.PanicLevel {
-			if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "system panic log redirect to %s file failed:%v", fw.level.String(), err)
-			}
-		}
-
-	}
+	//strTime := time.TimeToStringFormat(t0.Now(), time.FmtYMd)
+	//for _, level := range ls {
+	//	fw := createFileLeveWriter(level, strTime, idx, dir, name)
+	//	if fw != nil {
+	//		newWriter = append(newWriter, fw)
+	//	}
+	//	if level == zerolog.Disabled && write2File {
+	//		os.Stderr = fw.File
+	//		os.Stdout = fw.File
+	//	}
+	//	if level == zerolog.PanicLevel {
+	//		if err := panicHandler.Dup2(fw, os.Stderr); err != nil {
+	//			_, _ = fmt.Fprintf(os.Stderr, "system panic log redirect to %s file failed:%v", fw.level.String(), err)
+	//		}
+	//	}
+	//
+	//}
 	outers := append(newWriter, out)
 	writer := zerolog.MultiLevelWriter(outers...)
 	log.Logger = log.Logger.Output(writer).With().Caller().Logger()
