@@ -218,16 +218,27 @@ func getLogDir(logDir string) string {
 var panicHandler = Strategy{}
 
 func callerFormatter(i interface{}) string {
-	//去除Jenkins或编译所在主机信息
+	// 去除过多的目录层级信息
 	str := i.(string)
-	strs := strings.Split(str, "@2/project")
+	strs := strings.Split(str, string(os.PathSeparator))
+	ret := strs[len(strs)-1]
 	if len(strs) > 1 {
-		strs[0] = "../.."
-		str = strings.Join(strs, "")
+		ret = strs[len(strs)-2] + string(os.PathSeparator) + ret
 	}
-
-	return str
+	return ret
 }
+
+//func callerFormatter(i interface{}) string {
+//	//去除Jenkins或编译所在主机信息
+//	str := i.(string)
+//	strs := strings.Split(str, "@2/project")
+//	if len(strs) > 1 {
+//		strs[0] = "../.."
+//		str = strings.Join(strs, "")
+//	}
+//
+//	return str
+//}
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
