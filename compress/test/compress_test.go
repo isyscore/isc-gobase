@@ -2,6 +2,8 @@ package test
 
 import (
 	"github.com/isyscore/isc-gobase/compress"
+	"github.com/isyscore/isc-gobase/file"
+	"github.com/isyscore/isc-gobase/isc"
 	"testing"
 )
 
@@ -33,20 +35,39 @@ func TestZip(t *testing.T) {
 	f3 := "./zip/test3.txt"
 	var files = []string{f1, f2, f3}
 	dest := "./zip/test.zip"
-	if err := compress.Compress(dest, "./zip/", files); err == nil {
-		t.Logf("Compress success")
+	srcSize := isc.FormatSize(file.SizeList(files))
+	if err := compress.Zip(dest, files); err == nil {
+		dstSize := isc.FormatSize(file.Size("./zip/test.zip"))
+		// Compress success, size: 714.55KB -> 5.88KB
+		t.Logf("Compress success, zip size: %s -> %s", srcSize, dstSize)
 	} else {
 		t.Logf("Compress err: %v", err)
 	}
+	file.DeleteFile("./zip/test.zip")
 }
 
 func TestUnzip(t *testing.T) {
-	zf := "./zip/test.zip"
+	// zip
+	f1 := "./zip/test1.txt"
+	f2 := "./zip/test2.txt"
+	f3 := "./zip/test3.txt"
+	var files = []string{f1, f2, f3}
+
+	zipFile := "./zip/test.zip"
+	compress.Zip(zipFile, files)
+
+	// unzip
 	dest := "./zip/uncomp"
-	err := compress.Decompress(zf, dest)
+	err := compress.Unzip(zipFile, dest)
 	if err == nil {
-		t.Logf("Decompress success")
+		srcSize := isc.FormatSize(file.Size("./zip/test.zip"))
+		dstSize := isc.FormatSize(file.SizeList(files))
+
+		// Decompress success, unzip size: 5.88KB -> 714.55KB
+		t.Logf("Decompress success, unzip size: %s -> %s", srcSize, dstSize)
 	} else {
 		t.Logf("Decompress err: %v", err)
 	}
+	file.DeleteFile("./zip/test.zip")
+	file.DeleteDirs("./zip/uncomp")
 }

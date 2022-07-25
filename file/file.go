@@ -195,6 +195,22 @@ func Size(filePath string) int64 {
 	}
 }
 
+func Sizes(filePaths ...string) int64 {
+	var count int64
+	for _, filePath := range filePaths {
+		count += Size(filePath)
+	}
+	return count
+}
+
+func SizeList(filePaths []string) int64 {
+	var count int64
+	for _, filePath := range filePaths {
+		count += Size(filePath)
+	}
+	return count
+}
+
 // SizeFormat 返回文件/目录的可读大小
 func SizeFormat(filePath string) string {
 	return isc.FormatSize(Size(filePath))
