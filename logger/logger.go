@@ -27,7 +27,6 @@ package logger
 
 import (
 	"fmt"
-	f0 "github.com/isyscore/isc-gobase/file"
 	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
@@ -243,8 +242,12 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 	}
 	//建立软链
 
-	if f0.FileExists(linkName) {
-		f0.DeleteFile(linkName)
+	if _, err := os.Stat(linkName); err != nil {
+		if os.IsExist(err) {
+			os.Remove(linkName)
+		}
+	} else {
+		os.Remove(linkName)
 	}
 
 	if strings.ToLower(runtime.GOOS) != "windows" {
