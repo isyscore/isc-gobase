@@ -28,6 +28,8 @@ base:
   logger:
     # 日志root级别：trace/debug/info/warn/error/fatal/panic，默认：info
     level: info
+    # 日志打印的文件路径：full：全路径，short：半路径。默认：半路径
+    path: full/short
     time:
       # 时间格式，time包中的内容
       format: time.RFC3339

@@ -27,6 +27,7 @@ package logger
 
 import (
 	"fmt"
+	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
@@ -218,27 +219,27 @@ func getLogDir(logDir string) string {
 var panicHandler = Strategy{}
 
 func callerFormatter(i interface{}) string {
-	// 去除过多的目录层级信息
-	str := i.(string)
-	strs := strings.Split(str, string(os.PathSeparator))
-	ret := strs[len(strs)-1]
-	if len(strs) > 1 {
-		ret = strs[len(strs)-2] + string(os.PathSeparator) + ret
-	}
-	return ret
-}
+	if logPath := config.GetValueStringDefault("base.logger.path", "short"); logPath == "short" {
+		// 去除过多的目录层级信息
+		str := i.(string)
+		strs := strings.Split(str, string(os.PathSeparator))
+		ret := strs[len(strs)-1]
+		if len(strs) > 1 {
+			ret = strs[len(strs)-2] + string(os.PathSeparator) + ret
+		}
+		return ret
+	} else {
+		//去除Jenkins或编译所在主机信息
+		str := i.(string)
+		strs := strings.Split(str, "@2/project")
+		if len(strs) > 1 {
+			strs[0] = "../.."
+			str = strings.Join(strs, "")
+		}
 
-//func callerFormatter(i interface{}) string {
-//	//去除Jenkins或编译所在主机信息
-//	str := i.(string)
-//	strs := strings.Split(str, "@2/project")
-//	if len(strs) > 1 {
-//		strs[0] = "../.."
-//		str = strings.Join(strs, "")
-//	}
-//
-//	return str
-//}
+		return str
+	}
+}
 
 func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, appName string) *FileLevelWriter {
 	strL := level.String()
