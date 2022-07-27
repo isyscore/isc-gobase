@@ -59,6 +59,14 @@ func (c *cache) Remove(key string) {
 	}
 }
 
+func (c *cache) Clean() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for k := range c.items {
+		delete(c.items, k)
+	}
+}
+
 func (c *cache) Cap() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()

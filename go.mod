@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/dlclark/regexp2 v1.4.0
+	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/assert/v2 v2.0.1
 	github.com/go-redis/redis/v8 v8.11.5
@@ -18,7 +19,6 @@ require (
 )
 
 require (
-	github.com/gin-contrib/pprof v1.3.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 )
