@@ -44,6 +44,45 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var loggerTask *cron.Cron
+
+func init() {
+	cfg := config.BaseLogger{}
+	if cfg.Level == "" {
+		cfg.Level = "info"
+	}
+	if cfg.Time.Format == "" {
+		cfg.Time.Format = "2006-01-02 15:04:05"
+	}
+	if cfg.Split.Size == 0 {
+		cfg.Split.Size = 300
+	}
+	if cfg.Max.History == 0 {
+		cfg.Max.History = 7
+	}
+
+	appName := ""
+
+	//日志级别设置，默认Info
+	zerolog.ErrorHandler = func(err error) {
+		// do nothing
+	}
+
+	SetGlobalLevel(cfg.Level)
+
+	zerolog.CallerSkipFrameCount = 2
+	zerolog.CallerMarshalFunc = callerMarshalFunc
+	zerolog.TimeFieldFormat = cfg.Time.Format
+	out := zerolog.ConsoleWriter{Out: os.Stderr, NoColor: cfg.Color.Enable, FormatTimestamp: func(i interface{}) string {
+		return "[" + time.Now().Format(cfg.Time.Format) + "]"
+	}}
+	out.FormatLevel = func(i any) string {
+		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
+	}
+	out.FormatCaller = callerFormatter
+	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName, cfg.Console.WriteFile)
+}
+
 func Info(format string, v ...any) {
 	log.Info().Msgf(format, v...)
 }
@@ -272,7 +311,6 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 		}
 	}
 	return fw
-
 }
 
 var levels = []zerolog.Level{zerolog.DebugLevel, zerolog.TraceLevel, zerolog.InfoLevel, zerolog.WarnLevel, zerolog.ErrorLevel, zerolog.PanicLevel, zerolog.FatalLevel, zerolog.Disabled}
@@ -298,7 +336,6 @@ func updateOuters(out zerolog.ConsoleWriter, idx int, ls []zerolog.Level, dir, n
 				_, _ = fmt.Fprintf(os.Stderr, "system panic log redirect to %s file failed:%v", fw.level.String(), err)
 			}
 		}
-
 	}
 
 	outers := append(newWriter, out)
@@ -311,17 +348,18 @@ var oldWriter []io.Writer
 
 //initLogDir create log dir and file
 func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, dir string, history int, name string, write2File bool) {
+	if loggerTask != nil {
+		loggerTask.Stop()
+	}
+	loggerTask = cron.New()
+
+	// 每天创建一个日志文件
 	fileHandler := func() { updateOuters(out, 0, levels, dir, name, write2File) }
 	fileHandler()
-
-	//每天创建一个文件
-	c_d := cron.New()
-	_ = c_d.AddFunc("0 0 0 * * ?", fileHandler)
-	c_d.Start()
+	_ = loggerTask.AddFunc("0 0 0 * * ?", fileHandler)
 
 	if splitEnable {
-		c_check := cron.New()
-		_ = c_check.AddFunc("*/1 * * * * ?", func() {
+		_ = loggerTask.AddFunc("*/1 * * * * ?", func() {
 			//检查文件大小，如果超过核定大小，则生成新文件
 			go func() {
 				for _, w := range oldWriter {
@@ -342,11 +380,10 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 				}
 			}()
 		})
-		c_check.Start()
 	}
+
 	// log.Info().Msgf("开启定时日志清理任务")
-	cClean := cron.New()
-	_ = cClean.AddFunc("0 0 1 * * ?", func() {
+	_ = loggerTask.AddFunc("0 0 1 * * ?", func() {
 		log.Debug().Msg("定时每天日志清理任务执行")
 		_ = filepath.Walk(getLogDir(dir), func(path string, info fs.FileInfo, err error) error {
 			now := time.Now()
@@ -364,5 +401,6 @@ func initLogDir(out zerolog.ConsoleWriter, splitEnable bool, splitSize int64, di
 			return err
 		})
 	})
-	cClean.Start()
+
+	loggerTask.Start()
 }
