@@ -36,13 +36,14 @@ var (
 
 	EmptyTime = t0.Time{}
 
-	yRegex       = regexp.MustCompile("^(\\d){4}$")
-	ymRegex      = regexp.MustCompile("^(\\d){4}-(\\d){2}$")
-	ymdRegex     = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2}$")
-	ymdHRegex    = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}$")
-	ymdHmRegex   = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}$")
-	ymdHmsRegex  = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}$")
-	ymdHmsSRegex = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}.(\\d){3}$")
+	yRegex        = regexp.MustCompile("^(\\d){4}$")
+	yyyyMmDdRegex = regexp.MustCompile("^(\\d){4}(\\d){2}(\\d){2}$")
+	ymRegex       = regexp.MustCompile("^(\\d){4}-(\\d){2}$")
+	ymdRegex      = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2}$")
+	ymdHRegex     = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}$")
+	ymdHmRegex    = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}$")
+	ymdHmsRegex   = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}$")
+	ymdHmsSRegex  = regexp.MustCompile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}.(\\d){3}$")
 )
 
 type FPCDateTime float64
@@ -279,6 +280,12 @@ func ParseTime(timeStr string) t0.Time {
 	}
 	if yRegex.MatchString(timeStr) {
 		if times, err := t0.Parse(FmtY, timeStr); err == nil {
+			return times
+		} else {
+			log.Printf("解析时间错误, err: %v", err)
+		}
+	} else if yyyyMmDdRegex.MatchString(timeStr) {
+		if times, err := t0.Parse(FmtYYYYMMdd, timeStr); err == nil {
 			return times
 		} else {
 			log.Printf("解析时间错误, err: %v", err)

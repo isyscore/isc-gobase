@@ -45,3 +45,8 @@ func TestNumToTimeDuration(t *testing.T) {
 	data := time.NumToTimeDuration(3, t0.Hour)
 	fmt.Println(data.Milliseconds())
 }
+
+func TestParseTime(t *testing.T) {
+	d := time.ParseTime("20220729")
+	fmt.Println(time.TimeToStringYmdHmsS(d))
+}
