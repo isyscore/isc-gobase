@@ -46,6 +46,11 @@ func apiPreAndModule() string {
 	apiPrefix := config.GetValueStringDefault("base.api.prefix", "/api")
 	apiPrefix = strings.TrimSuffix(apiPrefix, "/")
 	module := strings.Trim(config.ApiModule, "/")
+
+	if !strings.HasPrefix(apiPrefix, "/") {
+		apiPrefix = "/" + apiPrefix
+	}
+
 	if module == "" {
 		return apiPrefix
 	}
