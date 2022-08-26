@@ -156,3 +156,41 @@ curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"k
 curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.server.request.print.include-uri[2]", "value":"/api/xx/xxz"}'
 ...
 ```
+## swagger 使用介绍
+如果想基于 gobase 来使用 swagger 这里需要按照如下步骤来处理
+
+#### 1. 安装命令
+这个是 go-swagger 必需
+```shell
+go install github.com/swaggo/swag/cmd/swag
+```
+#### 2. 添加注解
+这里按照go-swagger官网的注解进行编写即可
+
+```go
+// @Summary 接口概要说明
+// @Description 接口详细描述信息
+// @Tags 用户信息   //swagger API分类标签, 同一个tag为一组
+// @accept json  //浏览器可处理数据类型，浏览器默认发 Accept: */*
+// @Produce  json  //设置返回数据的类型和编码
+// @Param id path int true "ID"    //url参数：（name；参数类型[query(?id=),path(/123)]；数据类型；required；参数描述）
+// @Param name query string false "name"
+// @Success 200 {object} Res {"code":200,"data":null,"msg":""}  //成功返回的数据结构， 最后是示例
+// @Failure 400 {object} Res {"code":200,"data":null,"msg":""}
+// @Router /test/{id} [get]    //路由信息，一定要写上
+```
+
+#### 3. 生成swagger文件
+这里按照go-swagger官网的注解进行编写即可
+#### 4. gobase开启swagger开关
+代码开启如下开关
+```yaml
+base:
+  swagger:
+    enable: true
+```
+#### 5. 运行程序
+启动程序后，打开网页即可看到
+```shell
+http://xxxx:port/swagger/index.html
+```
