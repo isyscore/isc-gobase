@@ -165,7 +165,7 @@ curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"k
 go install github.com/swaggo/swag/cmd/swag
 ```
 #### 2. 添加注解
-这里按照go-swagger官网的注解进行编写即可
+这里按照go-swagger官网的注解进行编写即可，比如
 
 ```go
 // @Summary 接口概要说明
@@ -182,15 +182,32 @@ go install github.com/swaggo/swag/cmd/swag
 
 #### 3. 生成swagger文件
 这里按照go-swagger官网的注解进行编写即可
-#### 4. gobase开启swagger开关
+```shell
+swag init
+```
+执行该命令后，会生成docs文件，该文件中是swagger的文件内容
+#### 4. 开启开关，运行程序
 代码开启如下开关
 ```yaml
 base:
   swagger:
     enable: true
 ```
-#### 5. 运行程序
 启动程序后，打开网页即可看到
 ```shell
 http://xxxx:port/swagger/index.html
+```
+
+### 问题
+如果遇到如下问题，则执行下如下即可
+```shell
+../../../go/src/pkg/mod/github.com/swaggo/swag@v1.8.5/gen/gen.go:18:2: missing go.sum entry for module providing package github.com/ghodss/yaml (imported by github.com/swaggo/swag/gen); to add:
+        go get github.com/swaggo/swag/gen@v1.8.5
+../../../go/src/pkg/mod/github.com/swaggo/swag@v1.8.5/cmd/swag/main.go:10:2: missing go.sum entry for module providing package github.com/urfave/cli/v2 (imported by github.com/swaggo/swag/cmd/swag); to add:
+        go get github.com/swaggo/swag/cmd/swag@v1.8.5
+```
+执行
+```shell
+go get github.com/swaggo/swag/gen
+go get github.com/swaggo/swag/cmd/swag
 ```
