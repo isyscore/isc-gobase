@@ -7,6 +7,8 @@ import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/debug"
 	"github.com/isyscore/isc-gobase/listener"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -99,6 +101,11 @@ func InitServer() {
 
 	// 注册 debug的帮助命令
 	RegisterHelpEndpoint(apiPreAndModule())
+
+	// 注册 swagger的功能
+	if config.GetValueBoolDefault("base.swagger.enable", false) {
+		RegisterSwaggerEndpoint()
+	}
 
 	// 添加配置变更事件的监听
 	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
@@ -237,6 +244,11 @@ func RegisterBeanWatchEndpoint(apiBase string) gin.IRoutes {
 	RegisterRoute(apiBase+"/bean/field/get", HmPost, bean.DebugBeanGetField)
 	RegisterRoute(apiBase+"/bean/field/set", HmPut, bean.DebugBeanSetField)
 	RegisterRoute(apiBase+"/bean/fun/call", HmPost, bean.DebugBeanFunCall)
+	return engine
+}
+
+func RegisterSwaggerEndpoint() gin.IRoutes {
+	RegisterRoute("/swagger/*any", HmGet, ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return engine
 }
 

@@ -90,6 +90,9 @@ base:
           - 409
     # 版本号设置,默认值:unknown
     version: 1.0.0
+  swagger:
+    # 是否开启swagger：true, false；默认 false
+    enable: false
 ```
 isc-gobase项目内置的一些endpoint端口
 ```shell
