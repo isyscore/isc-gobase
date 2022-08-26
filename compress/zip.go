@@ -64,12 +64,10 @@ func Zip(zipPath string, paths []string) error {
 			if info.IsDir() {
 				return nil
 			}
-			f, err := os.Open(path)
+			err = copyFile(path, headerWriter)
 			if err != nil {
 				return err
 			}
-			defer f.Close()
-			_, err = io.Copy(headerWriter, f)
 			return err
 		})
 		if err != nil {
@@ -77,6 +75,16 @@ func Zip(zipPath string, paths []string) error {
 		}
 	}
 	return nil
+}
+
+func copyFile(fileSrcPath string, dstWriter io.Writer) error {
+	f, err := os.Open(fileSrcPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(dstWriter, f)
+	return err
 }
 
 // Unzip decompresses a zip file to specified directory.
