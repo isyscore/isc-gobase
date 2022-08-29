@@ -114,7 +114,7 @@ func Fatal(format string, v ...any) {
 // SetGlobalLevel sets the global override for log level. If this
 // values is raised, all Loggers will use at least this value.
 //
-// To globally disable logs, set zerolog.GlobalLevel to Disabled.
+// To globally disable logs, set zerolog.GlobalLevel to be Disabled.
 func SetGlobalLevel(strLevel string) {
 	level := zerolog.InfoLevel
 	if strLevel != "" {
@@ -142,7 +142,7 @@ func callerMarshalFunc(file string, l int) string {
 
 //InitLog create a root logger. it will write to console and multiple file by level.
 // note: default set root logger level is info
-// it provides custom log with CustomizeFiles,if it match any caller's name ,log's level will be setting debug and output
+// it provides custom log with CustomizeFiles,if it matches any caller's name ,log's level will be setting debug and output
 func InitLog(appName string) {
 	cfg := config.BaseCfg.Logger
 	if cfg.Level == "" {
@@ -278,10 +278,10 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 
 	if _, err := os.Stat(linkName); err != nil {
 		if os.IsExist(err) {
-			os.Remove(linkName)
+			_ = os.Remove(linkName)
 		}
 	} else {
-		os.Remove(linkName)
+		_ = os.Remove(linkName)
 	}
 
 	if strings.ToLower(runtime.GOOS) != "windows" {

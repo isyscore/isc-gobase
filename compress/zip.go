@@ -21,11 +21,15 @@ func Zip(zipPath string, paths []string) error {
 	if err != nil {
 		return err
 	}
-	defer archive.Close()
+	defer func(archive *os.File) {
+		_ = archive.Close()
+	}(archive)
 
 	// new zip writer
 	zipWriter := zip.NewWriter(archive)
-	defer zipWriter.Close()
+	defer func(zipWriter *zip.Writer) {
+		_ = zipWriter.Close()
+	}(zipWriter)
 
 	// traverse the file or directory
 	for _, srcPath := range paths {
@@ -82,7 +86,9 @@ func copyFile(fileSrcPath string, dstWriter io.Writer) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
 	_, err = io.Copy(dstWriter, f)
 	return err
 }
@@ -95,7 +101,9 @@ func Unzip(zipPath, dstDir string) error {
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
+	defer func(reader *zip.ReadCloser) {
+		_ = reader.Close()
+	}(reader)
 	for _, file := range reader.File {
 		if err := unzipFile(file, dstDir); err != nil {
 			return err
@@ -122,14 +130,18 @@ func unzipFile(file *zip.File, dstDir string) error {
 	if err != nil {
 		return err
 	}
-	defer rc.Close()
+	defer func(rc io.ReadCloser) {
+		_ = rc.Close()
+	}(rc)
 
 	// create the file
 	w, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}
-	defer w.Close()
+	defer func(w *os.File) {
+		_ = w.Close()
+	}(w)
 
 	// save the decompressed file content
 	_, err = io.Copy(w, rc)
