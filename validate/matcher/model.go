@@ -87,7 +87,7 @@ func BuildModelMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 
 func init() {
 	// 手机号
-	pReg, _ := regexp.Compile("^(?:\\+?86)?1(?:3\\d{3}|5[^4\\D]\\d{2}|8\\d{3}|7(?:[35678]\\d{2}|4(?:0\\d|1[0-2]|9\\d))|9[189]\\d{2}|66\\d{2})\\d{6}$")
+	pReg, _ := regexp.Compile("^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\\d{8}$")
 	modelMap[constant.Phone] = pReg
 
 	// 固定电话
