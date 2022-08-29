@@ -74,19 +74,19 @@ func GetClient() *http.Client {
 
 // ------------------ get ------------------
 
-func GetSimple(url string) (any, error) {
+func GetSimple(url string) (int, http.Header, any, error) {
 	return Get(url, nil, nil)
 }
 
-func GetSimpleOfStandard(url string) (any, error) {
+func GetSimpleOfStandard(url string) (int, http.Header, any, error) {
 	return GetOfStandard(url, nil, nil)
 }
 
-func Get(url string, header http.Header, parameterMap map[string]string) (any, error) {
+func Get(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
 	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -96,11 +96,11 @@ func Get(url string, header http.Header, parameterMap map[string]string) (any, e
 	return call(httpRequest, url)
 }
 
-func GetOfStandard(url string, header http.Header, parameterMap map[string]string) (any, error) {
+func GetOfStandard(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
 	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -132,21 +132,21 @@ func Head(url string, header http.Header, parameterMap map[string]string) error 
 
 // ------------------ post ------------------
 
-func PostSimple(url string, body any) (any, error) {
+func PostSimple(url string, body any) (int, http.Header, any, error) {
 	return Post(url, nil, nil, body)
 }
 
-func PostSimpleOfStandard(url string, body any) (any, error) {
+func PostSimpleOfStandard(url string, body any) (int, http.Header, any, error) {
 	return PostOfStandard(url, nil, nil, body)
 }
 
-func Post(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func Post(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -156,13 +156,13 @@ func Post(url string, header http.Header, parameterMap map[string]string, body a
 	return call(httpRequest, url)
 }
 
-func PostOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func PostOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -172,7 +172,7 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 	return callToStandard(httpRequest, url)
 }
 
-func PostForm(url string, header http.Header, parameterMap map[string]string) (any, error) {
+func PostForm(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
 	var httpRequest http.Request
 	_ = httpRequest.ParseForm()
 	if parameterMap != nil {
@@ -187,37 +187,41 @@ func PostForm(url string, header http.Header, parameterMap map[string]string) (a
 	body := strings.NewReader(httpRequest.Form.Encode())
 	resp, err := httpClient.Post(url, ContentPostForm, body)
 	if err != nil {
-		return nil, err
+		return -1, nil, nil, err
 	}
+
+	code := resp.StatusCode
+	head := resp.Header
+
 	defer func(Body io.ReadCloser) {
 		_ = Body.Close()
 	}(resp.Body)
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return code, head, nil, err
 	}
 
-	return b, nil
+	return code, head, b, nil
 }
 
 // ------------------ put ------------------
 
-func PutSimple(url string, body any) (any, error) {
+func PutSimple(url string, body any) (int, http.Header, any, error) {
 	return Put(url, nil, nil, body)
 }
 
-func PutSimpleOfStandard(url string, body any) (any, error) {
+func PutSimpleOfStandard(url string, body any) (int, http.Header, any, error) {
 	return PutOfStandard(url, nil, nil, body)
 }
 
-func Put(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func Put(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -227,13 +231,13 @@ func Put(url string, header http.Header, parameterMap map[string]string, body an
 	return call(httpRequest, url)
 }
 
-func PutOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func PutOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -245,19 +249,19 @@ func PutOfStandard(url string, header http.Header, parameterMap map[string]strin
 
 // ------------------ delete ------------------
 
-func DeleteSimple(url string) (any, error) {
+func DeleteSimple(url string) (int, http.Header, any, error) {
 	return Get(url, nil, nil)
 }
 
-func DeleteSimpleOfStandard(url string) (any, error) {
+func DeleteSimpleOfStandard(url string) (int, http.Header, any, error) {
 	return GetOfStandard(url, nil, nil)
 }
 
-func Delete(url string, header http.Header, parameterMap map[string]string) (any, error) {
+func Delete(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
 	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -267,11 +271,11 @@ func Delete(url string, header http.Header, parameterMap map[string]string) (any
 	return call(httpRequest, url)
 }
 
-func DeleteOfStandard(url string, header http.Header, parameterMap map[string]string) (any, error) {
+func DeleteOfStandard(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
 	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -283,21 +287,21 @@ func DeleteOfStandard(url string, header http.Header, parameterMap map[string]st
 
 // ------------------ patch ------------------
 
-func PatchSimple(url string, body any) (any, error) {
+func PatchSimple(url string, body any) (int, http.Header, any, error) {
 	return Post(url, nil, nil, body)
 }
 
-func PatchSimpleOfStandard(url string, body any) (any, error) {
+func PatchSimpleOfStandard(url string, body any) (int, http.Header, any, error) {
 	return PostOfStandard(url, nil, nil, body)
 }
 
-func Patch(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func Patch(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -307,13 +311,13 @@ func Patch(url string, header http.Header, parameterMap map[string]string, body 
 	return call(httpRequest, url)
 }
 
-func PatchOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (any, error) {
+func PatchOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
 	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
-		return nil, err
+		return -1, nil, nil, err
 	}
 
 	if header != nil {
@@ -323,14 +327,14 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 	return callToStandard(httpRequest, url)
 }
 
-func call(httpRequest *http.Request, url string) (any, error) {
+func call(httpRequest *http.Request, url string) (int, http.Header, any, error) {
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
 		log.Printf("Error sending request to API endpoint. %+v", err)
-		return nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
+		return -1, nil, nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
 		if httpResponse == nil {
 			log.Printf("httpResponse is nil\n")
-			return nil, nil
+			return -1, nil, nil, nil
 		}
 		defer func(Body io.ReadCloser) {
 			err := Body.Close()
@@ -340,19 +344,20 @@ func call(httpRequest *http.Request, url string) (any, error) {
 		}(httpResponse.Body)
 
 		code := httpResponse.StatusCode
+		headers := httpResponse.Header
 		if code != http.StatusOK {
 			body, _ := ioutil.ReadAll(httpResponse.Body)
-			return nil, &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
+			return code, headers, nil, &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
 		}
 
 		// We have seen inconsistencies even when we get 200 OK response
 		body, err := ioutil.ReadAll(httpResponse.Body)
 		if err != nil {
 			log.Printf("Couldn't parse response body(%v)", err)
-			return nil, &NetError{ErrMsg: "Couldn't parse response body, err: " + err.Error()}
+			return code, headers, nil, &NetError{ErrMsg: "Couldn't parse response body, err: " + err.Error()}
 		}
 
-		return body, nil
+		return code, headers, body, nil
 	}
 }
 
@@ -382,31 +387,30 @@ func callIgnoreReturn(httpRequest *http.Request, url string) error {
 			body, _ := ioutil.ReadAll(httpResponse.Body)
 			return &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
 		}
-
 		return nil
 	}
 }
 
-func callToStandard(httpRequest *http.Request, url string) (any, error) {
+func callToStandard(httpRequest *http.Request, url string) (int, http.Header, any, error) {
 	return parseStandard(call(httpRequest, url))
 }
 
-func parseStandard(responseResult any, errs error) (any, error) {
+func parseStandard(statusCode int, headers http.Header, responseResult any, errs error) (int, http.Header, any, error) {
 	if errs != nil {
-		return nil, errs
+		return statusCode, headers, nil, errs
 	}
 	var standRsp DataResponse[any]
 	err := json.Unmarshal(responseResult.([]byte), &standRsp)
 	if err != nil {
-		return nil, err
+		return statusCode, headers, nil, err
 	}
 
 	// 判断业务的失败信息
 	if standRsp.Code != 0 && standRsp.Code != 200 {
-		return nil, &NetError{ErrMsg: fmt.Sprintf("remote err, bizCode=%d, message=%s", standRsp.Code, standRsp.Message)}
+		return statusCode, headers, nil, &NetError{ErrMsg: fmt.Sprintf("remote err, bizCode=%d, message=%s", standRsp.Code, standRsp.Message)}
 	}
 
-	return standRsp.Data, nil
+	return statusCode, headers, standRsp.Data, nil
 }
 
 func urlWithParameter(url string, parameterMap map[string]string) string {

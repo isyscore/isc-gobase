@@ -8,18 +8,18 @@ import (
 
 func TestGetSimple(t *testing.T) {
 	// {"code":"success","data":"ok","message":"成功"}
-	data, err := http.GetSimple("http://localhost:8082/api/api/app/sample/test/get")
+	_, _, data, err := http.GetSimple("http://localhost:8082/api/api/app/sample/test/get")
 	if err != nil {
 		fmt.Errorf(err.Error())
 		return
 	}
-	fmt.Println(string(data))
+	fmt.Println(string(data.([]byte)))
 
 	// "ok"
-	data, err = http.GetSimpleOfStandard("http://localhost:8082/api/api/app/sample/test/get")
+	_, _, data, err = http.GetSimpleOfStandard("http://localhost:8082/api/api/app/sample/test/get")
 	if err != nil {
 		fmt.Errorf(err.Error())
 		return
 	}
-	fmt.Println(string(data))
+	fmt.Println(string(data.([]byte)))
 }
