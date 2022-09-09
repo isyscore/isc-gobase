@@ -16,14 +16,14 @@ func newElement(value interface{}) *element {
 }
 
 type Queue struct {
-	input  *element
-	output *element
-	ch     chan bool
+	input   *element
+	output  *element
+	ch      chan bool
 	waitNum int32
-	num   int32
-	lock  *sync.RWMutex
-	rLock  *sync.Mutex
-	timer *timer
+	num     int32
+	lock    *sync.RWMutex
+	rLock   *sync.Mutex
+	timer   *timer
 }
 
 type timer struct {
@@ -73,7 +73,7 @@ func freeTimer(timer *timer) {
 }
 
 func NewQueue() *Queue {
-	return &Queue{ch: make(chan bool), waitNum: 0, num: 0, lock: new(sync.RWMutex),rLock:new(sync.Mutex)}
+	return &Queue{ch: make(chan bool), waitNum: 0, num: 0, lock: new(sync.RWMutex), rLock: new(sync.Mutex)}
 }
 func (queue *Queue) Offer(value interface{}) (num int32) {
 	ele := newElement(value)
@@ -86,7 +86,7 @@ func (queue *Queue) Offer(value interface{}) (num int32) {
 		queue.input = ele
 	}
 	num = atomic.AddInt32(&queue.num, 1)
-	if queue.waitNum>0 {
+	if queue.waitNum > 0 {
 		queue.waitNum--
 		queue.lock.Unlock()
 		queue.ch <- true
@@ -95,7 +95,7 @@ func (queue *Queue) Offer(value interface{}) (num int32) {
 	}
 	return
 }
-func (queue *Queue) Num()int32{
+func (queue *Queue) Num() int32 {
 	return queue.num
 }
 func (queue *Queue) Peek() (value interface{}, num int32) {
@@ -115,18 +115,18 @@ func (queue *Queue) Poll() (value interface{}, num int32) {
 		queue.lock.Lock()
 		if queue.num > 0 {
 			if queue.num == 1 {
-				value,num = queue.readOne()
+				value, num = queue.readOne()
 				queue.lock.Unlock()
 				return
 			} else {
 				queue.lock.Unlock()
 				queue.rLock.Lock()
-				val,n,last := queue.readGtOne()
-				if last{
+				val, n, last := queue.readGtOne()
+				if last {
 					queue.rLock.Unlock()
-				}else{
+				} else {
 					queue.rLock.Unlock()
-					return val,n
+					return val, n
 				}
 			}
 		} else {
@@ -137,42 +137,41 @@ func (queue *Queue) Poll() (value interface{}, num int32) {
 	}
 }
 
-func (queue *Queue)readOne()(value interface{}, num int32){
+func (queue *Queue) readOne() (value interface{}, num int32) {
 	var ele = queue.output
 	value = ele.value
 	num = atomic.AddInt32(&queue.num, -1)
-	return value,num
+	return value, num
 }
-func (queue *Queue) readGtOne()(value interface{}, num int32, isLast bool){
+func (queue *Queue) readGtOne() (value interface{}, num int32, isLast bool) {
 	var ele = queue.output
-	if ele.next==nil{
-		return nil,0,true
+	if ele.next == nil {
+		return nil, 0, true
 	}
 	value = ele.value
 	queue.output = ele.next
 	ele.next = nil
 	num = atomic.AddInt32(&queue.num, -1)
-	return value,num,false
+	return value, num, false
 }
-
 
 func (queue *Queue) Take(duration t0.Duration) (value interface{}, num int32) {
 	for {
 		queue.lock.Lock()
 		if queue.num > 0 {
 			if queue.num == 1 {
-				value,num = queue.readOne()
+				value, num = queue.readOne()
 				queue.lock.Unlock()
 				return
 			} else {
 				queue.lock.Unlock()
 				queue.rLock.Lock()
-				val,n,last:= queue.readGtOne()
-				if last{
+				val, n, last := queue.readGtOne()
+				if last {
 					queue.rLock.Unlock()
-				}else{
+				} else {
 					queue.rLock.Unlock()
-					return val,n
+					return val, n
 				}
 			}
 		} else {
@@ -183,11 +182,11 @@ func (queue *Queue) Take(duration t0.Duration) (value interface{}, num int32) {
 				fa := tm.wait()
 				if !fa {
 					queue.lock.Lock()
-					if queue.waitNum >0  {
+					if queue.waitNum > 0 {
 						queue.waitNum--
 						queue.lock.Unlock()
 						queue.ch <- false
-					}else{
+					} else {
 						queue.lock.Unlock()
 					}
 				}
