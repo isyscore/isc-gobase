@@ -34,6 +34,7 @@ type timer struct {
 func newTimer() *timer {
 	return &timer{t: t0.NewTimer(t0.Second * 10), isEnd: make(chan bool)}
 }
+
 func (timer *timer) wait() bool {
 	select {
 	case <-timer.t.C:
@@ -47,12 +48,14 @@ func (timer *timer) wait() bool {
 	}
 	return false
 }
+
 func (timer *timer) end() {
 	fa := timer.t.Stop()
 	if fa {
 		timer.isEnd <- true
 	}
 }
+
 func (timer *timer) reset(duration t0.Duration) {
 	timer.t.Reset(duration)
 }
@@ -68,6 +71,7 @@ func getTimer(duration t0.Duration) *timer {
 	ti.reset(duration)
 	return ti
 }
+
 func freeTimer(timer *timer) {
 	poolTimer.Put(timer)
 }
@@ -75,6 +79,7 @@ func freeTimer(timer *timer) {
 func NewQueue() *Queue {
 	return &Queue{ch: make(chan bool), waitNum: 0, num: 0, lock: new(sync.RWMutex), rLock: new(sync.Mutex)}
 }
+
 func (queue *Queue) Offer(value interface{}) (num int32) {
 	ele := newElement(value)
 	queue.lock.Lock()
@@ -95,9 +100,11 @@ func (queue *Queue) Offer(value interface{}) (num int32) {
 	}
 	return
 }
+
 func (queue *Queue) Num() int32 {
 	return queue.num
 }
+
 func (queue *Queue) Peek() (value interface{}, num int32) {
 	queue.lock.RLock()
 	num = queue.num
@@ -110,6 +117,7 @@ func (queue *Queue) Peek() (value interface{}, num int32) {
 		return nil, 0
 	}
 }
+
 func (queue *Queue) Poll() (value interface{}, num int32) {
 	for {
 		queue.lock.Lock()
@@ -143,6 +151,7 @@ func (queue *Queue) readOne() (value interface{}, num int32) {
 	num = atomic.AddInt32(&queue.num, -1)
 	return value, num
 }
+
 func (queue *Queue) readGtOne() (value interface{}, num int32, isLast bool) {
 	var ele = queue.output
 	if ele.next == nil {
