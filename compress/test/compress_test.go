@@ -29,6 +29,19 @@ func TestUnGzip(t *testing.T) {
 	}
 }
 
+func TestGZipFile(t *testing.T) {
+	file.AppendFile("./zip/test3.txt", "cc")
+	compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
+	file.DeleteDirs("./zip/")
+}
+
+func TestUnGZipFile(t *testing.T) {
+	file.AppendFile("./zip/test3.txt", "cc")
+	compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
+	compress.GzipDeCompressFile("./zip/test3.txt.gz", "./zip/test3_1.txt")
+	file.DeleteDirs("./zip/")
+}
+
 func TestZip(t *testing.T) {
 	f1 := "./zip/test1.txt"
 	f2 := "./zip/test2.txt"
