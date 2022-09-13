@@ -812,6 +812,9 @@ func ObjectToJson(object any) string {
 	// 只接收 map、struct、array、slice进行解析
 	objKind := reflect.ValueOf(object).Kind()
 	if objKind != reflect.Map && objKind != reflect.Struct && objKind != reflect.Array && objKind != reflect.Slice {
+		if objKind == reflect.String {
+			return ToString(object)
+		}
 		return "{}"
 	}
 
