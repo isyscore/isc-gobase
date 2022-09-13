@@ -93,7 +93,6 @@ func ResponseHandler() gin.HandlerFunc {
 		}
 
 		if statusCode != 200 && statusCode != 0 {
-			config.GetValueArrayInt("base.server.exception.exclude")
 			datas := config.BaseCfg.Server.Exception.Print.Exclude
 			for _, code := range datas {
 				if code == statusCode {
