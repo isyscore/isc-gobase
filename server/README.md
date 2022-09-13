@@ -168,16 +168,12 @@ go install github.com/swaggo/swag/cmd/swag
 这里按照go-swagger官网的注解进行编写即可，比如
 
 ```go
-// @Summary 接口概要说明
-// @Description 接口详细描述信息
-// @Tags 用户信息   //swagger API分类标签, 同一个tag为一组
-// @accept json  //浏览器可处理数据类型，浏览器默认发 Accept: */*
-// @Produce  json  //设置返回数据的类型和编码
-// @Param id path int true "ID"    //url参数：（name；参数类型[query(?id=),path(/123)]；数据类型；required；参数描述）
-// @Param name query string false "name"
-// @Success 200 {object} Res {"code":200,"data":null,"msg":""}  //成功返回的数据结构， 最后是示例
-// @Failure 400 {object} Res {"code":200,"data":null,"msg":""}
-// @Router /test/{id} [get]    //路由信息，一定要写上
+// @Summary xxx
+// @title xxx
+// @Tags xxx
+// @Router /api/xx/xx/xxxx/xxx [post]
+// @param param body Addxxxx true "用户请求参数"
+// @Success 200 {object} any
 ```
 
 #### 3. 生成swagger文件
@@ -185,8 +181,25 @@ go install github.com/swaggo/swag/cmd/swag
 ```shell
 swag init
 ```
-执行该命令后，会生成docs文件，该文件中是swagger的文件内容
-#### 4. 开启开关，运行程序
+#### 4. 添加swagger的doc引入
+执行命令`swag init`后会生成`docs`文件夹，里面有相关的swagger配置。这里需要代码显示的引入，否则swagger解析不出来，建议在`main.go`中引入，示例：
+```go
+package main
+
+import (
+    "github.com/isyscore/isc-gobase/server"
+    // 这里：不引入就会在swagger生成的页面中找不到doc.json文件 
+    _ "isc-xx-service/docs"
+)
+
+// @Title xxx
+// @Version 1.0.0
+func main() {
+    server.Run()
+}
+```
+
+#### 5. 开启开关，运行程序
 代码开启如下开关
 ```yaml
 base:
