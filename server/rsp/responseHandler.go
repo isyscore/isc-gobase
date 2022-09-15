@@ -177,7 +177,7 @@ func printRsq(requestUri string, responseMessage Response) {
 
 	rspLogLevel := config.GetValueString("base.server.response.print.level")
 	if printFlag {
-		logger.Record(rspLogLevel, "响应：%v", isc.ToJsonString(responseMessage))
+		logger.Record(rspLogLevel, "响应：%v", isc.ObjectToJson(responseMessage))
 	}
 }
 
