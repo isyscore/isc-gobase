@@ -152,12 +152,11 @@ func printReq(requestUri string, requestData Request) {
 
 func printRsq(requestUri string, responseMessage Response) {
 	includeUri := config.GetValueArray("base.server.response.print.include-uri")
-	printFlag := false
+	printFlag := true
 	if len(includeUri) != 0 {
 		for _, uri := range includeUri {
-			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
-				printFlag = true
-				break
+			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = false
 			}
 		}
 	}
@@ -172,8 +171,9 @@ func printRsq(requestUri string, responseMessage Response) {
 		}
 	}
 
+	rspLogLevel := config.GetValueString("base.server.response.print.level")
 	if printFlag {
-		logger.Info("响应：%v", isc.ObjectToJson(responseMessage))
+		logger.Record(rspLogLevel, "响应：%v", isc.ObjectToJson(responseMessage))
 	}
 }
 

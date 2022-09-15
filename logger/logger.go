@@ -111,6 +111,26 @@ func Fatal(format string, v ...any) {
 	log.WithLevel(zerolog.FatalLevel).Msgf(format, v...)
 }
 
+func Record(level, format string, v ...any) {
+	level = strings.ToLower(level)
+	switch level {
+	case "debug":
+		Debug(format, v)
+	case "info":
+		Info(format, v)
+	case "warn":
+		Warn(format, v)
+	case "error":
+		Error(format, v)
+	case "panic":
+		Panic(format, v)
+	case "fatal":
+		Fatal(format, v)
+	default:
+		Debug(format, v)
+	}
+}
+
 // SetGlobalLevel sets the global override for log level. If this
 // values is raised, all Loggers will use at least this value.
 //

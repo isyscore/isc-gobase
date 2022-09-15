@@ -59,6 +59,8 @@ base:
       print:
         # 是否打印：true, false；默认 false
         enable: false
+        # 打印的话日志级别，默认debug
+        level: info
         # 指定要打印请求的uri
         include-uri:
           - /xxx/x/xxx
@@ -71,6 +73,8 @@ base:
       print:
         # 是否打印：true, false；默认 false
         enable: false
+        # 打印的话日志级别，默认debug
+        level: info
         # 指定要打印请求的uri
         include-uri:
           - /xxx/x/xxx
