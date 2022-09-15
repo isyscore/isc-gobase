@@ -107,7 +107,7 @@ func ResponseHandler() gin.HandlerFunc {
 			if err := json.Unmarshal([]byte(blw.body.String()), &response); err != nil {
 				return
 			} else {
-				if response.ResponseBase.Code != 0 && response.ResponseBase.Code != 200 {
+				if response.Code != 0 && response.Code != 200 {
 					errMessage.Response = response
 					if expPrint {
 						logger.Error("返回异常, result：%v", isc.ObjectToJson(errMessage))
@@ -152,11 +152,12 @@ func printReq(requestUri string, requestData Request) {
 
 func printRsq(requestUri string, responseMessage Response) {
 	includeUri := config.GetValueArray("base.server.response.print.include-uri")
-	printFlag := true
+	printFlag := false
 	if len(includeUri) != 0 {
 		for _, uri := range includeUri {
-			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
-				printFlag = false
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = true
+				break
 			}
 		}
 	}
@@ -164,7 +165,7 @@ func printRsq(requestUri string, responseMessage Response) {
 	excludeUri := config.GetValueArray("base.server.response.print.exclude-uri")
 	if len(excludeUri) != 0 {
 		for _, uri := range excludeUri {
-			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
 				printFlag = false
 				break
 			}
