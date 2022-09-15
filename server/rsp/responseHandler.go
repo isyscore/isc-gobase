@@ -107,7 +107,7 @@ func ResponseHandler() gin.HandlerFunc {
 			if err := json.Unmarshal([]byte(blw.body.String()), &response); err != nil {
 				return
 			} else {
-				if response.Code != 0 && response.Code != 200 {
+				if response.ResponseBase.Code != 0 && response.ResponseBase.Code != 200 {
 					errMessage.Response = response
 					if expPrint {
 						logger.Error("返回异常, result：%v", isc.ObjectToJson(errMessage))
