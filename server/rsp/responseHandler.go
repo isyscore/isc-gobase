@@ -145,8 +145,9 @@ func printReq(requestUri string, requestData Request) {
 		}
 	}
 
+	reqLogLevel := config.GetValueString("base.server.request.print.level")
 	if printFlag {
-		logger.Info("请求：%v", isc.ObjectToJson(requestData))
+		logger.Record(reqLogLevel, "请求：%v", isc.ObjectToJson(requestData))
 	}
 	return
 }
