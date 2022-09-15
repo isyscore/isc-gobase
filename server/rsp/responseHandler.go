@@ -125,11 +125,12 @@ func ResponseHandler() gin.HandlerFunc {
 
 func printReq(requestUri string, requestData Request) {
 	includeUri := config.GetValueArray("base.server.request.print.include-uri")
-	printFlag := true
+	printFlag := false
 	if len(includeUri) != 0 {
 		for _, uri := range includeUri {
-			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
-				printFlag = false
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = true
+				break
 			}
 		}
 	}
@@ -152,11 +153,12 @@ func printReq(requestUri string, requestData Request) {
 
 func printRsq(requestUri string, responseMessage Response) {
 	includeUri := config.GetValueArray("base.server.response.print.include-uri")
-	printFlag := true
+	printFlag := false
 	if len(includeUri) != 0 {
 		for _, uri := range includeUri {
-			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
-				printFlag = false
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
+				printFlag = true
+				break
 			}
 		}
 	}
@@ -164,7 +166,7 @@ func printRsq(requestUri string, responseMessage Response) {
 	excludeUri := config.GetValueArray("base.server.response.print.exclude-uri")
 	if len(excludeUri) != 0 {
 		for _, uri := range excludeUri {
-			if !strings.HasPrefix(requestUri, isc.ToString(uri)) {
+			if strings.HasPrefix(requestUri, isc.ToString(uri)) {
 				printFlag = false
 				break
 			}
