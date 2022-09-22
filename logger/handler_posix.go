@@ -1,4 +1,4 @@
-//go:build !windows && !arm64
+//go:build (linux && amd64) || darwin
 
 package logger
 
