@@ -172,13 +172,13 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 	return callToStandard(httpRequest, url)
 }
 
-func PostForm(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
+func PostForm(url string, header http.Header, parameterMap map[string]any) (int, http.Header, any, error) {
 	var httpRequest http.Request
 	_ = httpRequest.ParseForm()
 	if parameterMap != nil {
 		_ = httpRequest.ParseForm()
 		for k, v := range parameterMap {
-			httpRequest.Form.Add(k, v)
+			httpRequest.Form.Add(k, fmt.Sprintf("%v", v))
 		}
 	}
 	if header != nil {
