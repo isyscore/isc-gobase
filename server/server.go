@@ -3,12 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/gin-contrib/pprof"
-	"github.com/isyscore/isc-gobase/bean"
-	"github.com/isyscore/isc-gobase/debug"
-	"github.com/isyscore/isc-gobase/listener"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,6 +10,13 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/gin-contrib/pprof"
+	"github.com/isyscore/isc-gobase/bean"
+	"github.com/isyscore/isc-gobase/debug"
+	"github.com/isyscore/isc-gobase/listener"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/isyscore/isc-gobase/server/rsp"
 
@@ -41,7 +42,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.4.0"
+var GoBaseVersion = "1.4.1"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
