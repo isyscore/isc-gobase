@@ -3,7 +3,7 @@ package tracingGorm
 import (
 	"context"
 	"encoding/json"
-	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/logger"
 	"github.com/opentracing/opentracing-go"
 	opentracinglog "github.com/opentracing/opentracing-go/log"
 	"github.com/rs/zerolog/log"
@@ -147,7 +147,9 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	currentSpanId := isc.ToString(H["x-b3-spanid"])
+	currentSpanId := H.Get("x-b3-spanid")
+
+	logger.Info("header 的所有 信息 %v", H)
 
 	// 记录其他内容
 	span.LogFields(
