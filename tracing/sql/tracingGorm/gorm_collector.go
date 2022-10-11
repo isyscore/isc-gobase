@@ -147,8 +147,6 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	currentSpanId := H.Get("x-b3-spanid")
-
 	logger.Info("header 的所有 信息 %v", H)
 
 	// 记录其他内容
@@ -156,7 +154,7 @@ func after(db *gorm.DB) {
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),
 		opentracinglog.String("table", db.Statement.Table),
 		opentracinglog.String("query", db.Statement.SQL.String()),
-		opentracinglog.String("parentId", currentSpanId),
+		opentracinglog.String("parentId", H.Get("x-b3-spanid")),
 		opentracinglog.String("bindings", string(b)),
 	)
 }
