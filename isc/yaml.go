@@ -112,7 +112,6 @@ func YamlToProperties(contentOfYaml string) (string, error) {
 	// yaml 到 map
 	dataMap, err := YamlToMap(contentOfYaml)
 	if err != nil {
-		log.Printf("YamlToPropertiesStr error: %v, content: %v", err, contentOfYaml)
 		return "", err
 	}
 
