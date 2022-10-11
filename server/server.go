@@ -279,7 +279,7 @@ func RegisterCustomHealthCheck(apiBase string, status func() string, init func()
 
 func checkEngine() bool {
 	if engine == nil {
-		panic(fmt.Sprintf("服务没有初始化，请检查配置"))
+		panic(fmt.Sprintf("服务实例没有初始化，请检查配置"))
 		return false
 	}
 	return true

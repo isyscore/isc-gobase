@@ -3,6 +3,7 @@ package tracingGorm
 import (
 	"context"
 	"encoding/json"
+	"github.com/isyscore/isc-gobase/isc"
 	"github.com/opentracing/opentracing-go"
 	opentracinglog "github.com/opentracing/opentracing-go/log"
 	"github.com/rs/zerolog/log"
@@ -146,11 +147,14 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
+	currentSpanId := isc.ToString(H["x-b3-spanid"])
+
 	// 记录其他内容
 	span.LogFields(
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),
 		opentracinglog.String("table", db.Statement.Table),
 		opentracinglog.String("query", db.Statement.SQL.String()),
+		opentracinglog.String("parentId", currentSpanId),
 		opentracinglog.String("bindings", string(b)),
 	)
 }
