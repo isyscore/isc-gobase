@@ -44,6 +44,9 @@ base:
   api:
     # api前缀，默认包含api前缀，如果路径本身有api，则不再添加api前缀
     prefix: /api
+  application:
+    # 应用名，默认为空
+    name: isc-gobase-demo
   server:
     # 是否启用，默认：true
     enable: true
