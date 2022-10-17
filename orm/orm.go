@@ -7,5 +7,5 @@ type DatasourceConfig struct {
 	Port       int
 	DriverName string
 	DbName     string
-	SuffixUrl  string
+	SqlitePath     string
 }

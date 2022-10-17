@@ -1,0 +1,24 @@
+base:
+  datasource:
+    username: isyscore
+    password: Isysc0re
+    host: 10.30.30.78
+    port: 23306
+    # 目前支持: mysql、postgresql、sqlite、sqlserver
+    driver-name: mysql
+    # 数据库名
+    db-name: isc_pivot
+    # 示例：charset=utf8&parseTime=True&loc=Local 等url后面的配置，直接配置即可
+    url-config:
+      characterEncoding: utf8
+      serverTimezone: Asia/Shanghai
+    # 连接池配置
+    connect-pool:
+      # 最大空闲连接数
+      max-idel-conns: 10
+      # 最大连接数
+      max-open-conns: 10
+      # 连接可重用最大时间；带字符（s：秒，m：分钟，h：小时）
+      max-life-time: 10s
+      # 连接空闲的最大时间；带字符（s：秒，m：分钟，h：小时）
+      max-idle-time: 10s
