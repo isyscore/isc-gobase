@@ -20,6 +20,14 @@ func False(t *testing.T, value bool) {
 	}
 }
 
+func FalseMsg(t *testing.T, value bool, msg string) {
+	if value {
+		t.Error("expect false, but actual is true：" + msg)
+	} else {
+		t.Log("结果false，信息为：" + msg)
+	}
+}
+
 func FalseErr(t *testing.T, value bool, errMsg string) {
 	if value {
 		t.Errorf("expect false, but actual is true, error: %v", errMsg)

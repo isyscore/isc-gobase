@@ -17,13 +17,18 @@ type ValueMatch struct {
 func (valueMatch *ValueMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
 	values := valueMatch.Values
 
+	fieldRelValue := fieldValue
+	if reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
+		fieldRelValue = reflect.ValueOf(fieldValue).Elem()
+	}
+
 	for _, value := range values {
-		if fmt.Sprintf("%v", value) == fmt.Sprintf("%v", fieldValue) {
-			valueMatch.SetBlackMsg("属性 %v 的值 %v 位于禁用值 %v 中", field.Name, fieldValue, values)
+		if fmt.Sprintf("%v", value) == fmt.Sprintf("%v", fieldRelValue) {
+			valueMatch.SetBlackMsg("属性 %v 的值 %v 位于禁用值 %v 中", field.Name, fieldRelValue, values)
 			return true
 		}
 	}
-	valueMatch.SetWhiteMsg("属性 %v 的值 %v 不在只可用列表 %v 中", field.Name, fieldValue, values)
+	valueMatch.SetWhiteMsg("属性 %v 的值 %v 不在只可用列表 %v 中", field.Name, fieldRelValue, values)
 	return false
 }
 

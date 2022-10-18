@@ -226,42 +226,42 @@ func TestValueStructPtr(t *testing.T) {
 	var value ValueStructPtrEntity
 	var result bool
 	var err string
-	// 测试 正常情况
-	value = ValueStructPtrEntity{Inner: &ValueInnerEntity{
-		InnerAge:  2212,
-		InnerName: "inner_宋江",
-	}}
-	result, err = validate.Check(value, "inner")
-	TrueErr(t, result, err)
-
-	//测试 正常情况
-	value = ValueStructPtrEntity{Inner: &ValueInnerEntity{
-		InnerAge:  2213,
-		InnerName: "inner_宋江",
-	}}
-	result, err = validate.Check(value, "inner")
-	TrueErr(t, result, err)
-
-	// 测试 核查其他情况
-	value = ValueStructPtrEntity{Age: 12}
-	result, err = validate.Check(value, "age")
-	TrueErr(t, result, err)
-
-	// 测试 核查其他情况
-	value = ValueStructPtrEntity{Age: 12, Inner: &ValueInnerEntity{
-		InnerAge:  2213,
-		InnerName: "inner_宋江",
-	}}
-	result, err = validate.Check(value, "age", "inner")
-	TrueErr(t, result, err)
-
-	// 测试 核查其他情况
-	value = ValueStructPtrEntity{Age: 14, Inner: &ValueInnerEntity{
-		InnerAge:  2213,
-		InnerName: "inner_宋江",
-	}}
-	result, err = validate.Check(value, "age", "inner")
-	Equal(t, false, result, "属性 Age 的值 14 不在只可用列表 [12 13] 中", err)
+	//// 测试 正常情况
+	//value = ValueStructPtrEntity{Inner: &ValueInnerEntity{
+	//	InnerAge:  2212,
+	//	InnerName: "inner_宋江",
+	//}}
+	//result, err = validate.Check(value, "inner")
+	//TrueErr(t, result, err)
+	//
+	////测试 正常情况
+	//value = ValueStructPtrEntity{Inner: &ValueInnerEntity{
+	//	InnerAge:  2213,
+	//	InnerName: "inner_宋江",
+	//}}
+	//result, err = validate.Check(value, "inner")
+	//TrueErr(t, result, err)
+	//
+	//// 测试 核查其他情况
+	//value = ValueStructPtrEntity{Age: 12}
+	//result, err = validate.Check(value, "age")
+	//TrueErr(t, result, err)
+	//
+	//// 测试 核查其他情况
+	//value = ValueStructPtrEntity{Age: 12, Inner: &ValueInnerEntity{
+	//	InnerAge:  2213,
+	//	InnerName: "inner_宋江",
+	//}}
+	//result, err = validate.Check(value, "age", "inner")
+	//TrueErr(t, result, err)
+	//
+	//// 测试 核查其他情况
+	//value = ValueStructPtrEntity{Age: 14, Inner: &ValueInnerEntity{
+	//	InnerAge:  2213,
+	//	InnerName: "inner_宋江",
+	//}}
+	//result, err = validate.Check(value, "age", "inner")
+	//Equal(t, false, result, "属性 Age 的值 14 不在只可用列表 [12 13] 中", err)
 
 	//测试 异常情况
 	value = ValueStructPtrEntity{Inner: &ValueInnerEntity{

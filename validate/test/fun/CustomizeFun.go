@@ -28,6 +28,13 @@ type CustomizeEntity5 struct {
 	Age  int
 }
 
+type CustomizeEntity6 struct {
+	Name *string `match:"customize=judge6Name"`
+	Flag *bool `match:"customize=judge6Flag"`
+	Flag2 *bool `match:"customize=judge6Flag2"`
+	Age  int
+}
+
 func JudgeString1(name string) bool {
 	if name == "zhou" || name == "宋江" {
 		return true
@@ -83,10 +90,36 @@ func JudgeString5(customize CustomizeEntity5) (string, bool) {
 	}
 }
 
+func JudgeString6(customize CustomizeEntity6) (string, bool) {
+	var name = customize.Name
+	if name == nil {
+		return "用户不可为空", false
+	}
+	return "", true
+}
+
+func JudgeString6Flag(customize CustomizeEntity6) (string, bool) {
+	var flag = customize.Flag
+	if flag == nil {
+		return "flag不可为空", false
+	}
+	return "", true
+}
+
+func JudgeString6Flag2(flag *bool) (string, bool) {
+	if flag == nil {
+		return "flag不可为空", false
+	}
+	return "", true
+}
+
 func init() {
 	validate.RegisterCustomize("judge1Name", JudgeString1)
 	validate.RegisterCustomize("judge2Name", JudgeString2)
 	validate.RegisterCustomize("judge3Name", JudgeString3)
 	validate.RegisterCustomize("judge4Name", JudgeString4)
 	validate.RegisterCustomize("judge5Name", JudgeString5)
+	validate.RegisterCustomize("judge6Name", JudgeString6)
+	validate.RegisterCustomize("judge6Flag", JudgeString6Flag)
+	validate.RegisterCustomize("judge6Flag2", JudgeString6Flag2)
 }
