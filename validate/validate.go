@@ -69,12 +69,8 @@ func Check(object any, fieldNames ...string) (bool, string) {
 			continue
 		}
 
-		//if fieldValue.Kind() == reflect.Ptr && !fieldValue.IsNil() {
-		//	fieldValue = fieldValue.Elem()
-		//}
-
 		// 基本类型
-		if matcher.IsCheckedKing(fieldValue.Type()) || (fieldValue.Kind() == reflect.Ptr && matcher.IsCheckedKing(fieldValue.Elem().Type())) {
+		if matcher.IsCheckedKing(fieldValue.Type()) || (fieldValue.Kind() == reflect.Ptr && !fieldValue.Elem().IsValid()) || (fieldValue.Kind() == reflect.Ptr && matcher.IsCheckedKing(fieldValue.Elem().Type())) {
 			tagJudge := field.Tag.Get(constant.MATCH)
 			if len(tagJudge) == 0 {
 				continue

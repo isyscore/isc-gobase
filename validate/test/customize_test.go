@@ -167,10 +167,10 @@ func TestCustomize6(t *testing.T) {
 	False(t, result)
 
 	// 测试 正常情况
-	name := "df"
-	value = fun.CustomizeEntity6{Name: &name}
-	result, _ = validate.Check(value, "name")
-	True(t, result)
+	//name := "df"
+	//value = fun.CustomizeEntity6{Name: &name}
+	//result, _ = validate.Check(value, "name")
+	//True(t, result)
 }
 
 func TestCustomize6_1(t *testing.T) {
