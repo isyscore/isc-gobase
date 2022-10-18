@@ -32,9 +32,9 @@ func GetGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) 
 
 func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
 	datasourceConfig := DatasourceConfig{}
-	targetDatasourceName := "base.database"
+	targetDatasourceName := "base.datasource"
 	if datasourceName != "" {
-		targetDatasourceName = "base.database." + datasourceName
+		targetDatasourceName = "base.datasource." + datasourceName
 	}
 	err := config.GetValueObject(targetDatasourceName, &datasourceConfig)
 	if err != nil {
@@ -45,6 +45,7 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 	var gormDb *gorm.DB
 	gormDb, err = gorm.Open(getDialect(datasourceConfig.DriverName, datasourceConfig), gormConfig)
 	if err != nil {
+		logger.Warn("获取数据库db异常：%v", err.Error())
 		return nil, err
 	}
 
@@ -108,7 +109,7 @@ func getDialect(dbType string, datasourceConfig DatasourceConfig) gorm.Dialector
 		if len(sqlConfigMap) != 0 {
 			var kvList []string
 			for key, value := range sqlConfigMap {
-				kvList = append(kvList, fmt.Sprintf("%s=%s", key, value))
+				kvList = append(kvList, fmt.Sprintf("%s=%s", key, specialCharChange(value)))
 			}
 			dsn += fmt.Sprintf("?%s", strings.Join(kvList, "&"))
 		}
@@ -133,6 +134,11 @@ func getDialect(dbType string, datasourceConfig DatasourceConfig) gorm.Dialector
 		return sqlserver.Open(dsn)
 	}
 	return nil
+}
+
+// 特殊字符处理
+func specialCharChange(url string) string {
+	return strings.ReplaceAll(url, "/", "%2F")
 }
 
 func OrmIsOpen() bool {
