@@ -52,10 +52,10 @@ const (
 	_opRaw    = "execute"
 )
 
-// 开箱即用，svcName: 此项目的微服务名称，collectorEndpoint: jaeger 收集器的地址(如:http://127.0.0.1:14268/api/traces)
-func NewDefault(svcName, collectorEndpoint string) gorm.Plugin {
+// 开箱即用，serviceName: 此项目的微服务名称，collectorEndpoint: 数据收集器的地址(如:http://isc-core-back-service:31300/api/core/back/v1/middle/spans)
+func NewDefault(serviceName, collectorEndpoint string) gorm.Plugin {
 	i := &GobasePluginOfGorm{
-		ServiceName:       svcName,
+		ServiceName:       serviceName,
 		CollectorEndpoint: collectorEndpoint,
 	}
 	i.bootTracerBasedJaeger()
@@ -115,7 +115,6 @@ func _injectBefore(db *gorm.DB, op string) {
 
 // 注册后置事件时，对应的事件方法
 func after(db *gorm.DB) {
-
 	if db == nil {
 		return
 	}
@@ -183,7 +182,7 @@ func beforeRaw(db *gorm.DB) {
 	_injectBefore(db, _opRaw)
 }
 
-// 默认初始化一个 jaeger tracer
+// 默认初始化一个
 func (i *GobasePluginOfGorm) bootTracerBasedJaeger() {
 	// 基础配置
 	tracer, _, err := config.Configuration{
