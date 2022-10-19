@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"reflect"
 	"strconv"
 	"strings"
@@ -455,7 +454,7 @@ func ReaderToObject(reader io.Reader, targetPtrObj any) error {
 	if targetType.Kind() != reflect.Ptr {
 		return &ChangeError{ErrMsg: "targetPtrObj type is not ptr"}
 	}
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return err
 	}

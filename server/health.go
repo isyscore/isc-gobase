@@ -18,7 +18,7 @@ var startTime = time.Now().Format(t2.FmtYMdHms)
 
 const defaultVersion = "unknown"
 
-var Version string = defaultVersion
+var Version = defaultVersion
 
 func healthSystemStatus(c *gin.Context) {
 	c.Data(http.StatusOK, h2.ContentTypeJson, []byte(fmt.Sprintf(`{"status":"ok","running":true,"pid":%d,"startupAt":"%s","version":"%s"}`, procId, startTime, getVersion())))

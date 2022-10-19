@@ -12,7 +12,7 @@ type optList interface {
 	RemoveItem(key string, index int) error
 }
 
-func (c *cache) getUnixNano() int64 {
+func (c *Cache) getUnixNano() int64 {
 	de := c.defaultExpiration
 	var e int64
 	if de != -1 {
@@ -23,7 +23,7 @@ func (c *cache) getUnixNano() int64 {
 
 //Set Add an item to the cache,replacing any existing item.
 //note key is primary key
-func (c *cache) Set(key string, value any) error {
+func (c *Cache) Set(key string, value any) error {
 	e := c.getUnixNano()
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -36,7 +36,7 @@ func (c *cache) Set(key string, value any) error {
 
 //Get an item from the cache.Returns the item or nil, and a bool indicating
 // whether the key was found
-func (c *cache) Get(key string) (any, bool) {
+func (c *Cache) Get(key string) (any, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
@@ -50,7 +50,7 @@ func (c *cache) Get(key string) (any, bool) {
 	}
 }
 
-func (c *cache) Remove(key string) {
+func (c *Cache) Remove(key string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if _, found := c.items[key]; found {
@@ -59,7 +59,7 @@ func (c *cache) Remove(key string) {
 	}
 }
 
-func (c *cache) Clean() {
+func (c *Cache) Clean() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for k := range c.items {
@@ -67,7 +67,7 @@ func (c *cache) Clean() {
 	}
 }
 
-func (c *cache) Cap() int {
+func (c *Cache) Cap() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	ci := c.items

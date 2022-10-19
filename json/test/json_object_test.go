@@ -103,7 +103,7 @@ func TestPut4(t *testing.T) {
 	assert.Equal(t, jsonObject.GetInt("objectValue.field2Struct.f21"), 43)
 
 	testEntity := TestEntity{}
-	jsonObject.GetObject("objectValue", &testEntity)
+	_ = jsonObject.GetObject("objectValue", &testEntity)
 
 	fmt.Println(testEntity)
 }

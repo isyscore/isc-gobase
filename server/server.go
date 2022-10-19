@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -42,7 +42,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.4.1"
+var GoBaseVersion = "1.4.2"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
@@ -70,10 +70,10 @@ func InitServer() {
 		gin.SetMode(gin.TestMode)
 	} else if "release" == mode {
 		gin.SetMode(gin.ReleaseMode)
-		gin.DefaultWriter = ioutil.Discard
+		gin.DefaultWriter = io.Discard
 	} else {
 		gin.SetMode(gin.ReleaseMode)
-		gin.DefaultWriter = ioutil.Discard
+		gin.DefaultWriter = io.Discard
 	}
 
 	engine = gin.New()
@@ -182,7 +182,7 @@ func graceRun(port int) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := engineServer.Shutdown(ctx); err != nil {
-		logger.Warn("服务关闭异常: ", err)
+		logger.Warn("服务关闭异常: %v", err)
 	}
 	logger.Info("服务端退出")
 }

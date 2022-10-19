@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -30,7 +29,7 @@ func GzipDecompress(data []byte) ([]byte, error) {
 	fmt.Printf("res: %v\n", res.Bytes())
 	gz, _ := gzip.NewReader(&res)
 	defer func(gz *gzip.Reader) { _ = gz.Close() }(gz)
-	d, err := ioutil.ReadAll(gz)
+	d, err := io.ReadAll(gz)
 	if strings.Contains(err.Error(), "unexpected EOF") {
 		// 解gzip时，读到最后必定是unexpected EOF，这里做特殊处理
 		err = nil
@@ -38,13 +37,15 @@ func GzipDecompress(data []byte) ([]byte, error) {
 	return d, err
 }
 
-//压缩文件Src到Dst
+// GzipCompressFile 压缩文件Src到Dst
 func GzipCompressFile(src string, dst string) error {
 	newfile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
-	defer newfile.Close()
+	defer func(newfile *os.File) {
+		_ = newfile.Close()
+	}(newfile)
 
 	file, err := os.Open(src)
 	if err != nil {
@@ -65,26 +66,30 @@ func GzipCompressFile(src string, dst string) error {
 		return nil
 	}
 
-	zw.Flush()
+	_ = zw.Flush()
 	if err := zw.Close(); err != nil {
 		return nil
 	}
 	return nil
 }
 
-//解压文件Src到Dst
+// GzipDeCompressFile 解压文件Src到Dst
 func GzipDeCompressFile(src string, dst string) error {
 	file, err := os.Open(src)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
 	newfile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
-	defer newfile.Close()
+	defer func(newfile *os.File) {
+		_ = newfile.Close()
+	}(newfile)
 
 	zr, err := gzip.NewReader(file)
 	if err != nil {

@@ -37,8 +37,8 @@ func TestServer(t *testing.T) {
 			go func(idx int) {
 				c_s := cron.New()
 				_ = c_s.AddFunc("*/1 * * * * ?", func() {
-					fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
-					fmt.Fprintf(os.Stdout, "是真的\n")
+					_, _ = fmt.Fprintf(os.Stderr, "我好帅，%s\n", "哈哈哈")
+					_, _ = fmt.Fprintf(os.Stdout, "是真的\n")
 					//logger.Debug("协程ID=：%d,我是库陈胜Debug", idx)
 					logger.Info("协程ID=：%d,我是库陈胜Info", idx)
 					//logger.Warn("协程ID=：%d,我是库陈胜Warn", idx)
@@ -110,7 +110,7 @@ func TestServer2(t *testing.T) {
 
 	server.Post("/test/rsp1", func(c *gin.Context) {
 		testReq := pojo.TestReq{}
-		isc.DataToObject(c.Request.Body, &testReq)
+		_ = isc.DataToObject(c.Request.Body, &testReq)
 		rsp.SuccessOfStandard(c, testReq)
 	})
 

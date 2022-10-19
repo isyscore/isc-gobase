@@ -3,7 +3,6 @@ package file
 import (
 	"github.com/isyscore/isc-gobase/isc"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -69,7 +68,7 @@ func DeleteFile(filePath string) bool {
 
 func ReadFile(filePath string) string {
 	var ret = ""
-	if b, err := ioutil.ReadFile(filePath); err == nil {
+	if b, err := os.ReadFile(filePath); err == nil {
 		ret = string(b)
 	}
 	return ret
@@ -77,7 +76,7 @@ func ReadFile(filePath string) string {
 
 func ReadFileBytes(filePath string) []byte {
 	var ret []byte
-	if b, err := ioutil.ReadFile(filePath); err == nil {
+	if b, err := os.ReadFile(filePath); err == nil {
 		ret = b
 	}
 	return ret
@@ -85,7 +84,7 @@ func ReadFileBytes(filePath string) []byte {
 
 func ReadFileLines(filePath string) []string {
 	var ret []string
-	if b, err := ioutil.ReadFile(filePath); err == nil {
+	if b, err := os.ReadFile(filePath); err == nil {
 		ret = strings.Split(string(b), "\n")
 	}
 	return ret

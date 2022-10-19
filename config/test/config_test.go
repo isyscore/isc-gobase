@@ -55,22 +55,22 @@ func TestSmall(t *testing.T) {
 	config.LoadConfig()
 
 	entity1 := SmallEntity{}
-	config.GetValueObject("key1.ok1", &entity1)
+	_ = config.GetValueObject("key1.ok1", &entity1)
 	assert.Equal(t, entity1.NameAge, 32)
 	assert.Equal(t, entity1.HaoDeOk, 12)
 
 	entity2 := SmallEntity{}
-	config.GetValueObject("key1.ok2", &entity2)
+	_ = config.GetValueObject("key1.ok2", &entity2)
 	assert.Equal(t, entity2.NameAge, 32)
 	assert.Equal(t, entity2.HaoDeOk, 12)
 
 	entity3 := SmallEntity{}
-	config.GetValueObject("key1.ok3", &entity3)
+	_ = config.GetValueObject("key1.ok3", &entity3)
 	assert.Equal(t, entity3.NameAge, 32)
 	assert.Equal(t, entity3.HaoDeOk, 12)
 
 	entity4 := SmallEntity{}
-	config.GetValueObject("key1.ok4", &entity4)
+	_ = config.GetValueObject("key1.ok4", &entity4)
 	assert.Equal(t, entity4.NameAge, 32)
 	assert.Equal(t, entity4.HaoDeOk, 12)
 }
@@ -110,7 +110,7 @@ func TestAppend(t *testing.T) {
 
 // 测试cm文件位置定制化
 func TestConfigInit(t *testing.T) {
-	os.Setenv("base.config.additional-location", "./application-append.yaml")
+	_ = os.Setenv("base.config.additional-location", "./application-append.yaml")
 	config.LoadConfigFromRelativePath("./application-append-original.yaml")
 
 	assert.Equal(t, config.GetValueString("a.b.c"), "c-value-change")

@@ -153,7 +153,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	if !strings.HasSuffix(resourceAbsPath, "/") {
 		resourceAbsPath += "/"
 	}
-	files, err := ioutil.ReadDir(resourceAbsPath)
+	files, err := os.ReadDir(resourceAbsPath)
 	if err != nil {
 		return
 	}
@@ -282,7 +282,7 @@ func LoadYamlFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		// log.Printf("读取文件失败(%v)", err)
 		return
@@ -316,7 +316,7 @@ func AppendYamlFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		// log.Printf("读取文件失败(%v)", err)
 		return
@@ -343,7 +343,7 @@ func LoadPropertyFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		// log.Printf("读取文件失败(%v)", err)
 		return
@@ -371,7 +371,7 @@ func AppendPropertyFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Printf("读取文件失败(%v)", err)
 		return
@@ -403,7 +403,7 @@ func LoadJsonFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		// log.Printf("读取文件失败(%v)", err)
 		return
@@ -432,7 +432,7 @@ func AppendJsonFile(filePath string) {
 	if !file.FileExists(filePath) {
 		return
 	}
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Printf("读取文件失败(%v)", err)
 		return
@@ -893,7 +893,7 @@ func LoadYamlConfig(fileName string, AConfig any, handler func(data []byte, ACon
 //LoadYamlConfigByAbsolutPath read fileName from absolute path fileName,eg:/home/isc-gobase/application.yml, and transform it to AConfig
 //note: AConfig must be a pointer
 func LoadYamlConfigByAbsolutPath(path string, AConfig any, handler func(data []byte, AConfig any) error) error {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Printf("读取文件异常(%v)", err)
 	}
@@ -919,7 +919,7 @@ func LoadSpringConfig(AConfig any) {
 		v3 := reflect.ValueOf(o2)
 		act := v3.FieldByName("Active").String()
 		if act != "" && act != "default" {
-			yamlAdditional, err := ioutil.ReadFile(fmt.Sprintf("./application-%s.yml", act))
+			yamlAdditional, err := os.ReadFile(fmt.Sprintf("./application-%s.yml", act))
 			if err != nil {
 				log.Printf("读取 application-%s.yml 失败", act)
 				return err

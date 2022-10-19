@@ -190,7 +190,7 @@ func TestCustomize6_1(t *testing.T) {
 	True(t, result)
 
 	str := "{\"name\":\"xxx\", \"age\":12}"
-	json.Unmarshal([]byte(str), &value1)
+	_ = json.Unmarshal([]byte(str), &value1)
 	result, msg = validate.Check(value1, "flag")
 	FalseMsg(t, result, msg)
 

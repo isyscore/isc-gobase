@@ -15,8 +15,8 @@ type Value struct {
 func Test_cache_Get(t *testing.T) {
 	c := New()
 	v := Value{"库陈胜", 2022}
-	c.Set("test", v)
-	c.Set("test1", "啊哈")
+	_ = c.Set("test", v)
+	_ = c.Set("test1", "啊哈")
 	get, err := c.Get("test")
 	t.Logf("result %v,%v", get, err)
 
@@ -27,14 +27,14 @@ func Test_cache_Get(t *testing.T) {
 
 func Test_cache_Get1(t *testing.T) {
 	c := NewWithExpiration(1 * time.Second)
-	c.Set("testV", "库陈胜")
+	_ = c.Set("testV", "库陈胜")
 	time.Sleep(1 * time.Second)
 	get, b := c.Get("testV")
 	if b {
 		t.Error("expire fail get is ", get)
 	}
-	c.SetHash("Key", "subKey", "库陈胜")
-	c.SetHash("Key", "6不liuKey@", "贼溜")
+	_ = c.SetHash("Key", "subKey", "库陈胜")
+	_ = c.SetHash("Key", "6不liuKey@", "贼溜")
 
 	if v1, b := c.Get("Key"); !b {
 		t.Error("未获取到hash值")
@@ -70,11 +70,11 @@ func Test_cache_Get2(t *testing.T) {
 	for i := 0; i < length/3; i++ {
 		key := fmt.Sprintf("%s%d", "Key", i)
 		go func(ii int, k string) {
-			c.Set(k, "库陈胜"+k)
+			_ = c.Set(k, "库陈胜"+k)
 			ch <- int8(1)
-			c.SetHash(k+"hash", strconv.Itoa(ii), "性能测试"+k)
+			_ = c.SetHash(k+"hash", strconv.Itoa(ii), "性能测试"+k)
 			ch <- int8(1)
-			c.AddItem(k, ii)
+			_ = c.AddItem(k, ii)
 			ch <- int8(1)
 		}(i, key)
 	}

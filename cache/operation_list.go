@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func (c *cache) AddItem(key string, value ...any) error {
+func (c *Cache) AddItem(key string, value ...any) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -28,7 +28,7 @@ func (c *cache) AddItem(key string, value ...any) error {
 }
 
 //SetItem set or replace a value of items by index
-func (c *cache) SetItem(key string, idx int, value any) error {
+func (c *Cache) SetItem(key string, idx int, value any) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; found {
@@ -49,7 +49,7 @@ func (c *cache) SetItem(key string, idx int, value any) error {
 }
 
 //GetItem return an array of points or nil
-func (c *cache) GetItem(key string) []any {
+func (c *Cache) GetItem(key string) []any {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {
@@ -64,7 +64,7 @@ func (c *cache) GetItem(key string) []any {
 }
 
 //GetItemByIndex return a value of Type is T or nil
-func (c *cache) GetItemByIndex(key string, idx int) any {
+func (c *Cache) GetItemByIndex(key string, idx int) any {
 	if idx < 0 {
 		return nil
 	}
@@ -78,7 +78,7 @@ func (c *cache) GetItemByIndex(key string, idx int) any {
 }
 
 //RemoveItem an item from the cache. Does nothing if the key is not in the cache.
-func (c *cache) RemoveItem(key string, idx int) error {
+func (c *Cache) RemoveItem(key string, idx int) error {
 	if idx < 0 {
 		c.Remove(key)
 		return nil
@@ -92,6 +92,6 @@ func (c *cache) RemoveItem(key string, idx int) error {
 	}
 	newItem := item[:idx]
 	newItem = append(newItem, item[idx+1:]...)
-	c.Set(key, newItem)
+	_ = c.Set(key, newItem)
 	return nil
 }
