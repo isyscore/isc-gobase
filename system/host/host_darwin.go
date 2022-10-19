@@ -10,7 +10,7 @@ import (
 	"github.com/isyscore/isc-gobase/system/common"
 	"github.com/isyscore/isc-gobase/system/process"
 	"golang.org/x/sys/unix"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -60,9 +60,11 @@ func UsersWithContext(ctx context.Context) ([]UserStat, error) {
 	if err != nil {
 		return ret, err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
-	buf, err := ioutil.ReadAll(file)
+	buf, err := io.ReadAll(file)
 	if err != nil {
 		return ret, err
 	}

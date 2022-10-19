@@ -31,14 +31,14 @@ func TestUnGzip(t *testing.T) {
 
 func TestGZipFile(t *testing.T) {
 	file.AppendFile("./zip/test3.txt", "cc")
-	compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
+	_ = compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
 	file.DeleteDirs("./zip/")
 }
 
 func TestUnGZipFile(t *testing.T) {
 	file.AppendFile("./zip/test3.txt", "cc")
-	compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
-	compress.GzipDeCompressFile("./zip/test3.txt.gz", "./zip/test3_1.txt")
+	_ = compress.GzipCompressFile("./zip/test3.txt", "./zip/test3.txt.gz")
+	_ = compress.GzipDeCompressFile("./zip/test3.txt.gz", "./zip/test3_1.txt")
 	file.DeleteDirs("./zip/")
 }
 
@@ -67,7 +67,7 @@ func TestUnzip(t *testing.T) {
 	var files = []string{f1, f2, f3}
 
 	zipFile := "./zip/test.zip"
-	compress.Zip(zipFile, files)
+	_ = compress.Zip(zipFile, files)
 
 	// unzip
 	dest := "./zip/uncomp"

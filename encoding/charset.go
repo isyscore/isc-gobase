@@ -6,7 +6,7 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/ianaindex"
 	"golang.org/x/text/transform"
-	"io/ioutil"
+	"io"
 	"log"
 )
 
@@ -52,7 +52,7 @@ const (
 // 别名
 var charsetAlias = map[string]string{"HZGB2312": "HZ-GB-2312", "hzgb2312": "HZ-GB-2312", "GB2312": "HZ-GB-2312", "gb2312": "HZ-GB-2312"}
 
-// 判断指定的编码是否被支持
+// Supported 判断指定的编码是否被支持
 func Supported(charset string) bool {
 	return getEncoding(charset) != nil
 }
@@ -64,7 +64,7 @@ func Convert(src string, srcCharset string, dstCharset string) (string, error) {
 	dst := src
 	if srcCharset != "UTF-8" {
 		if e := getEncoding(srcCharset); e != nil {
-			tmp, err := ioutil.ReadAll(
+			tmp, err := io.ReadAll(
 				transform.NewReader(bytes.NewReader([]byte(src)), e.NewDecoder()),
 			)
 			if err != nil {
@@ -77,7 +77,7 @@ func Convert(src string, srcCharset string, dstCharset string) (string, error) {
 	}
 	if dstCharset != "UTF-8" {
 		if e := getEncoding(dstCharset); e != nil {
-			tmp, err := ioutil.ReadAll(
+			tmp, err := io.ReadAll(
 				transform.NewReader(bytes.NewReader([]byte(src)), e.NewEncoder()),
 			)
 			if err != nil {

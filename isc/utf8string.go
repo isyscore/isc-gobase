@@ -10,7 +10,7 @@ import (
 type ISCUTF8String []rune
 
 func NewUTF8String(str string) ISCUTF8String {
-	return ISCUTF8String([]rune(str))
+	return ISCUTF8String(str)
 }
 
 func (s ISCUTF8String) String() string {
@@ -45,7 +45,7 @@ func (s ISCUTF8String) toIndex(idx int) int {
 	if idx < 0 {
 		return idx
 	}
-	buf := string(string(s)[:idx])
+	buf := string(s)[:idx]
 	runeBuf := []rune(buf)
 	return len(runeBuf)
 }
@@ -73,42 +73,42 @@ func (s ISCUTF8String) LastIndexOfFunc(f func(rune) bool) int {
 func (s ISCUTF8String) SplitN(sep ISCUTF8String, n int) []ISCUTF8String {
 	ss := strings.SplitN(string(s), string(sep), n)
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
 func (s ISCUTF8String) SplitAfterN(sep ISCUTF8String, n int) []ISCUTF8String {
 	ss := strings.SplitAfterN(string(s), string(sep), n)
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
 func (s ISCUTF8String) Split(sep ISCUTF8String) []ISCUTF8String {
 	ss := strings.Split(string(s), string(sep))
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
 func (s ISCUTF8String) SplitAfter(sep ISCUTF8String) []ISCUTF8String {
 	ss := strings.SplitAfter(string(s), string(sep))
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
 func (s ISCUTF8String) Fields() []ISCUTF8String {
 	ss := strings.Fields(string(s))
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
 func (s ISCUTF8String) FieldsFunc(f func(rune) bool) []ISCUTF8String {
 	ss := strings.FieldsFunc(string(s), f)
 	return ListToMapFrom[string, ISCUTF8String](ss).Map(func(item string) ISCUTF8String {
-		return ISCUTF8String([]rune(item))
+		return ISCUTF8String(item)
 	})
 }
 
@@ -121,47 +121,47 @@ func (s ISCUTF8String) EndsWith(suffix ISCUTF8String) bool {
 }
 
 func (s ISCUTF8String) TrimLeftFunc(f func(rune) bool) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimLeftFunc(string(s), f)))
+	return ISCUTF8String(strings.TrimLeftFunc(string(s), f))
 }
 
 func (s ISCUTF8String) TrimRightFunc(f func(rune) bool) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimRightFunc(string(s), f)))
+	return ISCUTF8String(strings.TrimRightFunc(string(s), f))
 }
 
 func (s ISCUTF8String) TrimFunc(f func(rune) bool) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimFunc(string(s), f)))
+	return ISCUTF8String(strings.TrimFunc(string(s), f))
 }
 
 func (s ISCUTF8String) Trim(cutset ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.Trim(string(s), string(cutset))))
+	return ISCUTF8String(strings.Trim(string(s), string(cutset)))
 }
 
 func (s ISCUTF8String) TrimLeft(cutset ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimLeft(string(s), string(cutset))))
+	return ISCUTF8String(strings.TrimLeft(string(s), string(cutset)))
 }
 
 func (s ISCUTF8String) TrimRight(cutset ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimRight(string(s), string(cutset))))
+	return ISCUTF8String(strings.TrimRight(string(s), string(cutset)))
 }
 
 func (s ISCUTF8String) TrimSpace() ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimSpace(string(s))))
+	return ISCUTF8String(strings.TrimSpace(string(s)))
 }
 
 func (s ISCUTF8String) TrimPrefix(prefix ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimPrefix(string(s), string(prefix))))
+	return ISCUTF8String(strings.TrimPrefix(string(s), string(prefix)))
 }
 
 func (s ISCUTF8String) TrimSuffix(suffix ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.TrimSuffix(string(s), string(suffix))))
+	return ISCUTF8String(strings.TrimSuffix(string(s), string(suffix)))
 }
 
 func (s ISCUTF8String) Replace(old, new ISCUTF8String, n int) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.Replace(string(s), string(old), string(new), n)))
+	return ISCUTF8String(strings.Replace(string(s), string(old), string(new), n))
 }
 
 func (s ISCUTF8String) ReplaceAll(old, new ISCUTF8String) ISCUTF8String {
-	return ISCUTF8String([]rune(strings.ReplaceAll(string(s), string(old), string(new))))
+	return ISCUTF8String(strings.ReplaceAll(string(s), string(old), string(new)))
 }
 
 func (s ISCUTF8String) EqualFold(t ISCUTF8String) bool {
@@ -169,15 +169,15 @@ func (s ISCUTF8String) EqualFold(t ISCUTF8String) bool {
 }
 
 func (s ISCUTF8String) ToUpper() ISCUTF8String {
-	return ISCUTF8String([]rune(strings.ToUpper(string(s))))
+	return ISCUTF8String(strings.ToUpper(string(s)))
 }
 
 func (s ISCUTF8String) ToLower() ISCUTF8String {
-	return ISCUTF8String([]rune(strings.ToLower(string(s))))
+	return ISCUTF8String(strings.ToLower(string(s)))
 }
 
 func (s ISCUTF8String) ToTitle() ISCUTF8String {
-	return ISCUTF8String([]rune(strings.ToTitle(string(s))))
+	return ISCUTF8String(strings.ToTitle(string(s)))
 }
 
 func (s ISCUTF8String) IsEmpty() bool {
@@ -226,12 +226,12 @@ func (s ISCUTF8String) SubStringAfterLast(delimiter ISCUTF8String) ISCUTF8String
 
 func (s ISCUTF8String) Insert(index int, substr ISCUTF8String) ISCUTF8String {
 	ss := string(s[:index]) + string(substr) + string(s[index:])
-	return ISCUTF8String([]rune(ss))
+	return ISCUTF8String(ss)
 }
 
 func (s ISCUTF8String) Delete(index int, count int) ISCUTF8String {
 	ss := string(s[:index]) + string(s[index+count:])
-	return ISCUTF8String([]rune(ss))
+	return ISCUTF8String(ss)
 }
 
 func (s ISCUTF8String) Matches(pattern ISCUTF8String) bool {

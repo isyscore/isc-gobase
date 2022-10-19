@@ -6,8 +6,7 @@ import (
 	"time"
 )
 
-type Cache *cache
-type cache struct {
+type Cache struct {
 	defaultExpiration time.Duration
 	items             map[string]Item
 	mu                sync.RWMutex
@@ -30,23 +29,23 @@ func (item *Item) Expired() bool {
 	return time.Now().UnixNano() > item.Ttl
 }
 
-func New() *cache {
+func New() *Cache {
 	return NewWithExpiration(0)
 }
 
-func NewWithExpiration(expiration time.Duration) *cache {
+func NewWithExpiration(expiration time.Duration) *Cache {
 	return NewWithExpirationAndCleanupInterval(expiration, 0)
 }
 
-func NewWithCleanupInterval(cleanupInterval time.Duration) *cache {
+func NewWithCleanupInterval(cleanupInterval time.Duration) *Cache {
 	return NewWithExpirationAndCleanupInterval(0, cleanupInterval)
 }
-func NewWithExpirationAndCleanupInterval(defaultExpiration, cleanupInterval time.Duration) *cache {
+func NewWithExpirationAndCleanupInterval(defaultExpiration, cleanupInterval time.Duration) *Cache {
 	if defaultExpiration == 0 {
 		defaultExpiration = -1
 	}
 	ch := make(chan bool)
-	c := &cache{
+	c := &Cache{
 		defaultExpiration: defaultExpiration,
 		items:             make(map[string]Item),
 		j: &janitor{
@@ -67,7 +66,7 @@ type janitor struct {
 	stop     chan bool
 }
 
-func (c *cache) runCleanup(cleanupInterval time.Duration) {
+func (c *Cache) runCleanup(cleanupInterval time.Duration) {
 	if cleanupInterval == 0 {
 		cleanupInterval = 500 * time.Millisecond
 	}
@@ -83,11 +82,11 @@ func (c *cache) runCleanup(cleanupInterval time.Duration) {
 	}
 }
 
-func stopJanitor(c *cache) {
+func stopJanitor(c *Cache) {
 	c.j.stop <- true
 }
 
-func (c *cache) DeleteExpired() {
+func (c *Cache) DeleteExpired() {
 	l := len(c.items)
 	if l < 1 {
 		return

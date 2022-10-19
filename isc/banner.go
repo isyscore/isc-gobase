@@ -2,7 +2,7 @@ package isc
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 var Banner = DefaultBanner
@@ -12,7 +12,7 @@ func PrintBanner() {
 }
 
 func LoadBanner(filePath string) {
-	if b, err := ioutil.ReadFile(filePath); err == nil {
+	if b, err := os.ReadFile(filePath); err == nil {
 		str := string(b)
 		fmt.Printf("%s\n", str)
 	} else {

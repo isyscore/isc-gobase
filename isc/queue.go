@@ -38,15 +38,11 @@ func newTimer() *timer {
 func (timer *timer) wait() bool {
 	select {
 	case <-timer.t.C:
-		{
-			return false
-		}
+		return false
 	case fa := <-timer.isEnd:
-		{
-			return fa
-		}
+		return fa
 	}
-	return false
+	// return false
 }
 
 func (timer *timer) end() {

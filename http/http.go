@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -197,7 +196,7 @@ func PostForm(url string, header http.Header, parameterMap map[string]any) (int,
 		_ = Body.Close()
 	}(resp.Body)
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return code, head, nil, err
 	}
@@ -346,12 +345,12 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 		code := httpResponse.StatusCode
 		headers := httpResponse.Header
 		if code != http.StatusOK {
-			body, _ := ioutil.ReadAll(httpResponse.Body)
+			body, _ := io.ReadAll(httpResponse.Body)
 			return code, headers, nil, &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
 		}
 
 		// We have seen inconsistencies even when we get 200 OK response
-		body, err := ioutil.ReadAll(httpResponse.Body)
+		body, err := io.ReadAll(httpResponse.Body)
 		if err != nil {
 			log.Printf("Couldn't parse response body(%v)", err)
 			return code, headers, nil, &NetError{ErrMsg: "Couldn't parse response body, err: " + err.Error()}
@@ -384,7 +383,7 @@ func callIgnoreReturn(httpRequest *http.Request, url string) error {
 
 		code := httpResponse.StatusCode
 		if code != http.StatusOK {
-			body, _ := ioutil.ReadAll(httpResponse.Body)
+			body, _ := io.ReadAll(httpResponse.Body)
 			return &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
 		}
 		return nil

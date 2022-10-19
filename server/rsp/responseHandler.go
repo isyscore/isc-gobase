@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/isyscore/isc-gobase/config"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -38,12 +38,12 @@ func ResponseHandler() gin.HandlerFunc {
 		// 开始时间
 		startTime := time.Now()
 
-		data, err := ioutil.ReadAll(c.Request.Body)
+		data, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			logger.Error("read request body failed,err = %s.", err)
 			return
 		}
-		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(data))
 
 		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw

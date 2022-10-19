@@ -2,11 +2,10 @@ package isc
 
 import (
 	"fmt"
+	"github.com/dlclark/regexp2"
 	"regexp"
 	"strconv"
 	"strings"
-
-	regexp2 "github.com/dlclark/regexp2"
 )
 
 type ISCString string

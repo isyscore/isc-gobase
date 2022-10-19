@@ -48,7 +48,7 @@ func GetBeanNames(beanName string) []string {
 		return keys
 	} else {
 		j := 0
-		keys := []string{}
+		var keys []string
 		for k := range BeanMap {
 			if strings.Contains(k, beanName) {
 				keys = append(keys, k)
@@ -67,8 +67,7 @@ func ExistBean(beanName string) bool {
 func CallFun(beanName, methodName string, parameterValueMap map[string]any) []any {
 	if beanValue, exist := BeanMap[beanName]; exist {
 		fType := reflect.TypeOf(beanValue)
-
-		result := []any{}
+		var result []any
 		for index, num := 0, fType.NumMethod(); index < num; index++ {
 			method := fType.Method(index)
 

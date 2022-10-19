@@ -1,7 +1,7 @@
 package process
 
 import (
-	"io/ioutil"
+	"io"
 	"net"
 	"os"
 	"reflect"
@@ -23,10 +23,10 @@ func skipIfNotImplementedErr(t *testing.T, err error) {
 	}
 }
 
-func testGetProcess() Process {
+func testGetProcess() *Process {
 	checkPid := os.Getpid() // process.test
 	ret, _ := NewProcess(int32(checkPid))
-	return *ret
+	return ret
 }
 
 func Test_Pids(t *testing.T) {
@@ -236,8 +236,8 @@ func Test_Process_CreateTime(t *testing.T) {
 		t.Errorf("process created time is wrong.")
 	}
 
-	gotElapsed := time.Since(time.Unix(int64(c/1000), 0))
-	maxElapsed := time.Duration(20 * time.Second)
+	gotElapsed := time.Since(time.Unix(c/1000, 0))
+	maxElapsed := 20 * time.Second
 
 	if gotElapsed >= maxElapsed {
 		t.Errorf("this process has not been running for %v", gotElapsed)
@@ -271,7 +271,9 @@ func Test_Connections(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to listen on %v: %v", addr, err)
 	}
-	defer l.Close()
+	defer func(l *net.TCPListener) {
+		_ = l.Close()
+	}(l)
 
 	tcpServerAddr := l.Addr().String()
 	tcpServerAddrIP := strings.Split(tcpServerAddr, ":")[0]
@@ -286,10 +288,12 @@ func Test_Connections(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		defer conn.Close()
+		defer func(conn net.Conn) {
+			_ = conn.Close()
+		}(conn)
 
 		serverEstablished <- struct{}{}
-		_, err = ioutil.ReadAll(conn)
+		_, err = io.ReadAll(conn)
 		if err != nil {
 			panic(err)
 		}
@@ -299,7 +303,9 @@ func Test_Connections(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to dial %v: %v", tcpServerAddr, err)
 	}
-	defer conn.Close()
+	defer func(conn net.Conn) {
+		_ = conn.Close()
+	}(conn)
 
 	// Rarely the call to net.Dial returns before the server connection is
 	// established. Wait so that the test doesn't fail.
@@ -400,20 +406,20 @@ func Test_AllProcesses_Cwd(t *testing.T) {
 func BenchmarkNewProcess(b *testing.B) {
 	checkPid := os.Getpid()
 	for i := 0; i < b.N; i++ {
-		NewProcess(int32(checkPid))
+		_, _ = NewProcess(int32(checkPid))
 	}
 }
 
 func BenchmarkProcessName(b *testing.B) {
 	p := testGetProcess()
 	for i := 0; i < b.N; i++ {
-		p.Name()
+		_, _ = p.Name()
 	}
 }
 
 func BenchmarkProcessPpid(b *testing.B) {
 	p := testGetProcess()
 	for i := 0; i < b.N; i++ {
-		p.Ppid()
+		_, _ = p.Ppid()
 	}
 }

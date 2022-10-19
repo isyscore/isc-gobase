@@ -113,7 +113,7 @@ const (
 	RLIMIT_RTTIME     int32 = 15
 )
 
-func (p Process) String() string {
+func (p *Process) String() string {
 	s, _ := json.Marshal(p)
 	return string(s)
 }
@@ -180,7 +180,7 @@ func NewProcessWithContext(ctx context.Context, pid int32) (*Process, error) {
 	if !exists {
 		return p, ErrorProcessNotRunning
 	}
-	p.CreateTimeWithContext(ctx)
+	_, _ = p.CreateTimeWithContext(ctx)
 	return p, nil
 }
 
@@ -304,10 +304,10 @@ func (p *Process) MemoryPercentWithContext(ctx context.Context) (float32, error)
 	}
 	used := processMemory.RSS
 
-	return (100 * float32(used) / float32(total)), nil
+	return 100 * float32(used) / float32(total), nil
 }
 
-// CPU_Percent returns how many percent of the CPU time this process uses
+// CPUPercent returns how many percent of the CPU time this process uses
 func (p *Process) CPUPercent() (float64, error) {
 	return p.CPUPercentWithContext(context.Background())
 }
@@ -470,7 +470,7 @@ func (p *Process) MemoryInfoEx() (*MemoryInfoExStat, error) {
 	return p.MemoryInfoExWithContext(context.Background())
 }
 
-// PageFaultsInfo returns the process's page fault counters.
+// PageFaults returns the process's page fault counters.
 func (p *Process) PageFaults() (*PageFaultsStat, error) {
 	return p.PageFaultsWithContext(context.Background())
 }
@@ -493,7 +493,7 @@ func (p *Process) Connections() ([]net.ConnectionStat, error) {
 	return p.ConnectionsWithContext(context.Background())
 }
 
-// Connections returns a slice of net.ConnectionStat used by the process at most `max`.
+// ConnectionsMax returns a slice of net.ConnectionStat used by the process at most `max`.
 func (p *Process) ConnectionsMax(max int) ([]net.ConnectionStat, error) {
 	return p.ConnectionsMaxWithContext(context.Background(), max)
 }

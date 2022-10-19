@@ -6,7 +6,7 @@ import (
 	"github.com/isyscore/isc-gobase/test"
 	"github.com/magiconair/properties"
 	"github.com/rs/zerolog/log"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -165,7 +165,7 @@ func TestPropertiesToMap5(t *testing.T) {
 }
 
 func propertiesToMap(t *testing.T, filePath string) {
-	bytes, err := ioutil.ReadFile(filePath)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		test.Err(t, err)
 		return
@@ -180,7 +180,7 @@ func propertiesToMap(t *testing.T, filePath string) {
 }
 
 func yamlToPropertiesWithKeyTest(t *testing.T, filePath string) {
-	bytes, err := ioutil.ReadFile(filePath)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		test.Err(t, err)
 		return
@@ -197,7 +197,7 @@ func yamlToPropertiesWithKeyTest(t *testing.T, filePath string) {
 }
 
 func yamlToKvListTest(t *testing.T, filePath string) {
-	bytes, err := ioutil.ReadFile(filePath)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		test.Err(t, err)
 		return
@@ -236,7 +236,7 @@ func yamlToKvListTest(t *testing.T, filePath string) {
 }
 
 func yamlToMapTest(t *testing.T, filePath string) {
-	bytes, err := ioutil.ReadFile(filePath)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		test.Err(t, err)
 		return
@@ -254,7 +254,7 @@ func yamlToMapTest(t *testing.T, filePath string) {
 }
 
 func propertiesToYamlTest(t *testing.T, filePath string) {
-	bytes, err := ioutil.ReadFile(filePath)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		test.Err(t, err)
 		return

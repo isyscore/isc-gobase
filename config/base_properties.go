@@ -96,7 +96,8 @@ type StorageConnectionConfig struct {
 }
 
 // ---------------------------- redis ----------------------------
-// base.redis前缀
+
+// RedisConfig base.redis前缀
 type RedisConfig struct {
 	Password string
 	Username string
@@ -141,7 +142,7 @@ type RedisConfig struct {
 	IdleCheckFrequency int
 }
 
-// base.redis.standalone
+// RedisStandaloneConfig base.redis.standalone
 type RedisStandaloneConfig struct {
 	Addr     string
 	Database int
@@ -150,7 +151,7 @@ type RedisStandaloneConfig struct {
 	ReadOnly bool
 }
 
-// base.redis.sentinel
+// RedisSentinelConfig base.redis.sentinel
 type RedisSentinelConfig struct {
 	// 哨兵的集群名字
 	Master string

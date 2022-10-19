@@ -7,7 +7,7 @@ import (
 
 //SetHash Add an item to the cache,replacing any existing item.
 //note key and subKey is primary key
-func (c *cache) SetHash(key, subKey string, value any) error {
+func (c *Cache) SetHash(key, subKey string, value any) error {
 	e := c.getUnixNano()
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -26,7 +26,7 @@ func (c *cache) SetHash(key, subKey string, value any) error {
 	return nil
 }
 
-func (c *cache) RemoveHash(key, subKey string) error {
+func (c *Cache) RemoveHash(key, subKey string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; found {
@@ -46,7 +46,7 @@ func (c *cache) RemoveHash(key, subKey string) error {
 
 //GetHash get a hash value from the cache.Returns the hashes or nil, and a bool indicating
 // whether the key was found
-func (c *cache) GetHash(key, subKey string) (any, bool) {
+func (c *Cache) GetHash(key, subKey string) (any, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if item, found := c.items[key]; !found {

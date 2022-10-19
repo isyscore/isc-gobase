@@ -13,6 +13,7 @@ require (
 	github.com/magiconair/properties v1.8.5
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/rs/zerolog v1.26.1
+    
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.2
 	github.com/tklauser/go-sysconf v0.3.10

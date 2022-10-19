@@ -70,12 +70,8 @@ func Check(object any, fieldNames ...string) (bool, string) {
 			continue
 		}
 
-		if fieldValue.Kind() == reflect.Ptr && !fieldValue.IsNil() {
-			fieldValue = fieldValue.Elem()
-		}
-
 		// 基本类型
-		if matcher.IsCheckedKing(fieldValue.Type()) {
+		if matcher.IsCheckedKing(fieldValue.Type()) || (fieldValue.Kind() == reflect.Ptr && !fieldValue.Elem().IsValid()) || (fieldValue.Kind() == reflect.Ptr && matcher.IsCheckedKing(fieldValue.Elem().Type())) {
 			tagJudge := field.Tag.Get(constant.MATCH)
 			if len(tagJudge) == 0 {
 				continue
@@ -90,7 +86,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 				close(ch)
 				return false, checkResult.ErrMsg
 			}
-		} else if fieldValue.Kind() == reflect.Struct {
+		} else if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
 			// struct 结构类型
 			tagMatch := field.Tag.Get(constant.MATCH)
 			if len(tagMatch) == 0 || (len(tagMatch) == 1 && tagMatch != constant.CHECK) {
@@ -100,7 +96,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 			if !result {
 				return false, err
 			}
-		} else if fieldValue.Kind() == reflect.Map {
+		} else if fieldValue.Kind() == reflect.Map || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Map) {
 			// map结构
 			if fieldValue.Len() == 0 {
 				continue
@@ -119,7 +115,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 					return false, err
 				}
 			}
-		} else if fieldValue.Kind() == reflect.Array {
+		} else if fieldValue.Kind() == reflect.Array || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Array) {
 			// Array 结构
 			arrayLen := fieldValue.Len()
 			for arrayIndex := 0; arrayIndex < arrayLen; arrayIndex++ {
@@ -129,7 +125,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 					return false, err
 				}
 			}
-		} else if fieldValue.Kind() == reflect.Slice {
+		} else if fieldValue.Kind() == reflect.Slice || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Slice) {
 			// Slice 结构
 			tagJudge := field.Tag.Get(constant.MATCH)
 			if len(tagJudge) == 0 {
