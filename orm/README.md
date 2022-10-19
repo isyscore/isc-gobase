@@ -1,5 +1,8 @@
 # orm
-对业内的常见Orm进行封装，进行方便使用
+对业内的常见Orm进行封装，进行方便使用，目前支持的有
+- gorm
+- xorm
+- borm：基于database包进行的配置化封装
 
 ### 单数据源
 #### 代码
@@ -15,8 +18,8 @@ orm.GetGormDbWitConfig(gormConfig *gorm.Config)
 // xorm：获取默认配置库实例
 orm.GetXormDb()
 
-// xorm：获取默认配置库实例，自定义配置
-orm.GetXormDbWitConfig(gormConfig *gorm.Config)
+// borm：获取默认配置库实例
+orm.GetBormDb()
 ```
 #### 配置
 ```yaml
@@ -62,8 +65,8 @@ orm.GetGormDbWithNameAndConfig(gormConfig *gorm.Config)
 // xorm：根据数据源配置名获取库实例
 orm.GetXormDbWithName(datasourceName string)
 
-// xorm：根据数据源配置名获取库实例，自定义配置
-orm.GetXormDbWithNameAndConfig(gormConfig *gorm.Config)
+// borm：根据数据源配置名获取库实例
+orm.GetBormDbWithName(datasourceName string)
 ```
 #### 配置
 ```yml
@@ -154,6 +157,11 @@ func Test(t *testing.T) {
 ```
 
 ### 示例：xorm
+// todo
+```go
+
+```
+### 示例：borm
 // todo
 ```go
 
