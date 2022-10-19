@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/tracing/sql/tracingGorm"
+	"github.com/isyscore/isc-gobase/tracing"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -49,22 +49,24 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
-	if OrmIsOpen() {
-		err := gormDb.Use(tracingGorm.NewDefault(
-			config.GetValueStringDefault("base.application.name", "gobase-default"),
-			config.GetValueStringDefault("base.tracing.collector-endpoint", "http://isc-core-back-service:31300/api/core/back/v1/middle/spans"),
-		))
+	if OrmTracingIsOpen() {
+		err := tracing.InitTracing()
 		if err != nil {
-			logger.Warn("接入tracing异常：%v", err.Error())
+			logger.Warn("链路全局初始化失败，gorm 不接入埋点，错误：%v", err.Error())
+		} else {
+			err := gormDb.Use(tracing.NewGormPlugin())
+			if err != nil {
+				logger.Warn("接入tracing异常：%v", err.Error())
+			}
 		}
 	}
 
 	d, _ := gormDb.DB()
 
-	maxIdelConns := config.GetValueInt("base.datasource.connect-pool.max-idel-conns")
-	if maxIdelConns != 0 {
+	maxIdleConns := config.GetValueInt("base.datasource.connect-pool.max-idle-conns")
+	if maxIdleConns != 0 {
 		// 设置空闲的最大连接数
-		d.SetMaxIdleConns(maxIdelConns)
+		d.SetMaxIdleConns(maxIdleConns)
 	}
 
 	maxOpenConns := config.GetValueInt("base.datasource.connect-pool.max-open-conns")
@@ -83,10 +85,10 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		d.SetConnMaxLifetime(t)
 	}
 
-	maxIdelTime := config.GetValueString("base.datasource.connect-pool.max-idle-time")
-	if maxIdelTime != "" {
+	maxIdleTime := config.GetValueString("base.datasource.connect-pool.max-idle-time")
+	if maxIdleTime != "" {
 		// 设置conn最大空闲时间设置连接空闲的最大时间
-		t, err := time.ParseDuration(maxIdelTime)
+		t, err := time.ParseDuration(maxIdleTime)
 		if err != nil {
 			logger.Warn("读取配置【base.datasource.connect-pool.max-idle-time】异常", err)
 		}
@@ -141,6 +143,6 @@ func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
 }
 
-func OrmIsOpen() bool {
+func OrmTracingIsOpen() bool {
 	return config.GetValueBoolDefault("base.tracing.enable", true) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
 }

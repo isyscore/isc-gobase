@@ -1,6 +1,5 @@
 # trace
 
-### gorm
 ```yaml
 base:
   tracing:
@@ -10,5 +9,8 @@ base:
     collector-endpoint: http://isc-core-back-service:31300/api/core/back/v1/middle/spans
     orm:
       # 是否启动gorm采集；该开关与总开关是与的关系；目前go只支持gorm和xorm；默认关闭
+      enable: false
+    redis:
+      # 是否启动redis采集（go-redis客户端）；默认关闭
       enable: false
 ```

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/isyscore/isc-gobase/tracing"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -84,6 +85,11 @@ func InitServer() {
 	}
 	engine.Use(Cors(), gin.Recovery())
 	engine.Use(rsp.ResponseHandler())
+
+	// 添加 tracing插件
+	if config.GetValueBoolDefault("base.tracing.enable", true) {
+		engine.Use(tracing.TracePluginHandler())
+	}
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {

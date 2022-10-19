@@ -47,6 +47,8 @@ base:
   application:
     # 应用名，默认为空
     name: isc-gobase-demo
+    # 服务版本号
+    version: vx.x.xx
   server:
     # 是否启用，默认：true
     enable: true

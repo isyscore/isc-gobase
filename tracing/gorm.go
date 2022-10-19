@@ -1,4 +1,4 @@
-package tracingGorm
+package tracing
 
 import (
 	"context"
@@ -7,27 +7,15 @@ import (
 	"github.com/opentracing/opentracing-go"
 	opentracinglog "github.com/opentracing/opentracing-go/log"
 	"github.com/rs/zerolog/log"
-	"github.com/uber/jaeger-client-go"
-	"github.com/uber/jaeger-client-go/config"
-	jaegerlog "github.com/uber/jaeger-client-go/log"
 	"github.com/uber/jaeger-client-go/zipkin"
 	"gorm.io/gorm"
-	"net/http"
-	"os"
 )
 
 type GobasePluginOfGorm struct {
-	ServiceName       string
-	CollectorEndpoint string
 }
 
-var (
-	H http.Header
-	_ gorm.Plugin = &GobasePluginOfGorm{}
-)
-
 const (
-	spanKey = "gobase-gorm-collector"
+	spanKey = "gobase-gorm-span"
 
 	// 自定义事件名称
 	_eventBeforeCreate = "gobase-gorm-collector-event:before_create"
@@ -53,18 +41,13 @@ const (
 )
 
 // 开箱即用，serviceName: 此项目的微服务名称，collectorEndpoint: 数据收集器的地址(如:http://isc-core-back-service:31300/api/core/back/v1/middle/spans)
-func NewDefault(serviceName, collectorEndpoint string) gorm.Plugin {
-	i := &GobasePluginOfGorm{
-		ServiceName:       serviceName,
-		CollectorEndpoint: collectorEndpoint,
-	}
-	i.bootTracerBasedJaeger()
-	return i
+func NewGormPlugin() gorm.Plugin {
+	return &GobasePluginOfGorm{}
 }
 
 // 实现 gorm 插件所需方法
 func (i *GobasePluginOfGorm) Name() string {
-	return "GormGobasePlugin"
+	return "gobase_gorm_plugin"
 }
 
 // 实现 gorm 插件所需方法
@@ -93,7 +76,6 @@ func (i *GobasePluginOfGorm) Initialize(db *gorm.DB) (err error) {
 
 // 注册各种前置事件时，对应的事件方法
 func _injectBefore(db *gorm.DB, op string) {
-
 	if db == nil {
 		return
 	}
@@ -103,9 +85,9 @@ func _injectBefore(db *gorm.DB, op string) {
 		return
 	}
 
-	// 这里是关键，通过 istio 传过来的 header 解析出父 span，如果没有，则会创建新的根 span
+	// 这里是关键，通过 envoy 传过来的 header 解析出父 span，如果没有，则会创建新的根 span
 	zipkinPropagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
-	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(H))
+	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
 	if err != nil {
 		log.Printf("jaeger span 解析失败, 错误原因: %v", err)
 	}
@@ -146,14 +128,14 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	logger.Info("header 的所有 信息 %v", H)
+	logger.Info("header 的所有 信息 %v", GetHeader())
 
 	// 记录其他内容
 	span.LogFields(
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),
 		opentracinglog.String("table", db.Statement.Table),
 		opentracinglog.String("query", db.Statement.SQL.String()),
-		opentracinglog.String("parentId", H.Get("x-b3-spanid")),
+		opentracinglog.String("parentId", GetHeaderWithKey("x-b3-spanid")),
 		opentracinglog.String("bindings", string(b)),
 	)
 }
@@ -180,30 +162,4 @@ func beforeRow(db *gorm.DB) {
 
 func beforeRaw(db *gorm.DB) {
 	_injectBefore(db, _opRaw)
-}
-
-// 默认初始化一个
-func (i *GobasePluginOfGorm) bootTracerBasedJaeger() {
-	// 基础配置
-	tracer, _, err := config.Configuration{
-		Sampler: &config.SamplerConfig{
-			Type:  jaeger.SamplerTypeConst,
-			Param: 1,
-		},
-		ServiceName: i.ServiceName,
-		Reporter: &config.ReporterConfig{
-			LogSpans:          true,
-			CollectorEndpoint: i.CollectorEndpoint,
-		},
-	}.NewTracer(
-		config.Logger(jaegerlog.StdLogger),
-	)
-
-	if err != nil {
-		log.Printf("jaeger tracer 插件初始化失败, 错误原因: %v", err)
-		os.Exit(1)
-	}
-
-	// 设为全局使用的 tracer
-	opentracing.SetGlobalTracer(tracer)
 }
