@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/listener"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
