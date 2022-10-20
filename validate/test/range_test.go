@@ -396,6 +396,16 @@ func TestRangeString(t *testing.T) {
 	value = RangeStringEntity{Name: "z"}
 	result, err = validate.Check(value, "name")
 	Equal(t, err, "属性 [Name] 值 [z] 长度没有命中只允许的范围 [[2, 12]]", result, false)
+
+	//测试中文 异常情况
+	value = RangeStringEntity{Name: "中"}
+	result, err = validate.Check(value, "name")
+	Equal(t, err, "属性 [Name] 值 [中] 长度没有命中只允许的范围 [[2, 12]]", result, false)
+
+	//测试中文 正常情况
+	value = RangeStringEntity{Name: "中国"}
+	result, err = validate.Check(value, "name")
+	TrueErr(t, result, err)
 }
 
 // 测试分片类型1

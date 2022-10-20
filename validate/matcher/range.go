@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	t0 "time"
+	"unicode/utf8"
 
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/compiler"
@@ -71,7 +72,7 @@ func (rangeMatch *RangeMatch) Match(_ any, field reflect.StructField, fieldValue
 	if IsCheckNumber(fieldKind) {
 		env["value"] = fieldValue
 	} else if fieldKind == reflect.String {
-		env["value"] = len(fmt.Sprintf("%v", fieldValue))
+		env["value"] = utf8.RuneCountInString(fmt.Sprintf("%v", fieldValue))
 	} else if fieldKind == reflect.Slice {
 		env["value"] = reflect.ValueOf(fieldValue).Len()
 	} else if field.Type.String() == "time.Time" {
