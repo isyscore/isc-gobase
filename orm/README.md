@@ -166,3 +166,6 @@ func Test(t *testing.T) {
 ```go
 
 ```
+
+### 注意
+请不要在业务中使用init方法获取db，因为这个时候config的配置还没有加载出来

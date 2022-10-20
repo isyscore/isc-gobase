@@ -90,6 +90,7 @@ func _injectBefore(db *gorm.DB, op string) {
 	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
 	if err != nil {
 		log.Printf("jaeger span 解析失败, 错误原因: %v", err)
+		return
 	}
 	span, _ := opentracing.StartSpanFromContext(db.Statement.Context, op, opentracing.ChildOf(spanCtx))
 	db.InstanceSet(spanKey, span)

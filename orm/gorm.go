@@ -54,6 +54,7 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		if err != nil {
 			logger.Warn("链路全局初始化失败，gorm 不接入埋点，错误：%v", err.Error())
 		} else {
+			logger.Debug("开启orm的tracing")
 			err := gormDb.Use(tracing.NewGormPlugin())
 			if err != nil {
 				logger.Warn("接入tracing异常：%v", err.Error())

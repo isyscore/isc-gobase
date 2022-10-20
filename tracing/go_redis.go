@@ -25,6 +25,7 @@ func (redisHookError) BeforeProcess(ctx context.Context, cmd redis.Cmder) (conte
 	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
 	if err != nil {
 		logger.Warn("span 解析失败, 错误原因: %v", err)
+		return ctx, err
 	}
 
 	span, _ := opentracing.StartSpanFromContext(ctx, cmd.Name(), opentracing.ChildOf(spanCtx))
