@@ -46,17 +46,13 @@ func (redisHookError) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	logger.Debug("header 的所有 信息 %v", GetHeader())
+
 	args, err := json.Marshal(cmd.Args())
 	if err != nil {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	cmd.FullName()
-
-	// 踩点率配置
-
-	// 记录其他内容
+	logger.Info("发送redis的埋点信息")
 	span.LogFields(
 		opentracinglog.String("cmd", cmd.Name()),
 		opentracinglog.String("fullName", cmd.FullName()),

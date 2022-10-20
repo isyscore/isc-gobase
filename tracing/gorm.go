@@ -128,8 +128,6 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	logger.Info("header 的所有 信息 %v", GetHeader())
-
 	// 记录其他内容
 	span.LogFields(
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),
