@@ -2,6 +2,9 @@ package tracing
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/goid"
@@ -9,15 +12,16 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	jaegerConfig "github.com/uber/jaeger-client-go/config"
-	"net/http"
-	"sync"
 )
 
-// 我觉得这个有点问题，按理说应该是goid
 var headerStorage goid.LocalStorage
 var GlobalTracing opentracing.Tracer
 var traceConfig bool
 var loadLock sync.Mutex
+
+func init() {
+	headerStorage = goid.NewLocalStorage()
+}
 
 func InitTracing() error {
 	loadLock.Lock()
@@ -41,7 +45,7 @@ func InitTracing() error {
 		},
 	}
 
-	tracer, _, err := conf.NewTracer(jaegerConfig.Logger(&baseJaegerLogger{}),)
+	tracer, _, err := conf.NewTracer(jaegerConfig.Logger(&baseJaegerLogger{}))
 	if err != nil {
 		logger.Warn("globalTracer 插件初始化失败, 错误原因: %v", err)
 		return err
@@ -49,7 +53,6 @@ func InitTracing() error {
 
 	GlobalTracing = tracer
 	opentracing.SetGlobalTracer(GlobalTracing)
-	headerStorage = goid.NewLocalStorage()
 
 	traceConfig = true
 	return nil
