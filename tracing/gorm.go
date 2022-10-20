@@ -6,7 +6,6 @@ import (
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/opentracing/opentracing-go"
 	opentracinglog "github.com/opentracing/opentracing-go/log"
-	"github.com/rs/zerolog/log"
 	"github.com/uber/jaeger-client-go/zipkin"
 	"gorm.io/gorm"
 )
@@ -89,7 +88,7 @@ func _injectBefore(db *gorm.DB, op string) {
 	zipkinPropagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
 	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
 	if err != nil {
-		log.Printf("jaeger span 解析失败, 错误原因: %v", err)
+		logger.Error("jaeger span 解析失败, 错误原因: %v", err)
 		return
 	}
 	span, _ := opentracing.StartSpanFromContext(db.Statement.Context, op, opentracing.ChildOf(spanCtx))
