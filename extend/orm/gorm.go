@@ -14,24 +14,24 @@ import (
 	"time"
 )
 
-func GetGormDb() (*gorm.DB, error) {
-	return doGetGormDb("", &gorm.Config{})
+func NewGormDb() (*gorm.DB, error) {
+	return doNewGormDb("", &gorm.Config{})
 }
 
-func GetGormDbWitConfig(gormConfig *gorm.Config) (*gorm.DB, error) {
-	return doGetGormDb("", gormConfig)
+func NewGormDbWitConfig(gormConfig *gorm.Config) (*gorm.DB, error) {
+	return doNewGormDb("", gormConfig)
 }
 
-func GetGormDbWithName(datasourceName string) (*gorm.DB, error) {
-	return doGetGormDb(datasourceName, &gorm.Config{})
+func NewGormDbWithName(datasourceName string) (*gorm.DB, error) {
+	return doNewGormDb(datasourceName, &gorm.Config{})
 }
 
-func GetGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
-	return doGetGormDb(datasourceName, gormConfig)
+func NewGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
+	return doNewGormDb(datasourceName, gormConfig)
 }
 
-func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
-	datasourceConfig := DatasourceConfig{}
+func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
+	datasourceConfig := config.DatasourceConfig{}
 	targetDatasourceName := "base.datasource"
 	if datasourceName != "" {
 		targetDatasourceName = "base.datasource." + datasourceName
@@ -82,8 +82,9 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		t, err := time.ParseDuration(maxLifeTime)
 		if err != nil {
 			logger.Warn("读取配置【base.datasource.connect-pool.max-life-time】异常", err)
+		} else {
+			d.SetConnMaxLifetime(t)
 		}
-		d.SetConnMaxLifetime(t)
 	}
 
 	maxIdleTime := config.GetValueString("base.datasource.connect-pool.max-idle-time")
@@ -92,13 +93,14 @@ func doGetGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		t, err := time.ParseDuration(maxIdleTime)
 		if err != nil {
 			logger.Warn("读取配置【base.datasource.connect-pool.max-idle-time】异常", err)
+		} else {
+			d.SetConnMaxIdleTime(t)
 		}
-		d.SetConnMaxIdleTime(t)
 	}
 	return gormDb, nil
 }
 
-func getDialect(dbType string, datasourceConfig DatasourceConfig) gorm.Dialector {
+func getDialect(dbType string, datasourceConfig config.DatasourceConfig) gorm.Dialector {
 	sqlConfigMap := map[string]string{}
 	err := config.GetValueObject("base.datasource.url-config", &sqlConfigMap)
 	if err != nil {

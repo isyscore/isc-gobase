@@ -29,7 +29,7 @@ func init() {
 	}
 }
 
-func GetClient() (goredis.UniversalClient, error) {
+func NewClient() (goredis.UniversalClient, error) {
 	var rdbClient goredis.UniversalClient
 	if config.RedisCfg.Sentinel.Master != "" {
 		rdbClient = goredis.NewFailoverClient(getSentinelConfig())

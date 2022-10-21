@@ -3,14 +3,14 @@ package test
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
-	"github.com/isyscore/isc-gobase/orm"
+	orm2 "github.com/isyscore/isc-gobase/extend/orm"
 	"testing"
 	"time"
 )
 
 func Test1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
-	db, _ := orm.GetGormDb()
+	db, _ := orm2.NewGormDb()
 
 	// 删除表
 	db.Exec("drop table isc_demo.gobase_demo")

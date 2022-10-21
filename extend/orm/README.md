@@ -10,21 +10,23 @@
 import "github.com/isyscore/isc-gobase/orm"
 
 // gorm：获取默认配置库实例
-orm.GetGormDb()
+orm.NewGormDb()
 
 // gorm：获取默认配置库实例，自定义配置
-orm.GetGormDbWitConfig(gormConfig *gorm.Config)
+orm.NewGormDbWitConfig(gormConfig *gorm.Config)
 
 // xorm：获取默认配置库实例
-orm.GetXormDb()
+orm.NewXormDb()
 
 // borm：获取默认配置库实例
-orm.GetBormDb()
+orm.NewBormDb()
 ```
 #### 配置
 ```yaml
 base:
   datasource:
+    # 是否启用，默认关闭
+    enable: true
     username: user
     password: passwd
     host: 10.33.33.33
@@ -57,21 +59,23 @@ base:
 import "github.com/isyscore/isc-gobase/orm"
 
 // gorm：根据数据源配置名获取库实例
-orm.GetGormDbWithName(datasourceName string)
+orm.NewGormDbWithName(datasourceName string)
 
 // gorm：根据数据源配置名获取库实例，自定义配置
-orm.GetGormDbWithNameAndConfig(gormConfig *gorm.Config)
+orm.NewGormDbWithNameAndConfig(gormConfig *gorm.Config)
 
 // xorm：根据数据源配置名获取库实例
-orm.GetXormDbWithName(datasourceName string)
+orm.NewXormDbWithName(datasourceName string)
 
 // borm：根据数据源配置名获取库实例
-orm.GetBormDbWithName(datasourceName string)
+orm.NewBormDbWithName(datasourceName string)
 ```
 #### 配置
 ```yml
 base:
   datasource:
+    # 是否启用，默认关闭
+    enable: true
     # 数据源配置名1
     xxx-name1:
       username: xxx
@@ -128,7 +132,7 @@ base:
 ### 示例：gorm
 ```go
 func Test(t *testing.T) {
-    db, _ := orm.GetGormDb()
+    db, _ := orm.NewGormDb()
 
     // 删除表
     db.Exec("drop table isc_demo.gobase_demo")

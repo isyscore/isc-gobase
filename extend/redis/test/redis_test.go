@@ -2,17 +2,16 @@ package test
 
 import (
 	"context"
+	redis2 "github.com/isyscore/isc-gobase/extend/redis"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
-
-	"github.com/isyscore/isc-gobase/redis"
 )
 
 func TestRedis(t *testing.T) {
 	// 客户端获取
-	rdb, err := redis.GetClient()
+	rdb, err := redis2.NewClient()
 	if err != nil {
 		logger.Warn("连接redis错误 %v", err)
 		return

@@ -65,7 +65,7 @@ root@user ~> curl http://localhost:8080/api/get
 | [server](/server)| 服务处理 |
 | [goid](/goid)| 局部id传递处理（theadlocal） |
 | [json](/json)| json字符串处理工具 |
-| [redis](/redis)| go-redis的封装 |
+| [redis](/extend/redis)| go-redis的封装 |
 | [cache](/cache)| 缓存工具 |
 | [time](/time)| 时间管理工具 |
 | [file](/file)| 文件管理工具 |

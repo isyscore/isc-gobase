@@ -51,7 +51,7 @@ import (
 )
 
 func TestRedis(t *testing.T) {
-    rdb, _ := redis.GetClient()
+    rdb, _ := redis.NewClient()
     
     // ...
 }
