@@ -9,17 +9,17 @@ import (
 	opentracinglog "github.com/opentracing/opentracing-go/log"
 	"github.com/uber/jaeger-client-go/zipkin"
 )
-type redisHookError struct {
+type GoBaseRedisHook struct {
 	redis.Hook
 }
 
 func NewGoRedisTracer() redis.Hook {
-	return redisHookError{}
+	return GoBaseRedisHook{}
 }
 
-var contextSpanKey = "gobase-redis-span"
+var spanKeyRedis = "gobase-redis-span"
 
-func (redisHookError) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
+func (GoBaseRedisHook) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 	// 这里是关键，通过 envoy 传过来的 header 解析出父 span，如果没有，则会创建新的根 span
 	zipkinPropagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
 	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
@@ -29,12 +29,12 @@ func (redisHookError) BeforeProcess(ctx context.Context, cmd redis.Cmder) (conte
 	}
 
 	span, _ := opentracing.StartSpanFromContext(ctx, cmd.Name(), opentracing.ChildOf(spanCtx))
-	ctx = context.WithValue(ctx, contextSpanKey, span)
+	ctx = context.WithValue(ctx, spanKeyRedis, span)
 	return ctx, nil
 }
 
-func (redisHookError) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
-	span, ok := ctx.Value(contextSpanKey).(opentracing.Span)
+func (GoBaseRedisHook) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
+	span, ok := ctx.Value(spanKeyRedis).(opentracing.Span)
 	if !ok || span == nil {
 		return nil
 	}
@@ -46,7 +46,6 @@ func (redisHookError) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-
 	args, err := json.Marshal(cmd.Args())
 	if err != nil {
 		span.LogFields(opentracinglog.Error(err))
@@ -57,7 +56,7 @@ func (redisHookError) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 		opentracinglog.String("cmd", cmd.Name()),
 		opentracinglog.String("fullName", cmd.FullName()),
 		opentracinglog.String("parentId", GetHeaderWithKey("x-b3-spanid")),
-		opentracinglog.String("args", string(args)),
+		opentracinglog.String("parameters", string(args)),
 	)
 	return nil
 }

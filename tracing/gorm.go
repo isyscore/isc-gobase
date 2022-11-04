@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type GobasePluginOfGorm struct {
+type GobaseGormHook struct {
 }
 
 const (
-	spanKey = "gobase-gorm-span"
+	spanKeyGorm = "gobase-gorm-span"
 
 	// 自定义事件名称
 	_eventBeforeCreate = "gobase-gorm-collector-event:before_create"
@@ -41,16 +41,16 @@ const (
 
 // 开箱即用，serviceName: 此项目的微服务名称，collectorEndpoint: 数据收集器的地址(如:http://isc-core-back-service:31300/api/core/back/v1/middle/spans)
 func NewGormPlugin() gorm.Plugin {
-	return &GobasePluginOfGorm{}
+	return &GobaseGormHook{}
 }
 
 // 实现 gorm 插件所需方法
-func (i *GobasePluginOfGorm) Name() string {
+func (i *GobaseGormHook) Name() string {
 	return "gobase_gorm_plugin"
 }
 
 // 实现 gorm 插件所需方法
-func (i *GobasePluginOfGorm) Initialize(db *gorm.DB) (err error) {
+func (i *GobaseGormHook) Initialize(db *gorm.DB) (err error) {
 	// 在 gorm 中注册各种回调事件
 	for _, e := range []error{
 		db.Callback().Create().Before("gorm:create").Register(_eventBeforeCreate, beforeCreate),
@@ -92,7 +92,7 @@ func _injectBefore(db *gorm.DB, op string) {
 		return
 	}
 	span, _ := opentracing.StartSpanFromContext(db.Statement.Context, op, opentracing.ChildOf(spanCtx))
-	db.InstanceSet(spanKey, span)
+	db.InstanceSet(spanKeyGorm, span)
 }
 
 // 注册后置事件时，对应的事件方法
@@ -106,7 +106,7 @@ func after(db *gorm.DB) {
 		return
 	}
 
-	_span, isExist := db.InstanceGet(spanKey)
+	_span, isExist := db.InstanceGet(spanKeyGorm)
 	if !isExist || _span == nil {
 		return
 	}
@@ -134,7 +134,7 @@ func after(db *gorm.DB) {
 		opentracinglog.String("table", db.Statement.Table),
 		opentracinglog.String("query", db.Statement.SQL.String()),
 		opentracinglog.String("parentId", GetHeaderWithKey("x-b3-spanid")),
-		opentracinglog.String("bindings", string(b)),
+		opentracinglog.String("parameters", string(b)),
 	)
 }
 

@@ -27,7 +27,11 @@ require (
 	gorm.io/gorm v1.24.0
 )
 
-require go.etcd.io/etcd/client/v3 v3.5.5
+require (
+	go.etcd.io/etcd/client/v3 v3.5.5
+	go.uber.org/zap v1.17.0
+	google.golang.org/grpc v1.41.0
+)
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
@@ -68,11 +72,9 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
-	google.golang.org/grpc v1.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
