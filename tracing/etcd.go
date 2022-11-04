@@ -18,9 +18,6 @@ type GobaseEtcdHook struct {
 }
 
 func (pHook *GobaseEtcdHook) Before(ctx context.Context, op etcdClientV3.Op) context.Context {
-	if op.IsGet() {
-
-	}
 	// 这里是关键，通过 envoy 传过来的 header 解析出父 span，如果没有，则会创建新的根 span
 	zipkinPropagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
 	spanCtx, err := zipkinPropagator.Extract(opentracing.HTTPHeadersCarrier(GetHeader()))
