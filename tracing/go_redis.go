@@ -51,7 +51,6 @@ func (GoBaseRedisHook) AfterProcess(ctx context.Context, cmd redis.Cmder) error 
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	logger.Info("发送redis的埋点信息")
 	span.LogFields(
 		opentracinglog.String("cmd", cmd.Name()),
 		opentracinglog.String("fullName", cmd.FullName()),
