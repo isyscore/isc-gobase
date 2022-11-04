@@ -2,12 +2,14 @@ package etcd
 
 import (
 	"context"
+	"github.com/golang/glog"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 	"io"
 	"time"
 )
@@ -22,6 +24,8 @@ func init() {
 			return
 		}
 	}
+
+	grpclog.SetLoggerV2(&EtcdLogger{})
 }
 
 func NewEtcdClient() (*EtcdClientWrap, error) {
@@ -349,6 +353,76 @@ func (etcdWrap *EtcdClientWrap) Dial(ep string) (*grpc.ClientConn, error) {
 
 func (etcdWrap *EtcdClientWrap) ActiveConnection() *grpc.ClientConn {
 	return etcdWrap.Client.ActiveConnection()
+}
+
+type EtcdLogger struct{}
+
+func (g *EtcdLogger) Info(args ...interface{}) {
+	logger.Info("", args...)
+}
+
+func (g *EtcdLogger) Infoln(args ...interface{}) {
+	logger.Info("", args...)
+}
+
+func (g *EtcdLogger) Infof(format string, args ...interface{}) {
+	logger.Info(format, args)
+}
+
+func (g *EtcdLogger) InfoDepth(depth int, args ...interface{}) {
+	logger.Info("", args...)
+}
+
+func (g *EtcdLogger) Warning(args ...interface{}) {
+	logger.Warn("", args...)
+}
+
+func (g *EtcdLogger) Warningln(args ...interface{}) {
+	logger.Warn("", args...)
+}
+
+func (g *EtcdLogger) Warningf(format string, args ...interface{}) {
+	logger.Warn(format, args...)
+}
+
+func (g *EtcdLogger) WarningDepth(depth int, args ...interface{}) {
+	logger.Warn("", args...)
+}
+
+func (g *EtcdLogger) Error(args ...interface{}) {
+	logger.Error("", args...)
+}
+
+func (g *EtcdLogger) Errorln(args ...interface{}) {
+	logger.Error("", args...)
+}
+
+func (g *EtcdLogger) Errorf(format string, args ...interface{}) {
+	logger.Error(format, args...)
+}
+
+func (g *EtcdLogger) ErrorDepth(depth int, args ...interface{}) {
+	logger.Error("", args...)
+}
+
+func (g *EtcdLogger) Fatal(args ...interface{}) {
+	logger.Fatal("", args...)
+}
+
+func (g *EtcdLogger) Fatalln(args ...interface{}) {
+	logger.Fatal("", args...)
+}
+
+func (g *EtcdLogger) Fatalf(format string, args ...interface{}) {
+	logger.Fatal(format, args...)
+}
+
+func (g *EtcdLogger) FatalDepth(depth int, args ...interface{}) {
+	logger.Fatal("", args...)
+}
+
+func (g *EtcdLogger) V(l int) bool {
+	return bool(glog.V(glog.Level(l)))
 }
 
 func EtcdTracingIsOpen() bool {

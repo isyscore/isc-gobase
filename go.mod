@@ -28,6 +28,8 @@ require (
 )
 
 require (
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	go.etcd.io/etcd/api/v3 v3.5.5
 	go.etcd.io/etcd/client/v3 v3.5.5
 	go.uber.org/zap v1.17.0
 	google.golang.org/grpc v1.41.0
@@ -68,7 +70,6 @@ require (
 	github.com/swaggo/swag v1.8.5 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
