@@ -190,7 +190,7 @@ func graceRun(port int) {
 	if err := engineServer.Shutdown(ctx); err != nil {
 		logger.Warn("服务关闭异常: %v", err.Error())
 	}
-	logger.Info("服务端退出")
+	logger.Warn("服务端退出")
 }
 
 func RegisterStatic(relativePath string, rootPath string) gin.IRoutes {
