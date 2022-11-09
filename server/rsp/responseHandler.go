@@ -94,7 +94,7 @@ func ResponseHandler() gin.HandlerFunc {
 		}
 
 		// 1xx和2xx都是成功
-		if (statusCode < 300) && statusCode != 0 {
+		if (statusCode >= 300) && statusCode != 0 {
 			datas := config.BaseCfg.Server.Exception.Print.Exclude
 			for _, code := range datas {
 				if code == statusCode {

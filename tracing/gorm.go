@@ -128,8 +128,6 @@ func after(db *gorm.DB) {
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	// todo delete
-	logger.Info("发送mysql的埋点信息")
 	// 记录其他内容
 	span.LogFields(
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),

@@ -43,8 +43,6 @@ func (pHook *GobaseEtcdHook) After(ctx context.Context, op etcdClientV3.Op, pRsp
 		span.LogFields(opentracinglog.Error(err))
 	}
 
-	// todo delete
-	logger.Info("发送etcd的埋点信息")
 	span.LogFields(
 		opentracinglog.String("req", isc.ToJsonString(toRequestOp(op))),
 		opentracinglog.String("rsp", isc.ToJsonString(pRsp)),

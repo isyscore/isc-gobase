@@ -84,7 +84,10 @@ func (l *baseJaegerLogger) Error(msg string) {
 }
 
 func (l *baseJaegerLogger) Infof(msg string, args ...interface{}) {
-	logger.Info(msg, args...)
+	printLog := config.GetValueBoolDefault("base.tracing.print-log", false)
+	if printLog {
+		logger.Info(msg, args...)
+	}
 }
 
 func (l *baseJaegerLogger) Debugf(msg string, args ...interface{}) {
