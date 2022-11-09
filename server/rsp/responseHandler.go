@@ -93,7 +93,8 @@ func ResponseHandler() gin.HandlerFunc {
 			printReq(request.Uri, request)
 		}
 
-		if statusCode != 200 && statusCode != 0 {
+		// 2xx都是成功
+		if (statusCode / 200 > 1) && statusCode != 0 {
 			datas := config.BaseCfg.Server.Exception.Print.Exclude
 			for _, code := range datas {
 				if code == statusCode {
