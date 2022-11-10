@@ -19,7 +19,7 @@ type IsUnBlankMatch struct {
 	IsUnBlank bool
 }
 
-func (isUnBlankMatch *IsUnBlankMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
+func (isUnBlankMatch *IsUnBlankMatch) Match(_ map[string]interface{}, _ any, field reflect.StructField, fieldValue any) bool {
 	if reflect.TypeOf(fieldValue).Kind() != field.Type.Kind() {
 		isUnBlankMatch.SetBlackMsg("属性 %v 的值不是字符类型", field.Name)
 		return false

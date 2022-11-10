@@ -130,8 +130,29 @@ func main() {
 ```
 说明：<br/>
 
-1. 这里提供方法Check，用于核查属性，Check方法也支持核查指定属性，默认核查所有属性
+1. 这里提供方法Check，用于核查是否符合条件
 2. 提供标签match，标签内容中提供匹配器：value，该匹配器表示匹配的具体的一些值
+
+## api说明
+只提供两个Api，`Check` 和 `CheckWithParameter`
+```go
+// 入参：
+//  @any            待核查对象
+//  @fieldNames     待核查对象的核查属性；不指定则核查所有属性名
+// 返回值：
+//  bool    是否匹配合法：true-合法，false-不合法
+//  string  不合法对应的说明
+func Check(object any, fieldNames ...string) (bool, string) {}
+
+// 入参：
+//  @parameterMap   额外的参数，用于在自定义函数中进行使用，可见下面的customize的用法
+//  @any            待核查对象
+//  @fieldNames     待核查对象的核查属性；不指定则核查所有属性名
+// 返回值：
+//  bool    是否匹配合法：true-合法，false-不合法
+//  string  不合法对应的说明
+func CheckWithParameter(parameterMap map[string]interface{}, object interface{}, fieldNames ...string) (bool, string) {}
+```
 
 ## 更多功能
 
@@ -475,15 +496,32 @@ func init() {
 ```
 ##### 说明：
 
-其中自定义的函数有相关的要求，参数可以为一个，也可以为两个，返回<br/>
+其中自定义的函数有相关的要求，参数可以为一个，也可以为两个，也可以为三个<br/>
+其中的参数类型有严格限制
+- 属性类型
+- 属性所在对象类型
+- 外部参数类型`map[string]interface{}`
+
+
 参数：<br/>
-- 一个值：为修饰的属性的值
-- 两个值：第一个值为属性所在的对象的值，第二个值为属性的值
+- 一个参数：
+  - 1：属性类型
+  - 2：属性所在对象类型
+- 两个参数
+  - 1：属性所在对象类型，2：属性类型
+  - 1：属性所在对象类型，2：外部参数类型`map[string]interface{}`
+  - 1：属性类型，2：属性所在对象类型
+  - 1：属性类型，2：外部参数类型`map[string]interface{}`
+- 三个参数：前两个参数为：属性类型和所在对象类型的组合
+  - 1：属性类型，2：属性所在对象类型，3：外部参数类型`map[string]interface{}`
+  - 1：属性所在对象类型，2：属性类型，3：外部参数类型`map[string]interface{}`
 
 返回值：<br/>
 - 一个值：则为bool类型（表示是否匹配上）
 - 两个值：第一个为bool类型（表示是否匹配上），第二个为string类型（匹配或者没有匹配上的自定义错误）
 
+更多详情请见测试类`customize_test.go` <br/><br/>
+示例：
 ```go
 package fun
 
@@ -522,6 +560,7 @@ func JudgeString3(customize CustomizeEntity3, name string) (bool, string) {
     }
 }
 
+// 由于go反射功能没那么强，因此需要用户自己先将函数和name进行注册
 func init() {
     validate.RegisterCustomize("judge2Name", JudgeString2)
     validate.RegisterCustomize("judge3Name", JudgeString3)

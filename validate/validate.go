@@ -35,6 +35,11 @@ var checkerEntities []CollectorEntity
 var matchTagArray = []string{constant.Value, constant.IsBlank, constant.Range, constant.Model, constant.Condition, constant.Regex, constant.Customize}
 
 func Check(object any, fieldNames ...string) (bool, string) {
+	return CheckWithParameter(map[string]interface{}{}, object, fieldNames...)
+}
+
+// CheckWithParameter 添加额外参数的传递
+func CheckWithParameter(parameterMap map[string]interface{}, object interface{}, fieldNames ...string) (bool, string) {
 	if object == nil {
 		return true, ""
 	}
@@ -78,7 +83,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 
 			// 核查结果：任何一个属性失败，则返回失败
 			goid.Go(func() {
-				check(object, field, fieldValue.Interface(), ch)
+				check(parameterMap, object, field, fieldValue.Interface(), ch)
 			})
 			checkResult := <-ch
 			if !checkResult.Result {
@@ -133,7 +138,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 
 			// 核查结果：任何一个属性失败，则返回失败
 			goid.Go(func() {
-				go check(object, field, fieldValue.Interface(), ch)
+				go check(parameterMap, object, field, fieldValue.Interface(), ch)
 			})
 			checkResult := <-ch
 			if !checkResult.Result {
@@ -288,6 +293,7 @@ func isSelectField(fieldName string, fieldNames ...string) bool {
 		return true
 	}
 	for _, name := range fieldNames {
+		// 不区分大小写
 		if strings.EqualFold(name, fieldName) {
 			return true
 		}
@@ -331,7 +337,7 @@ func buildChecker(objectFullName string, fieldKind reflect.Kind, fieldName strin
 	}
 }
 
-func check(object any, field reflect.StructField, fieldRelValue any, ch chan *CheckResult) {
+func check(parameterMap map[string]interface{}, object any, field reflect.StructField, fieldRelValue any, ch chan *CheckResult) {
 	objectType := reflect.TypeOf(object)
 
 	if fieldMatcher, contain := matcher.MatchMap[objectType.String()][field.Name]; contain {
@@ -341,7 +347,7 @@ func check(object any, field reflect.StructField, fieldRelValue any, ch chan *Ch
 
 		// 黑名单，而且匹配到，则核查失败
 		if !accept {
-			if matchResult, errMsg := judgeMatch(matchers, object, field, fieldRelValue, accept); matchResult {
+			if matchResult, errMsg := judgeMatch(matchers, parameterMap, object, field, fieldRelValue, accept); matchResult {
 				if errMsgProgram != nil {
 					env := map[string]any{
 						"sprintf": fmt.Sprintf,
@@ -368,7 +374,7 @@ func check(object any, field reflect.StructField, fieldRelValue any, ch chan *Ch
 
 		// 白名单，没有匹配到，则核查失败
 		if accept {
-			if matchResult, errMsg := judgeMatch(matchers, object, field, fieldRelValue, accept); !matchResult {
+			if matchResult, errMsg := judgeMatch(matchers, parameterMap, object, field, fieldRelValue, accept); !matchResult {
 				if errMsgProgram != nil {
 					env := map[string]any{
 						"sprintf": fmt.Sprintf,
@@ -397,14 +403,14 @@ func check(object any, field reflect.StructField, fieldRelValue any, ch chan *Ch
 }
 
 // 任何一个匹配上，则返回true，都没有匹配上则返回false
-func judgeMatch(matchers []*matcher.Matcher, object any, field reflect.StructField, fieldValue any, accept bool) (bool, string) {
+func judgeMatch(matchers []*matcher.Matcher, parameterMap map[string]interface{}, object any, field reflect.StructField, fieldValue any, accept bool) (bool, string) {
 	var errMsgArray []string
 	for _, match := range matchers {
 		if (*match).IsEmpty() {
 			continue
 		}
 
-		matchResult := (*match).Match(object, field, fieldValue)
+		matchResult := (*match).Match(parameterMap, object, field, fieldValue)
 		if matchResult {
 			if !accept {
 				errMsgArray = append(errMsgArray, (*match).GetBlackMsg())
