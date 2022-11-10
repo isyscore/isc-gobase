@@ -133,7 +133,7 @@ func after(db *gorm.DB) {
 		opentracinglog.String("sql", db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)),
 		opentracinglog.String("table", db.Statement.Table),
 		opentracinglog.String("query", db.Statement.SQL.String()),
-		opentracinglog.String("parentId", GetHeaderWithKey("x-b3-spanid")),
+		opentracinglog.String("parentSpanId", GetHeaderWithKey("x-b3-spanid")),
 		opentracinglog.String("parameters", string(b)),
 	)
 }

@@ -109,6 +109,8 @@ func ResponseHandler() gin.HandlerFunc {
 			if err := json.Unmarshal([]byte(blw.body.String()), &response); err != nil {
 				return
 			} else {
+				c.Writer.Header().Add("isc-biz-code", isc.ToString(response.Code))
+				c.Writer.Header().Add("isc-biz-message", response.Message)
 				if response.Code != 0 && response.Code != 200 {
 					errMessage.Response = response
 					if expPrint {
