@@ -1,6 +1,7 @@
 package rsp
 
 import (
+	"github.com/isyscore/isc-gobase/isc"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,8 @@ func Success(ctx *gin.Context, object any) {
 }
 
 func SuccessOfStandard(ctx *gin.Context, v any) {
+	ctx.Header("isc-biz-code", "0")
+	ctx.Header("isc-biz-message", "success")
 	ctx.JSON(http.StatusOK, map[string]any{
 		"code":    0,
 		"message": "success",
@@ -48,6 +51,8 @@ func SuccessOfStandard(ctx *gin.Context, v any) {
 }
 
 func FailedOfStandard(ctx *gin.Context, code int, message string) {
+	ctx.Header("isc-biz-code", isc.ToString(code))
+	ctx.Header("isc-biz-message", message)
 	ctx.JSON(http.StatusOK, map[string]any{
 		"code":    code,
 		"message": message,
@@ -56,6 +61,8 @@ func FailedOfStandard(ctx *gin.Context, code int, message string) {
 }
 
 func FailedWithDataOfStandard(ctx *gin.Context, code string, message string, v any) {
+	ctx.Header("isc-biz-code", isc.ToString(code))
+	ctx.Header("isc-biz-message", message)
 	ctx.JSON(http.StatusOK, map[string]any{
 		"code":    code,
 		"message": message,
