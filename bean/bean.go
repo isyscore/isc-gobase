@@ -47,15 +47,27 @@ func GetBeanNames(beanName string) []string {
 		}
 		return keys
 	} else {
-		j := 0
 		var keys []string
 		for k := range BeanMap {
-			if strings.Contains(k, beanName) {
+			if strings.HasPrefix(k, beanName) {
 				keys = append(keys, k)
-				j++
 			}
 		}
 		return keys
+	}
+}
+
+func GetBeanWithNamePre(beanName string) []any {
+	if beanName == "" {
+		return nil
+	} else {
+		var values []any
+		for k, v := range BeanMap {
+			if strings.HasPrefix(k, beanName) {
+				values = append(values, v)
+			}
+		}
+		return values
 	}
 }
 
@@ -64,6 +76,7 @@ func ExistBean(beanName string) bool {
 	return exist
 }
 
+// @parameterValueMap p1、p2、p3...这种表示的是第一个、第二个、第三个参数的值
 func CallFun(beanName, methodName string, parameterValueMap map[string]any) []any {
 	if beanValue, exist := BeanMap[beanName]; exist {
 		fType := reflect.TypeOf(beanValue)

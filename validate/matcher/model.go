@@ -2,7 +2,7 @@ package matcher
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"regexp"
 	"strings"
@@ -57,7 +57,7 @@ func (modelMatch *ModelMatch) IsEmpty() bool {
 }
 
 func BuildModelMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.MATCH != tagName {
+	if constants.MATCH != tagName {
 		return
 	}
 
@@ -65,7 +65,7 @@ func BuildModelMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 		return
 	}
 
-	if !strings.Contains(subCondition, constant.Model) || !strings.Contains(subCondition, constant.EQUAL) {
+	if !strings.Contains(subCondition, constants.Model) || !strings.Contains(subCondition, constants.EQUAL) {
 		return
 	}
 
@@ -73,12 +73,12 @@ func BuildModelMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 	modelKey := strings.TrimSpace(subCondition[index+1:])
 
 	pReg, contain := modelMap[modelKey]
-	if !contain && modelKey != constant.IdCard {
+	if !contain && modelKey != constants.IdCard {
 		logger.Error("不包含模式%v", modelKey)
 		return
 	}
 
-	if modelKey == constant.IdCard {
+	if modelKey == constants.IdCard {
 		addMatcher(objectTypeFullName, objectFieldName, &ModelMatch{pReg: pReg, isIdCard: true, modelName: modelKey}, errMsg, true)
 	} else {
 		addMatcher(objectTypeFullName, objectFieldName, &ModelMatch{pReg: pReg, isIdCard: false, modelName: modelKey}, errMsg, true)
@@ -88,17 +88,17 @@ func BuildModelMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 func init() {
 	// 手机号
 	pReg, _ := regexp.Compile("^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\\d{8}$")
-	modelMap[constant.Phone] = pReg
+	modelMap[constants.Phone] = pReg
 
 	// 固定电话
 	pReg, _ = regexp.Compile("^(([0+]\\d{2,3}-)?(0\\d{2,3})-)(\\d{7,8})(-(\\d{3,}))?$")
-	modelMap[constant.FixedPhone] = pReg
+	modelMap[constants.FixedPhone] = pReg
 
 	// 邮箱
 	pReg, _ = regexp.Compile("^([\\w-_]+(?:\\.[\\w-_]+)*)@[\\w-]+(.[\\w_-]+)+")
-	modelMap[constant.MAIL] = pReg
+	modelMap[constants.MAIL] = pReg
 
 	// IP地址
 	pReg, _ = regexp.Compile("^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$")
-	modelMap[constant.IpAddress] = pReg
+	modelMap[constants.IpAddress] = pReg
 }

@@ -2,7 +2,7 @@ package matcher
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"strings"
 
@@ -50,18 +50,18 @@ func (conditionMatch *ConditionMatch) IsEmpty() bool {
 }
 
 func BuildConditionMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.MATCH != tagName {
+	if constants.MATCH != tagName {
 		return
 	}
 
 	if fieldKind == reflect.Slice {
 		return
 	}
-	if !strings.Contains(subCondition, constant.Condition) || !strings.Contains(subCondition, constant.EQUAL) {
+	if !strings.Contains(subCondition, constants.Condition) || !strings.Contains(subCondition, constants.EQUAL) {
 		return
 	}
 
-	index := strings.Index(subCondition, constant.EQUAL)
+	index := strings.Index(subCondition, constants.EQUAL)
 	expression := subCondition[index+1:]
 
 	if expression == "" {

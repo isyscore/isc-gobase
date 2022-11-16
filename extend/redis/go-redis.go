@@ -2,9 +2,13 @@ package redis
 
 import (
 	goredis "github.com/go-redis/redis/v8"
+	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
 	baseTime "github.com/isyscore/isc-gobase/time"
+	"github.com/isyscore/isc-gobase/tracing"
+
 	//"github.com/isyscore/isc-gobase/tracing"
 	"time"
 )
@@ -39,19 +43,17 @@ func NewClient() (goredis.UniversalClient, error) {
 		rdbClient = goredis.NewClient(getStandaloneConfig())
 	}
 
-	//if RedisTracingIsOpen() {
-	//	err := tracing.InitTracing()
-	//	if err != nil {
-	//		logger.Warn("链路全局初始化失败，go-redis不接入埋点，错误：%v", err.Error())
-	//	} else {
-	//		rdbClient.AddHook(tracing.NewGoRedisTracer())
-	//	}
-	//}
+	if RedisTracingIsOpen() {
+		for _, hook := range tracing.RedisHooks {
+			rdbClient.AddHook(hook)
+		}
+	}
+	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
 	return rdbClient, nil
 }
 
 func RedisTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", false)
+	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.redis.enable", false)
 }
 
 func getStandaloneConfig() *goredis.Options {

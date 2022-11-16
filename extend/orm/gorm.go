@@ -1,9 +1,11 @@
 package orm
 
 import (
-	"fmt"
+	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
+	"github.com/isyscore/isc-gobase/tracing"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -48,18 +50,19 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
-	//if OrmTracingIsOpen() {
-	//	err := tracing.InitTracing()
-	//	if err != nil {
-	//		logger.Warn("链路全局初始化失败，gorm 不接入埋点，错误：%v", err.Error())
-	//	} else {
-	//		logger.Debug("开启orm的tracing")
-	//		err := gormDb.Use(tracing.NewGormPlugin())
-	//		if err != nil {
-	//			logger.Warn("接入tracing异常：%v", err.Error())
-	//		}
-	//	}
-	//}
+	if OrmTracingIsOpen() {
+		logger.Debug("开启gorm的tracing")
+		if len(tracing.GormHooks) != 0 {
+			for _, hook := range tracing.GormHooks {
+				err := gormDb.Use(hook)
+				if err != nil {
+					logger.Warn("接入tracing异常：%v", err.Error())
+				}
+			}
+		} else {
+			logger.Warn("gorm的tracing的插件暂时没有，后续也可以添加")
+		}
+	}
 
 	d, _ := gormDb.DB()
 
@@ -96,45 +99,21 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 			d.SetConnMaxIdleTime(t)
 		}
 	}
+
+	bean.AddBean(constants.BeanNameGormPre + datasourceName, gormDb)
 	return gormDb, nil
 }
 
 func getDialect(dbType string, datasourceConfig config.DatasourceConfig) gorm.Dialector {
-	sqlConfigMap := map[string]string{}
-	err := config.GetValueObject("base.datasource.url-config", &sqlConfigMap)
-	if err != nil {
-		logger.Warn("读取配置【base.datasource.url-config】异常", err)
-	}
-
+	dsn := getDbDsn(dbType, datasourceConfig)
 	switch dbType {
 	case "mysql":
-		// 格式：user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.DbName)
-		if len(sqlConfigMap) != 0 {
-			var kvList []string
-			for key, value := range sqlConfigMap {
-				kvList = append(kvList, fmt.Sprintf("%s=%s", key, specialCharChange(value)))
-			}
-			dsn += fmt.Sprintf("?%s", strings.Join(kvList, "&"))
-		}
 		return mysql.Open(dsn)
 	case "postgresql":
-		// 格式：host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d", datasourceConfig.Host, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.DbName, datasourceConfig.Port)
-		if len(sqlConfigMap) != 0 {
-			var kvList []string
-			for key, value := range sqlConfigMap {
-				kvList = append(kvList, fmt.Sprintf("%s=%s", key, value))
-			}
-			dsn += fmt.Sprintf(" %s", strings.Join(kvList, " "))
-		}
 		return postgres.Open(dsn)
 	case "sqlite":
-		// 格式： gorm.db
-		return sqlite.Open(datasourceConfig.SqlitePath)
+		return sqlite.Open(dsn)
 	case "sqlserver":
-		// 格式：sqlserver://user:password@localhost:9930?database=gorm
-		dsn := fmt.Sprintf("sqlserver://%s:%s@%s:%d?database=%s", datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.DbName)
 		return sqlserver.Open(dsn)
 	}
 	return nil
@@ -143,4 +122,8 @@ func getDialect(dbType string, datasourceConfig config.DatasourceConfig) gorm.Di
 // 特殊字符处理
 func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
+}
+
+func OrmTracingIsOpen() bool {
+	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
 }

@@ -1,14 +1,14 @@
 package matcher
 
 import (
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
 func CollectAccept(objectTypeFullName string, _ reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.Accept != tagName {
+	if constants.Accept != tagName {
 		return
 	}
 

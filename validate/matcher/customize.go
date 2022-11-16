@@ -2,7 +2,7 @@ package matcher
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"strings"
 
@@ -94,11 +94,11 @@ func (customizeMatch *CustomizeMatch) IsEmpty() bool {
 }
 
 func BuildCustomizeMatcher(objectTypeFullName string, _ reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.MATCH != tagName {
+	if constants.MATCH != tagName {
 		return
 	}
 
-	if !strings.Contains(subCondition, constant.Customize) {
+	if !strings.Contains(subCondition, constants.Customize) {
 		return
 	}
 

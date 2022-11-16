@@ -9,10 +9,10 @@ import (
 	"sync"
 
 	"github.com/antonmedv/expr"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/validate/constant"
 	"github.com/isyscore/isc-gobase/validate/matcher"
 )
 
@@ -33,7 +33,7 @@ type CheckResult struct {
 var checkerEntities []CollectorEntity
 
 /* 核查的标签 */
-var matchTagArray = []string{constant.Value, constant.IsBlank, constant.Range, constant.Model, constant.Condition, constant.Regex, constant.Customize}
+var matchTagArray = []string{constants.Value, constants.IsBlank, constants.Range, constants.Model, constants.Condition, constants.Regex, constants.Customize}
 
 func Check(object any, fieldNames ...string) (bool, string) {
 	if object == nil {
@@ -72,7 +72,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 
 		// 基本类型
 		if matcher.IsCheckedKing(fieldValue.Type()) || (fieldValue.Kind() == reflect.Ptr && !fieldValue.Elem().IsValid()) || (fieldValue.Kind() == reflect.Ptr && matcher.IsCheckedKing(fieldValue.Elem().Type())) {
-			tagJudge := field.Tag.Get(constant.MATCH)
+			tagJudge := field.Tag.Get(constants.MATCH)
 			if len(tagJudge) == 0 {
 				continue
 			}
@@ -88,8 +88,8 @@ func Check(object any, fieldNames ...string) (bool, string) {
 			}
 		} else if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
 			// struct 结构类型
-			tagMatch := field.Tag.Get(constant.MATCH)
-			if len(tagMatch) == 0 || (len(tagMatch) == 1 && tagMatch != constant.CHECK) {
+			tagMatch := field.Tag.Get(constants.MATCH)
+			if len(tagMatch) == 0 || (len(tagMatch) == 1 && tagMatch != constants.CHECK) {
 				continue
 			}
 			result, err := Check(fieldValue.Interface())
@@ -127,7 +127,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 			}
 		} else if fieldValue.Kind() == reflect.Slice || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Slice) {
 			// Slice 结构
-			tagJudge := field.Tag.Get(constant.MATCH)
+			tagJudge := field.Tag.Get(constants.MATCH)
 			if len(tagJudge) == 0 {
 				continue
 			}
@@ -206,7 +206,7 @@ func doCollectCollector(objType reflect.Type) {
 		}
 
 		// 禁用
-		tagMatch := field.Tag.Get(constant.Disable)
+		tagMatch := field.Tag.Get(constants.Disable)
 		if len(tagMatch) != 0 && tagMatch == "true" {
 			continue
 		}
@@ -214,10 +214,10 @@ func doCollectCollector(objType reflect.Type) {
 		// 基本类型
 		if matcher.IsCheckedKing(field.Type) {
 			// 错误码信息
-			errMsg := field.Tag.Get(constant.ErrMsg)
+			errMsg := field.Tag.Get(constants.ErrMsg)
 
 			// match
-			tagMatch := field.Tag.Get(constant.MATCH)
+			tagMatch := field.Tag.Get(constants.MATCH)
 			if len(tagMatch) == 0 {
 				continue
 			}
@@ -227,18 +227,18 @@ func doCollectCollector(objType reflect.Type) {
 			}
 
 			// accept
-			tagAccept := field.Tag.Get(constant.Accept)
+			tagAccept := field.Tag.Get(constants.Accept)
 			if len(tagMatch) == 0 {
 				continue
 			}
 
 			if _, contain := matcher.MatchMap[objectFullName][field.Name]; contain {
-				addCollector(objectFullName, fieldKind, field.Name, constant.Accept, tagAccept, errMsg)
+				addCollector(objectFullName, fieldKind, field.Name, constants.Accept, tagAccept, errMsg)
 			}
 		} else if fieldKind == reflect.Struct {
 			// struct 结构类型
-			tagMatch := field.Tag.Get(constant.MATCH)
-			if len(tagMatch) == 0 || (len(tagMatch) == 1 && tagMatch != constant.CHECK) {
+			tagMatch := field.Tag.Get(constants.MATCH)
+			if len(tagMatch) == 0 || (len(tagMatch) == 1 && tagMatch != constants.CHECK) {
 				continue
 			}
 
@@ -254,10 +254,10 @@ func doCollectCollector(objType reflect.Type) {
 			// Slice 结构
 
 			// 错误码信息
-			errMsg := field.Tag.Get(constant.ErrMsg)
+			errMsg := field.Tag.Get(constants.ErrMsg)
 
 			// match
-			tagMatch := field.Tag.Get(constant.MATCH)
+			tagMatch := field.Tag.Get(constants.MATCH)
 			if len(tagMatch) == 0 {
 				continue
 			}
@@ -267,13 +267,13 @@ func doCollectCollector(objType reflect.Type) {
 			}
 
 			// accept
-			tagAccept := field.Tag.Get(constant.Accept)
+			tagAccept := field.Tag.Get(constants.Accept)
 			if len(tagMatch) == 0 {
 				continue
 			}
 
 			if _, contain := matcher.MatchMap[objectFullName][field.Name]; !contain {
-				addCollector(objectFullName, fieldKind, field.Name, constant.Accept, tagAccept, errMsg)
+				addCollector(objectFullName, fieldKind, field.Name, constants.Accept, tagAccept, errMsg)
 			}
 
 			doCollectCollector(field.Type.Elem())
@@ -313,12 +313,12 @@ func addMatcher(objectFullName string, fieldKind reflect.Kind, fieldName string,
 			continue
 		}
 		subJudgeStr := matchJudge[lastIndex:subIndex]
-		buildChecker(objectFullName, fieldKind, fieldName, constant.MATCH, subJudgeStr, errMsg)
+		buildChecker(objectFullName, fieldKind, fieldName, constants.MATCH, subJudgeStr, errMsg)
 		lastIndex = subIndex
 	}
 
 	subJudgeStr := matchJudge[lastIndex:]
-	buildChecker(objectFullName, fieldKind, fieldName, constant.MATCH, subJudgeStr, errMsg)
+	buildChecker(objectFullName, fieldKind, fieldName, constants.MATCH, subJudgeStr, errMsg)
 }
 
 // 添加搜集器
@@ -429,17 +429,17 @@ func RegisterCustomize(funName string, fun any) {
 // 包的初始回调
 func init() {
 	/* 匹配后是否接受 */
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Accept, matcher.CollectAccept})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Accept, matcher.CollectAccept})
 
 	/* 搜集匹配器 */
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Value, matcher.BuildValuesMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.IsBlank, matcher.BuildIsBlankMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.IsUnBlank, matcher.BuildIsUnBlankMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Range, matcher.BuildRangeMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Model, matcher.BuildModelMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Condition, matcher.BuildConditionMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Customize, matcher.BuildCustomizeMatcher})
-	checkerEntities = append(checkerEntities, CollectorEntity{constant.Regex, matcher.BuildRegexMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Value, matcher.BuildValuesMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.IsBlank, matcher.BuildIsBlankMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.IsUnBlank, matcher.BuildIsUnBlankMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Range, matcher.BuildRangeMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Model, matcher.BuildModelMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Condition, matcher.BuildConditionMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Customize, matcher.BuildCustomizeMatcher})
+	checkerEntities = append(checkerEntities, CollectorEntity{constants.Regex, matcher.BuildRegexMatcher})
 }
 
 func arraysToString(dataArray []string) string {

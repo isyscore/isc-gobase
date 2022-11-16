@@ -1,7 +1,7 @@
 package matcher
 
 import (
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"strconv"
 	"strings"
@@ -49,7 +49,7 @@ func (isUnBlankMatch *IsUnBlankMatch) IsEmpty() bool {
 }
 
 func BuildIsUnBlankMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.MATCH != tagName {
+	if constants.MATCH != tagName {
 		return
 	}
 
@@ -57,12 +57,12 @@ func BuildIsUnBlankMatcher(objectTypeFullName string, fieldKind reflect.Kind, ob
 		return
 	}
 
-	if !strings.Contains(subCondition, constant.IsUnBlank) {
+	if !strings.Contains(subCondition, constants.IsUnBlank) {
 		return
 	}
 
 	value := "true"
-	if strings.Contains(subCondition, constant.EQUAL) {
+	if strings.Contains(subCondition, constants.EQUAL) {
 		index := strings.Index(subCondition, "=")
 		value = strings.TrimSpace(subCondition[index+1:])
 	}

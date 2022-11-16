@@ -2,7 +2,7 @@ package matcher
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/validate/constant"
+	"github.com/isyscore/isc-gobase/constants"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -146,11 +146,11 @@ func (rangeMatch *RangeMatch) IsEmpty() bool {
 }
 
 func BuildRangeMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
-	if constant.MATCH != tagName {
+	if constants.MATCH != tagName {
 		return
 	}
 
-	if !strings.Contains(subCondition, constant.Range) || !strings.Contains(subCondition, constant.EQUAL) {
+	if !strings.Contains(subCondition, constants.Range) || !strings.Contains(subCondition, constants.EQUAL) {
 		return
 	}
 
@@ -173,15 +173,15 @@ func BuildRangeMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 	if begin == nil {
 		if end == nil {
 			if beginNow {
-				if constant.LeftEqual == beginAli {
+				if constants.LeftEqual == beginAli {
 					script = "begin <= value"
-				} else if constant.LeftUnEqual == beginAli {
+				} else if constants.LeftUnEqual == beginAli {
 					script = "begin < value"
 				}
 			} else if endNow {
-				if constant.RightEqual == endAli {
+				if constants.RightEqual == endAli {
 					script = "value <= end"
-				} else if constant.RightUnEqual == endAli {
+				} else if constants.RightUnEqual == endAli {
 					script = "value < end"
 				}
 			} else {
@@ -189,19 +189,19 @@ func BuildRangeMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 			}
 		} else {
 			if beginNow {
-				if constant.LeftEqual == beginAli && constant.RightEqual == endAli {
+				if constants.LeftEqual == beginAli && constants.RightEqual == endAli {
 					script = "begin <= value && value <= end"
-				} else if constant.LeftEqual == beginAli && constant.RightUnEqual == endAli {
+				} else if constants.LeftEqual == beginAli && constants.RightUnEqual == endAli {
 					script = "begin <= value && value < end"
-				} else if constant.LeftUnEqual == beginAli && constant.RightEqual == endAli {
+				} else if constants.LeftUnEqual == beginAli && constants.RightEqual == endAli {
 					script = "begin < value && value <= end"
-				} else if constant.LeftUnEqual == beginAli && constant.RightUnEqual == endAli {
+				} else if constants.LeftUnEqual == beginAli && constants.RightUnEqual == endAli {
 					script = "begin < value && value < end"
 				}
 			} else {
-				if constant.RightEqual == endAli {
+				if constants.RightEqual == endAli {
 					script = "value <= end"
-				} else if constant.RightUnEqual == endAli {
+				} else if constants.RightUnEqual == endAli {
 					script = "value < end"
 				}
 			}
@@ -209,30 +209,30 @@ func BuildRangeMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 	} else {
 		if end == nil {
 			if endNow {
-				if constant.LeftEqual == beginAli && constant.RightEqual == endAli {
+				if constants.LeftEqual == beginAli && constants.RightEqual == endAli {
 					script = "begin <= value && value <= end"
-				} else if constant.LeftEqual == beginAli && constant.RightUnEqual == endAli {
+				} else if constants.LeftEqual == beginAli && constants.RightUnEqual == endAli {
 					script = "begin <= value && value < end"
-				} else if constant.LeftUnEqual == beginAli && constant.RightEqual == endAli {
+				} else if constants.LeftUnEqual == beginAli && constants.RightEqual == endAli {
 					script = "begin < value && value <= end"
-				} else if constant.LeftUnEqual == beginAli && constant.RightUnEqual == endAli {
+				} else if constants.LeftUnEqual == beginAli && constants.RightUnEqual == endAli {
 					script = "begin < value && value < end"
 				}
 			} else {
-				if constant.LeftEqual == beginAli {
+				if constants.LeftEqual == beginAli {
 					script = "begin <= value"
-				} else if constant.LeftUnEqual == beginAli {
+				} else if constants.LeftUnEqual == beginAli {
 					script = "begin < value"
 				}
 			}
 		} else {
-			if constant.LeftEqual == beginAli && constant.RightEqual == endAli {
+			if constants.LeftEqual == beginAli && constants.RightEqual == endAli {
 				script = "begin <= value && value <= end"
-			} else if constant.LeftEqual == beginAli && constant.RightUnEqual == endAli {
+			} else if constants.LeftEqual == beginAli && constants.RightUnEqual == endAli {
 				script = "begin <= value && value < end"
-			} else if constant.LeftUnEqual == beginAli && constant.RightEqual == endAli {
+			} else if constants.LeftUnEqual == beginAli && constants.RightEqual == endAli {
 				script = "begin < value && value <= end"
-			} else if constant.LeftUnEqual == beginAli && constant.RightUnEqual == endAli {
+			} else if constants.LeftUnEqual == beginAli && constants.RightUnEqual == endAli {
 				script = "begin < value && value < end"
 			}
 		}
@@ -298,13 +298,13 @@ func parseRange(fieldKind reflect.Kind, subCondition string) *RangeEntity {
 			var endNow bool
 			var beginTime t0.Time
 			var endTime t0.Time
-			if begin == constant.Now {
+			if begin == constants.Now {
 				beginNow = true
 			} else {
 				beginTime = time.ParseTime(begin)
 			}
 
-			if end == constant.Now {
+			if end == constants.Now {
 				endNow = true
 			} else {
 				endTime = time.ParseTime(end)
@@ -333,12 +333,12 @@ func parseRange(fieldKind reflect.Kind, subCondition string) *RangeEntity {
 		}
 	} else {
 		// 匹配过去和未来的时间
-		if subCondition == constant.Past {
+		if subCondition == constants.Past {
 			// 过去，则范围为(null, now)
-			return &RangeEntity{beginAli: constant.LeftUnEqual, begin: nil, end: nil, endAli: constant.RightUnEqual, dateFlag: true, endNow: true}
-		} else if subCondition == constant.Future {
+			return &RangeEntity{beginAli: constants.LeftUnEqual, begin: nil, end: nil, endAli: constants.RightUnEqual, dateFlag: true, endNow: true}
+		} else if subCondition == constants.Future {
 			// 未来，则范围为(now, null)
-			return &RangeEntity{beginAli: constant.LeftUnEqual, begin: nil, end: nil, endAli: constant.RightUnEqual, dateFlag: true, beginNow: true}
+			return &RangeEntity{beginAli: constants.LeftUnEqual, begin: nil, end: nil, endAli: constants.RightUnEqual, dateFlag: true, beginNow: true}
 		}
 		return nil
 	}
