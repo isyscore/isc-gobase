@@ -8,6 +8,9 @@ listener包：是isc-gobase的事件监听模块
 // 添加事件监听器
 listener.AddListener(eventName string, eventListener EventListener)
 
+// 添加分组的事件监听器，分组默认为：GobaseDefault
+listener.AddListenerWithGroup(group string, eventName string, eventListener EventListener)
+
 // 发布事件
 listener.PublishEvent(event listener.BaseEvent)
 ```

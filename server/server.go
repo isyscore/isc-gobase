@@ -3,7 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/isyscore/isc-gobase/tracing"
+	"github.com/isyscore/isc-gobase/goid"
+	//"github.com/isyscore/isc-gobase/tracing"
 	"io"
 	"net/http"
 	"os"
@@ -48,11 +49,13 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 var pprofHave = false
+var headerStorage goid.LocalStorage
 
 func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 	printVersionAndProfile()
+	headerStorage = goid.NewLocalStorage()
 
 	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", false) {
 		InitServer()
@@ -79,35 +82,36 @@ func InitServer() {
 
 	engine = gin.New()
 
-	if config.GetValueBoolDefault("base.server.gin.pprof.enable", false) {
-		pprofHave = true
-		pprof.Register(engine)
+	if config.GetValueBoolDefault("base.debug.enable", true) {
+		// 注册pprof
+		if config.GetValueBoolDefault("base.server.gin.pprof.enable", false) {
+			pprofHave = true
+			pprof.Register(engine)
+		}
 	}
 	engine.Use(Cors(), gin.Recovery())
 	engine.Use(rsp.ResponseHandler())
-
-	// 添加 tracing插件
-	if config.GetValueBoolDefault("base.tracing.enable", true) {
-		engine.Use(tracing.TracePluginHandler())
-	}
+	engine.Use(HeadSaveHandler())
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
 		RegisterHealthCheckEndpoint(apiPreAndModule())
 	}
 
-	// 注册 配置检测endpoint
-	if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
-		RegisterConfigWatchEndpoint(apiPreAndModule())
-	}
+	if config.GetValueBoolDefault("base.debug.enable", true) {
+		// 注册 配置查看和变更功能
+		if config.GetValueBoolDefault("base.endpoint.config.enable", false) {
+			RegisterConfigWatchEndpoint(apiPreAndModule())
+		}
 
-	// 注册 bean管理的功能
-	if config.GetValueBoolDefault("base.endpoint.bean.enable", false) {
-		RegisterBeanWatchEndpoint(apiPreAndModule())
-	}
+		// 注册 bean管理的功能
+		if config.GetValueBoolDefault("base.endpoint.bean.enable", false) {
+			RegisterBeanWatchEndpoint(apiPreAndModule())
+		}
 
-	// 注册 debug的帮助命令
-	RegisterHelpEndpoint(apiPreAndModule())
+		// 注册 debug的帮助命令
+		RegisterHelpEndpoint(apiPreAndModule())
+	}
 
 	// 注册 swagger的功能
 	if config.GetValueBoolDefault("base.swagger.enable", false) {
@@ -450,4 +454,27 @@ func getPathAppendApiModel(path string) string {
 	} else {
 		return fmt.Sprintf("/%s/%s/%s", ApiPrefix, apiModel, p2)
 	}
+}
+
+func HeadSaveHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		SaveHeader(c.Request.Header)
+	}
+}
+
+func SaveHeader(header http.Header) {
+	headerStorage.Set(header)
+}
+
+func GetHeader() http.Header {
+	h := headerStorage.Get()
+	if h == nil {
+		return nil
+	}
+	return h.(http.Header)
+}
+
+func GetHeaderWithKey(headKey string) string {
+	head := headerStorage.Get().(http.Header)
+	return head.Get(headKey)
 }

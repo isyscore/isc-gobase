@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/tracing"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -49,18 +48,18 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
-	if OrmTracingIsOpen() {
-		err := tracing.InitTracing()
-		if err != nil {
-			logger.Warn("链路全局初始化失败，gorm 不接入埋点，错误：%v", err.Error())
-		} else {
-			logger.Debug("开启orm的tracing")
-			err := gormDb.Use(tracing.NewGormPlugin())
-			if err != nil {
-				logger.Warn("接入tracing异常：%v", err.Error())
-			}
-		}
-	}
+	//if OrmTracingIsOpen() {
+	//	err := tracing.InitTracing()
+	//	if err != nil {
+	//		logger.Warn("链路全局初始化失败，gorm 不接入埋点，错误：%v", err.Error())
+	//	} else {
+	//		logger.Debug("开启orm的tracing")
+	//		err := gormDb.Use(tracing.NewGormPlugin())
+	//		if err != nil {
+	//			logger.Warn("接入tracing异常：%v", err.Error())
+	//		}
+	//	}
+	//}
 
 	d, _ := gormDb.DB()
 
@@ -144,8 +143,4 @@ func getDialect(dbType string, datasourceConfig config.DatasourceConfig) gorm.Di
 // 特殊字符处理
 func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
-}
-
-func OrmTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", true) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
 }

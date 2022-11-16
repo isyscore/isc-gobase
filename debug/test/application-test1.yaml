@@ -11,4 +11,3 @@ base:
     password: ZljIsysc0re123
     # 拨号超时：是指连接失败后的超时时间；配置示例：1s、1000ms
     dial-timeout: 5s
-

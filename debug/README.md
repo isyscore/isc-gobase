@@ -1,12 +1,25 @@
-# 线上调试文档介绍
-鉴于提供的一些调试工具比较分散，这里进行统一介绍。<br/>
+# 调试包
+调试包用于为应用提供在线上时候的一些观察和调试能力，目前分为两个部分
+- 单实例配置调试功能
+- 集群化配置变更功能
+
+配置
+```yaml
+base:
+  debug:
+    # 线上调试功能开启，默认开启
+    enable: true
+```
+
+# 一、单实例配置调试功能
+通过提供restful的方式，给业务提供诸多功能用于单实例的线上调试功能<br/>
 
 - 动态修改日志级别
 - 动态打印接口出入参
 - 动态查看管理的bean
 - 动态启用pprof
 
-## 一、帮助手册
+## 1. 帮助手册
 命令很多，提供帮助手册
 ```shell
 curl http://localhost:xxx/{api-prefix}/{api-module}/debug/help
@@ -41,7 +54,7 @@ curl http://localhost:xxx/{api-prefix}/{api-module}/debug/help
 }
 ```
 
-## 二、动态修改日志
+## 2. 动态修改日志
 在出现问题时候，希望开启debug日志，这里提供了动态修改的功能，如下
 ```shell
 curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.logger.level", "value":"debug"}'
@@ -51,7 +64,7 @@ curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"k
 目前日志级别粒度比较粗，比如修改了级别为debug后，则大于等于debug的级别都会打印，粒度还是比较粗，建议后续增加日志分组概念
 
 
-## 三、接口动态打印
+## 3. 接口动态打印
 在出现问题时候如何确定接口是否正常，要开启请求和响应的话，就方便多了，这里提供了该功能
 
 ### 指定uri
@@ -87,7 +100,7 @@ curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"k
 # 开启异常的打印
 curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.server.exception.print.enable", "value":"true"}'
 ```
-## 四、动态管理bean
+## 4. 动态管理bean
 在运行中如果出现问题，需要查看某个对象的属性和函数的时候，就可以使用该功能，进行动态的查看、修改对应属性，以及动态的执行对应的函数
 
 ### 注意：
@@ -116,7 +129,7 @@ curl -X POST http://localhost:xxx/{api-prefix}/{api-module}/bean/fun/call' -d '{
 - 调用bean函数中，parameter的对应的map中的key只能是p1、p2、p3...这种表示的是第一个、第二个、第三个参数的值
 - 调用bean函数中，参数值暂时只适用于基本结构，对于实体类或者map类的暂时不支持，后续可以考虑支持
 
-## 五、动态启用pprof
+## 5. 动态启用pprof
 在线上出现性能问题后，本地如果要排查则很有可能复现不了，如果可以直接在线上开启pprof功能的话，就非常好了，这里提供了动态开启pprof的功能
 ```shell
 # 开启pprof
@@ -135,3 +148,61 @@ go tool pprof -http=:18080 http://localhost:xxx/debug/pprof/goroutine
 ```
 然后自动打开网页，如下
 ![pprof.png](./pic/pprof.png)
+
+# 二、集群化配置变更功能
+
+集群化的配置变更功能目前底层使用的是etcd，因此需要接入如下
+```yaml
+base:
+  debug:
+    # 线上调试功能开启，默认：true-开启
+    enable: true
+  etcd:
+    # 是否启用etcd，默认: false-关闭
+    enable: true
+    # etcd的服务ip:port列表
+    endpoints:
+      - 10.10.10.10:2379
+    # 用户
+    username: xxx
+    # 密码
+    password: xxx
+    # 拨号超时：是指连接失败后的超时时间；配置示例：1s、1000ms
+    dial-timeout: 5s
+```
+
+提供如下三个api
+```go
+// 初始化相关信息
+func Init() {}
+
+// 添加对某个key的监听
+func AddWatcher(key string, keyListener KeyListener) {}
+
+// 更新某个key
+func Update(key, value string) {}
+```
+
+示例
+```go
+// 测试监听
+func TestWatcher(t *testing.T) {
+    debug.Init()
+    debug.AddWatcher("test", func(key string, value string) {
+        fmt.Println("有变化 key=", key, ", value=", value)
+    })
+    t0.Sleep(1000000000000)
+}
+
+// 测试推送
+func TestWatcher(t *testing.T) {
+    debug.Init()
+    debug.Update("test", time.TimeToStringYmdHmsS(time.Now()))
+}
+```
+
+#### 说明：debug包和etcd包区别
+可能有人会问题了，debug功能与etcd的watch差不多，为什么还需要再提供一个debug包，etcd本身提供的watch功能比较强大，在业务使用时候还需要做一些适配和改造，比如如下功能
+- 集群中某个节点宕机，这个时候配置变化了，该节点并没有watch到结果，重启后也获取不到最新的值，就会造成集群中所有节点数据不一致的问题
+
+debug对etcd的watch功能做了简单的封装

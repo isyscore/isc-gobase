@@ -1,5 +1,6 @@
 package listener
 
+var DefaultGroup = "DefaultGroup"
 var EventOfServerRunStart = "event_of_server_run_start"
 var EventOfServerRunFinish = "event_of_server_run_finish"
 var EventOfServerStop = "event_of_server_stop"
@@ -24,14 +25,30 @@ func (e ServerRunStartEvent) Name() string {
 	return EventOfServerRunStart
 }
 
+func (e ServerRunStartEvent) Group() string {
+	return DefaultGroup
+}
+
 func (e ServerRunFinishEvent) Name() string {
 	return EventOfServerRunFinish
+}
+
+func (e ServerRunFinishEvent) Group() string {
+	return DefaultGroup
 }
 
 func (e ServerStopEvent) Name() string {
 	return EventOfServerStop
 }
 
+func (e ServerStopEvent) Group() string {
+	return DefaultGroup
+}
+
 func (e ConfigChangeEvent) Name() string {
 	return EventOfConfigChange
+}
+
+func (e ConfigChangeEvent) Group() string {
+	return DefaultGroup
 }

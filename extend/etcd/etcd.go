@@ -5,7 +5,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -29,6 +28,11 @@ func init() {
 }
 
 func NewEtcdClient() (*EtcdClientWrap, error) {
+	if !config.GetValueBoolDefault("base.etcd.enable", false) {
+		logger.Error("etcd没有配置，请先配置")
+		return nil, nil
+	}
+
 	// 客户端配置
 	etcdCfg := etcdClientV3.Config{
 		Endpoints:           config.EtcdCfg.Endpoints,
@@ -81,39 +85,36 @@ func NewEtcdClient() (*EtcdClientWrap, error) {
 		logger.Error("生成etcd-client失败：%v", err.Error())
 		return nil, err
 	}
-
-	if EtcdTracingIsOpen() {
-		err := tracing.InitTracing()
-		if err != nil {
-			logger.Warn("链路全局初始化失败，go-redis不接入埋点，错误：%v", err.Error())
-		} else {
-			return &EtcdClientWrap{Client: etcdClient, etcdHook: &tracing.GobaseEtcdHook{}}, nil
-		}
-	}
 	return &EtcdClientWrap{Client: etcdClient}, nil
 }
 
 func NewEtcdClientWithCfg(etcdCfg etcdClientV3.Config) (*EtcdClientWrap, error) {
+	if !config.GetValueBoolDefault("base.etcd.enable", false) {
+		logger.Error("etcd没有配置，请先配置")
+		return nil, nil
+	}
+
 	etcdClient, err := etcdClientV3.New(etcdCfg)
 	if err != nil {
 		logger.Error("生成etcd-client失败：%v", err.Error())
 		return nil, err
 	}
 
-	if EtcdTracingIsOpen() {
-		err := tracing.InitTracing()
-		if err != nil {
-			logger.Warn("链路全局初始化失败，go-redis不接入埋点，错误：%v", err.Error())
-		} else {
-			return &EtcdClientWrap{Client: etcdClient, etcdHook: &tracing.GobaseEtcdHook{}}, nil
-		}
-	}
 	return &EtcdClientWrap{Client: etcdClient}, nil
 }
 
 type EtcdClientWrap struct {
 	*etcdClientV3.Client
-	etcdHook *tracing.GobaseEtcdHook
+	etcdHooks []GobaseEtcdHook
+}
+
+type GobaseEtcdHook interface {
+	Before(ctx context.Context, op etcdClientV3.Op) context.Context
+	After(ctx context.Context, op etcdClientV3.Op, pRsp any, err error)
+}
+
+func (etcdWrap *EtcdClientWrap) AddHook(etcdHook GobaseEtcdHook) {
+	etcdWrap.etcdHooks = append(etcdWrap.etcdHooks, etcdHook)
 }
 
 func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts ...etcdClientV3.OpOption) (*etcdClientV3.PutResponse, error) {
@@ -121,9 +122,14 @@ func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts .
 		return etcdWrap.Client.Put(ctx, key, val, opts...)
 	}
 	op := etcdClientV3.OpPut(key, val, opts...)
-	ctx = etcdWrap.etcdHook.Before(ctx, op)
+	for _, hook := range etcdWrap.etcdHooks {
+		ctx = hook.Before(ctx, op)
+	}
+
 	rsp, err := etcdWrap.Client.Put(ctx, key, val, opts...)
-	etcdWrap.etcdHook.After(ctx, op, rsp, err)
+	for _, hook := range etcdWrap.etcdHooks {
+		hook.After(ctx, op, rsp, err)
+	}
 	return rsp, err
 }
 
@@ -132,9 +138,13 @@ func (etcdWrap *EtcdClientWrap) Get(ctx context.Context, key string, opts ...etc
 		return etcdWrap.Client.Get(ctx, key, opts...)
 	}
 	op := etcdClientV3.OpGet(key, opts...)
-	etcdWrap.etcdHook.Before(ctx, op)
+	for _, hook := range etcdWrap.etcdHooks {
+		ctx = hook.Before(ctx, op)
+	}
 	rsp, err := etcdWrap.Client.Get(ctx, key, opts...)
-	etcdWrap.etcdHook.After(ctx, op, rsp, err)
+	for _, hook := range etcdWrap.etcdHooks {
+		hook.After(ctx, op, rsp, err)
+	}
 	return rsp, err
 }
 
@@ -143,9 +153,14 @@ func (etcdWrap *EtcdClientWrap) Delete(ctx context.Context, key string, opts ...
 		return etcdWrap.Client.Delete(ctx, key, opts...)
 	}
 	op := etcdClientV3.OpDelete(key, opts...)
-	etcdWrap.etcdHook.Before(ctx, op)
+	for _, hook := range etcdWrap.etcdHooks {
+		ctx = hook.Before(ctx, op)
+	}
+
 	rsp, err := etcdWrap.Client.Delete(ctx, key, opts...)
-	etcdWrap.etcdHook.After(ctx, op, rsp, err)
+	for _, hook := range etcdWrap.etcdHooks {
+		hook.After(ctx, op, rsp, err)
+	}
 	return rsp, err
 }
 
@@ -157,9 +172,13 @@ func (etcdWrap *EtcdClientWrap) Do(ctx context.Context, op etcdClientV3.Op) (etc
 	if !EtcdTracingIsOpen() {
 		return etcdWrap.Client.Do(ctx, op)
 	}
-	etcdWrap.etcdHook.Before(ctx, op)
+	for _, hook := range etcdWrap.etcdHooks {
+		ctx = hook.Before(ctx, op)
+	}
 	rsp, err := etcdWrap.Client.Do(ctx, op)
-	etcdWrap.etcdHook.After(ctx, op, rsp, err)
+	for _, hook := range etcdWrap.etcdHooks {
+		hook.After(ctx, op, rsp, err)
+	}
 	return rsp, err
 }
 
@@ -426,5 +445,5 @@ func (g *EtcdLogger) V(l int) bool {
 }
 
 func EtcdTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", true) && config.GetValueBoolDefault("base.tracing.etcd.enable", false)
+	return config.GetValueBoolDefault("base.tracing.enable", false)
 }

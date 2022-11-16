@@ -5,7 +5,7 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
 	baseTime "github.com/isyscore/isc-gobase/time"
-	"github.com/isyscore/isc-gobase/tracing"
+	//"github.com/isyscore/isc-gobase/tracing"
 	"time"
 )
 
@@ -39,19 +39,19 @@ func NewClient() (goredis.UniversalClient, error) {
 		rdbClient = goredis.NewClient(getStandaloneConfig())
 	}
 
-	if RedisTracingIsOpen() {
-		err := tracing.InitTracing()
-		if err != nil {
-			logger.Warn("链路全局初始化失败，go-redis不接入埋点，错误：%v", err.Error())
-		} else {
-			rdbClient.AddHook(tracing.NewGoRedisTracer())
-		}
-	}
+	//if RedisTracingIsOpen() {
+	//	err := tracing.InitTracing()
+	//	if err != nil {
+	//		logger.Warn("链路全局初始化失败，go-redis不接入埋点，错误：%v", err.Error())
+	//	} else {
+	//		rdbClient.AddHook(tracing.NewGoRedisTracer())
+	//	}
+	//}
 	return rdbClient, nil
 }
 
 func RedisTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", true) && config.GetValueBoolDefault("base.tracing.redis.enable", false)
+	return config.GetValueBoolDefault("base.tracing.enable", false)
 }
 
 func getStandaloneConfig() *goredis.Options {
