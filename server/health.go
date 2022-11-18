@@ -18,8 +18,6 @@ var startTime = time.Now().Format(t2.FmtYMdHms)
 
 const defaultVersion = "unknown"
 
-var Version = defaultVersion
-
 func healthSystemStatus(c *gin.Context) {
 	c.Data(http.StatusOK, h2.ContentTypeJson, []byte(fmt.Sprintf(`{"status":"ok","running":true,"pid":%d,"startupAt":"%s","version":"%s"}`, procId, startTime, getVersion())))
 }
@@ -33,9 +31,5 @@ func healthSystemDestroy(c *gin.Context) {
 }
 
 func getVersion() string {
-	if Version != defaultVersion {
-		return Version
-	}
-	Version := config.GetValueStringDefault("base.server.version", defaultVersion)
-	return Version
+	return config.GetValueStringDefault("base.server.version", defaultVersion)
 }
