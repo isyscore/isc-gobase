@@ -22,6 +22,7 @@ func TestWatcher(t *testing.T) {
 	debug.AddWatcher("test", func(key string, value string) {
 		fmt.Println("有变化 key=", key, ", value=", value)
 	})
+	debug.StartWatch()
 
 	t0.Sleep(1000000000000)
 }

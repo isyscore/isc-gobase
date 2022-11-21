@@ -26,7 +26,6 @@ func Init() {
 		return
 	}
 	etcdClient = etcdClientTem
-	go startWatch()
 }
 
 func AddWatcher(key string, keyListener KeyListener) {
@@ -57,7 +56,7 @@ func Update(key, value string) {
 	}
 }
 
-func startWatch() {
+func StartWatch() {
 	for key, listeners := range keyListenerMap {
 		watchKey := key
 		keyListeners := listeners
