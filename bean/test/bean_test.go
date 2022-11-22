@@ -3,7 +3,6 @@ package test
 import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/isc"
-	"github.com/isyscore/isc-gobase/server"
 	"github.com/magiconair/properties/assert"
 	"testing"
 )
@@ -193,7 +192,30 @@ func TestCallFun5(t *testing.T) {
 	bean.Clean()
 }
 
-func TestCallPtrFun(t *testing.T) {
+func TestCallFun6(t *testing.T) {
+	tt := TestEntity{Age: 12}
+
+	bean.AddBean("test", tt)
+
+	fv := bean.CallFun("test", "Fun5", map[string]any{})
+	assert.Equal(t, isc.ToInt(fv[0]), 12)
+
+	bean.Clean()
+}
+
+func TestCallFun7(t *testing.T) {
+	tt := TestEntity{Age: 12}
+
+	bean.AddBean("test", tt)
+	tt.Age = 13
+
+	fv := bean.CallFun("test", "Fun5", map[string]any{})
+	assert.Equal(t, isc.ToInt(fv[0]), 12)
+
+	bean.Clean()
+}
+
+func TestCallPtrFun1(t *testing.T) {
 	tt := TestEntity{Age: 12}
 
 	bean.AddBean("test", &tt)
@@ -204,7 +226,7 @@ func TestCallPtrFun(t *testing.T) {
 	bean.Clean()
 }
 
-func TestCallPtrFun1(t *testing.T) {
+func TestCallPtrFun2(t *testing.T) {
 	tt := TestEntity{}
 
 	bean.AddBean("test", &tt)
@@ -217,6 +239,21 @@ func TestCallPtrFun1(t *testing.T) {
 
 	bean.Clean()
 }
+
+func TestCallPtrFun3(t *testing.T) {
+	tt := TestEntity{}
+
+	bean.AddBean("test", &tt)
+
+	parameterMap := map[string]any{}
+	parameterMap["p1"] = "name"
+
+	fv := bean.CallFun("test", "Fun1", parameterMap)
+	assert.Equal(t, isc.ToString(fv[0]), "name")
+
+	bean.Clean()
+}
+
 
 func TestSetField(t *testing.T) {
 	tt := TestEntity{}
@@ -272,17 +309,17 @@ func TestGetBeans(t *testing.T) {
 	bean.Clean()
 }
 
-func TestServerBean(t *testing.T) {
-	tt1 := TestEntity{Name: "t1", Age: 12}
-	tt2 := TestEntity{Name: "t2", Age: 13}
-	tt3 := TestEntity{Name: "t2", Age: 13}
-
-	bean.AddBean("t1-name", &tt1)
-	bean.AddBean("t2-name2", &tt2)
-	bean.AddBean("t3-change", &tt3)
-
-	server.Run()
-}
+//func TestServerBean(t *testing.T) {
+//	tt1 := TestEntity{Name: "t1", Age: 12}
+//	tt2 := TestEntity{Name: "t2", Age: 13}
+//	tt3 := TestEntity{Name: "t2", Age: 13}
+//
+//	bean.AddBean("t1-name", &tt1)
+//	bean.AddBean("t2-name2", &tt2)
+//	bean.AddBean("t3-change", &tt3)
+//
+//	server.Run()
+//}
 
 type ValueInnerEntity struct {
 	Name string

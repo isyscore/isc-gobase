@@ -18,11 +18,6 @@ func init() {
 // AddBean 添加bean
 // 强烈建议：bean使用指针
 func AddBean(beanName string, beanPtr any) {
-	beanType := reflect.TypeOf(beanPtr)
-	if beanType.Kind() != reflect.Ptr {
-		logger.Warn("bean 只可为指针类型")
-		return
-	}
 	BeanMap[beanName] = beanPtr
 }
 
@@ -37,6 +32,7 @@ func Clean() {
 	BeanMap = map[string]any{}
 }
 
+// 模糊搜索
 func GetBeanNames(beanName string) []string {
 	if beanName == "" {
 		j := 0
@@ -49,7 +45,7 @@ func GetBeanNames(beanName string) []string {
 	} else {
 		var keys []string
 		for k := range BeanMap {
-			if strings.HasPrefix(k, beanName) {
+			if strings.Contains(k, beanName) {
 				keys = append(keys, k)
 			}
 		}
@@ -57,6 +53,7 @@ func GetBeanNames(beanName string) []string {
 	}
 }
 
+// 前缀搜索
 func GetBeanWithNamePre(beanName string) []any {
 	if beanName == "" {
 		return nil
@@ -160,6 +157,7 @@ func SetField(beanName string, fieldName string, fieldValue any) {
 			fType = fType.Elem()
 			fValue = fValue.Elem()
 		} else {
+			logger.Warn("对象名【%v】对应的对象不是指针类型，无法修改属性的值", beanName)
 			return
 		}
 

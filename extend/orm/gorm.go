@@ -50,17 +50,10 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
-	if OrmTracingIsOpen() {
-		logger.Debug("开启gorm的tracing")
-		if len(tracing.GormHooks) != 0 {
-			for _, hook := range tracing.GormHooks {
-				err := gormDb.Use(hook)
-				if err != nil {
-					logger.Warn("接入tracing异常：%v", err.Error())
-				}
-			}
-		} else {
-			logger.Warn("gorm的tracing的插件暂时没有，后续也可以添加")
+	for _, hook := range tracing.GormHooks {
+		err := gormDb.Use(hook)
+		if err != nil {
+			logger.Error("gorm添加hook出错: %v", err.Error())
 		}
 	}
 
@@ -99,7 +92,6 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 			d.SetConnMaxIdleTime(t)
 		}
 	}
-
 	bean.AddBean(constants.BeanNameGormPre + datasourceName, gormDb)
 	return gormDb, nil
 }

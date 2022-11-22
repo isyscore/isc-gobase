@@ -43,17 +43,11 @@ func NewClient() (goredis.UniversalClient, error) {
 		rdbClient = goredis.NewClient(getStandaloneConfig())
 	}
 
-	if RedisTracingIsOpen() {
-		for _, hook := range tracing.RedisHooks {
-			rdbClient.AddHook(hook)
-		}
+	for _, hook := range tracing.RedisHooks {
+		rdbClient.AddHook(hook)
 	}
 	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
 	return rdbClient, nil
-}
-
-func RedisTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.redis.enable", false)
 }
 
 func getStandaloneConfig() *goredis.Options {

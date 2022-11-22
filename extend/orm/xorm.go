@@ -46,15 +46,8 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 		return nil, err
 	}
 
-	if OrmTracingIsOpen() {
-		logger.Debug("开启xorm的tracing")
-		if len(tracing.GormHooks) != 0 {
-			for _, hook := range tracing.XormHooks {
-				xormDb.AddHook(hook)
-			}
-		} else {
-			logger.Warn("xorm的tracing的插件暂时没有，后续也可以添加")
-		}
+	for _, hook := range tracing.XormHooks {
+		xormDb.AddHook(hook)
 	}
 
 	maxIdleConns := config.GetValueInt("base.datasource.connect-pool.max-idle-conns")
@@ -79,7 +72,6 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 			xormDb.SetConnMaxLifetime(t)
 		}
 	}
-
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
 	return xormDb, nil
 }
