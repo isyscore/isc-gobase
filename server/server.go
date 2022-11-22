@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/server/rsp"
 	"sync"
@@ -23,7 +22,6 @@ import (
 	"github.com/isyscore/isc-gobase/listener"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
 
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
@@ -52,7 +50,7 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 var pprofHave = false
-var reqStorage goid.LocalStorage
+var requestStorage goid.LocalStorage
 
 var loadLock sync.Mutex
 var serverLoaded = false
@@ -65,7 +63,7 @@ func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 	printVersionAndProfile()
-	reqStorage = goid.NewLocalStorage()
+	requestStorage = goid.NewLocalStorage()
 }
 
 // 提供给外部注册使用
@@ -115,8 +113,8 @@ func InitServer() {
 		}
 	}
 	engine.Use(Cors(), gin.Recovery())
-	engine.Use(rsp.ResponseHandler())
 	engine.Use(HeadSaveHandler())
+	engine.Use(rsp.ResponseHandler())
 
 	for _, handler := range ginHandlers {
 		engine.Use(handler)
@@ -488,46 +486,42 @@ func getPathAppendApiModel(path string) string {
 
 func HeadSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		SaveHeader(c.Request.Header, c.Request.RemoteAddr)
+		SaveHeader(c.Request)
 	}
 }
 
-func SaveHeader(header http.Header, remoteAddr string) {
-	reqHeadAndIpMap := map[string]any{}
-	reqHeadAndIpMap["head"] = header
-	reqHeadAndIpMap["remoteId"] = remoteAddr
+func SaveHeader(request *http.Request) {
+	requestStorage.Set(request)
+	logger.PutHead(request.Header)
+}
 
-	reqStorage.Set(reqHeadAndIpMap)
-	logger.PutHead(header)
+func GetRequest() *http.Request {
+	return requestStorage.Get().(*http.Request)
 }
 
 func GetHeader() http.Header {
-	req := reqStorage.Get()
+	req := requestStorage.Get()
 	if req == nil {
 		return nil
 	}
-	reqS := req.(map[string]any)
-	data, exist := reqS[constants.SAVE_HEAD]
-	if exist {
-		return data.(http.Header)
-	}
-	return nil
+	reqS := req.(*http.Request)
+	return reqS.Header
 }
 
 func GetRemoteAddr() string {
-	req := reqStorage.Get()
+	req := requestStorage.Get()
 	if req == nil {
 		return ""
 	}
-	reqS := req.(map[string]any)
-	data, exist := reqS[constants.SAVE_REMOTE_ADDR]
-	if exist {
-		return data.(string)
-	}
-	return ""
+	reqS := req.(*http.Request)
+	return reqS.RemoteAddr
 }
 
 func GetHeaderWithKey(headKey string) string {
-	head := reqStorage.Get().(http.Header)
-	return head.Get(headKey)
+	req := requestStorage.Get()
+	if req == nil {
+		return ""
+	}
+	reqS := req.(*http.Request)
+	return reqS.Header.Get(headKey)
 }
