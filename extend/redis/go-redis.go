@@ -8,10 +8,11 @@ import (
 	"github.com/isyscore/isc-gobase/logger"
 	baseTime "github.com/isyscore/isc-gobase/time"
 	"github.com/isyscore/isc-gobase/tracing"
-
 	//"github.com/isyscore/isc-gobase/tracing"
 	"time"
 )
+
+var RedisHooks []goredis.Hook
 
 type ConfigError struct {
 	ErrMsg string
@@ -31,6 +32,7 @@ func init() {
 			return
 		}
 	}
+	RedisHooks = []goredis.Hook{}
 }
 
 func NewClient() (goredis.UniversalClient, error) {
@@ -48,6 +50,15 @@ func NewClient() (goredis.UniversalClient, error) {
 	}
 	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
 	return rdbClient, nil
+}
+
+func AddRedisHook(hook goredis.Hook) {
+	RedisHooks = append(RedisHooks, hook)
+	redisDb := bean.GetBeanWithNamePre(constants.BeanNameRedisPre)
+	if len(redisDb) > 0 {
+		rd := redisDb[0].(goredis.UniversalClient)
+		rd.AddHook(hook)
+	}
 }
 
 func getStandaloneConfig() *goredis.Options {

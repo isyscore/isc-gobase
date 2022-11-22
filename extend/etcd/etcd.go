@@ -16,6 +16,8 @@ import (
 	"time"
 )
 
+var EtcdHooks []GobaseEtcdHook
+
 func init() {
 	config.LoadConfig()
 
@@ -27,6 +29,7 @@ func init() {
 		}
 	}
 
+	EtcdHooks = []GobaseEtcdHook{}
 	grpclog.SetLoggerV2(&EtcdLogger{})
 }
 
@@ -90,7 +93,7 @@ func NewEtcdClient() (*EtcdClientWrap, error) {
 	}
 
 	var etcdClientWrap EtcdClientWrap
-	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
+	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: EtcdHooks}
 	bean.AddBean(constants.BeanNameEtcdPre, &etcdClientWrap)
 	return &etcdClientWrap, nil
 }
@@ -108,9 +111,16 @@ func NewEtcdClientWithCfg(etcdCfg etcdClientV3.Config) (*EtcdClientWrap, error) 
 	}
 
 	var etcdClientWrap EtcdClientWrap
-	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
+	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: EtcdHooks}
 	bean.AddBean(constants.BeanNameEtcdPre, &etcdClientWrap)
 	return &etcdClientWrap, nil
+}
+
+func AddEtcdHook(hook GobaseEtcdHook) {
+	EtcdHooks = append(EtcdHooks, hook)
+	client := bean.GetBean(constants.BeanNameEtcdPre)
+	etcdClient := client.(*EtcdClientWrap)
+	etcdClient.AddHook(hook)
 }
 
 type EtcdClientWrap struct {

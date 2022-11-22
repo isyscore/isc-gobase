@@ -15,6 +15,12 @@ import (
 	"time"
 )
 
+var GormHooks []gorm.Plugin
+
+func init() {
+	GormHooks = []gorm.Plugin{}
+}
+
 func NewGormDb() (*gorm.DB, error) {
 	return doNewGormDb("", &gorm.Config{})
 }
@@ -29,6 +35,18 @@ func NewGormDbWithName(datasourceName string) (*gorm.DB, error) {
 
 func NewGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
 	return doNewGormDb(datasourceName, gormConfig)
+}
+
+func AddGormHook(hook gorm.Plugin) {
+	GormHooks = append(GormHooks, hook)
+	gormDbs := bean.GetBeanWithNamePre(constants.BeanNameGormPre)
+	for _, db := range gormDbs {
+		gormDb := db.(*gorm.DB)
+		err := gormDb.Use(hook)
+		if err != nil {
+			logger.Error("添加hook出错: %v", err.Error())
+		}
+	}
 }
 
 func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
