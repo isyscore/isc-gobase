@@ -28,6 +28,7 @@ package logger
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
@@ -194,7 +195,7 @@ func InitLog(appName string) {
 		return "[" + time.Now().Format(cfg.Time.Format) + "]"
 	}}
 	out.FormatLevel = func(i any) string {
-		return strings.ToUpper(fmt.Sprintf(" [%s] [%-2s]", appName, i))
+		return strings.ToUpper(fmt.Sprintf(" [%s] [%v] [%v] [%-2s]", appName, GetMdc(constants.TRACE_HEAD_ID), GetMdc(constants.TRACE_HEAD_USER_ID), i))
 	}
 	out.FormatCaller = callerFormatter
 	initLogDir(out, cfg.Split.Enable, cfg.Split.Size, cfg.Dir, cfg.Max.History, appName, cfg.Console.WriteFile)

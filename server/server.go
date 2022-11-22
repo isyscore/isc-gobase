@@ -464,6 +464,7 @@ func HeadSaveHandler() gin.HandlerFunc {
 
 func SaveHeader(header http.Header) {
 	headerStorage.Set(header)
+	logger.PutHead(header)
 }
 
 func GetHeader() http.Header {
