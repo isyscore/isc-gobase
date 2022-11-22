@@ -7,7 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/tracing"
+	//"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

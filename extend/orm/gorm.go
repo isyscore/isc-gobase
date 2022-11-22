@@ -5,7 +5,7 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
-	"github.com/isyscore/isc-gobase/tracing"
+	//"github.com/isyscore/isc-gobase/tracing"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -68,7 +68,7 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
-	for _, hook := range tracing.GormHooks {
+	for _, hook := range GormHooks {
 		err := gormDb.Use(hook)
 		if err != nil {
 			logger.Error("gorm添加hook出错: %v", err.Error())
@@ -134,6 +134,6 @@ func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
 }
 
-func OrmTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
-}
+//func OrmTracingIsOpen() bool {
+//	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
+//}

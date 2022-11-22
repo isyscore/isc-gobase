@@ -7,7 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
 	baseTime "github.com/isyscore/isc-gobase/time"
-	"github.com/isyscore/isc-gobase/tracing"
+	//"github.com/isyscore/isc-gobase/tracing"
 	//"github.com/isyscore/isc-gobase/tracing"
 	"time"
 )
@@ -45,7 +45,7 @@ func NewClient() (goredis.UniversalClient, error) {
 		rdbClient = goredis.NewClient(getStandaloneConfig())
 	}
 
-	for _, hook := range tracing.RedisHooks {
+	for _, hook := range RedisHooks {
 		rdbClient.AddHook(hook)
 	}
 	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
