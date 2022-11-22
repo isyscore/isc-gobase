@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/server/rsp"
 	"sync"
@@ -51,7 +52,7 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 var pprofHave = false
-var headerStorage goid.LocalStorage
+var reqStorage goid.LocalStorage
 
 var loadLock sync.Mutex
 var serverLoaded = false
@@ -64,7 +65,7 @@ func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 	printVersionAndProfile()
-	headerStorage = goid.NewLocalStorage()
+	reqStorage = goid.NewLocalStorage()
 }
 
 // 提供给外部注册使用
@@ -487,24 +488,46 @@ func getPathAppendApiModel(path string) string {
 
 func HeadSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		SaveHeader(c.Request.Header)
+		SaveHeader(c.Request.Header, c.Request.RemoteAddr)
 	}
 }
 
-func SaveHeader(header http.Header) {
-	headerStorage.Set(header)
+func SaveHeader(header http.Header, remoteAddr string) {
+	reqHeadAndIpMap := map[string]any{}
+	reqHeadAndIpMap["head"] = header
+	reqHeadAndIpMap["remoteId"] = remoteAddr
+
+	reqStorage.Set(reqHeadAndIpMap)
 	logger.PutHead(header)
 }
 
 func GetHeader() http.Header {
-	h := headerStorage.Get()
-	if h == nil {
+	req := reqStorage.Get()
+	if req == nil {
 		return nil
 	}
-	return h.(http.Header)
+	reqS := req.(map[string]any)
+	data, exist := reqS[constants.SAVE_HEAD]
+	if exist {
+		return data.(http.Header)
+	}
+	return nil
+}
+
+func GetRemoteAddr() string {
+	req := reqStorage.Get()
+	if req == nil {
+		return ""
+	}
+	reqS := req.(map[string]any)
+	data, exist := reqS[constants.SAVE_REMOTE_ADDR]
+	if exist {
+		return data.(string)
+	}
+	return ""
 }
 
 func GetHeaderWithKey(headKey string) string {
-	head := headerStorage.Get().(http.Header)
+	head := reqStorage.Get().(http.Header)
 	return head.Get(headKey)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
+	"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -89,11 +90,7 @@ func NewEtcdClient() (*EtcdClientWrap, error) {
 	}
 
 	var etcdClientWrap EtcdClientWrap
-	//if EtcdTracingIsOpen() {
-	//	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
-	//}
-
-	etcdClientWrap = EtcdClientWrap{Client: etcdClient}
+	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
 	bean.AddBean(constants.BeanNameEtcdPre, &etcdClientWrap)
 	return &etcdClientWrap, nil
 }
@@ -111,11 +108,7 @@ func NewEtcdClientWithCfg(etcdCfg etcdClientV3.Config) (*EtcdClientWrap, error) 
 	}
 
 	var etcdClientWrap EtcdClientWrap
-	//if EtcdTracingIsOpen() {
-	//	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
-	//}
-
-	etcdClientWrap = EtcdClientWrap{Client: etcdClient}
+	etcdClientWrap = EtcdClientWrap{Client: etcdClient, etcdHooks: tracing.EtcdHooks}
 	bean.AddBean(constants.BeanNameEtcdPre, &etcdClientWrap)
 	return &etcdClientWrap, nil
 }
@@ -461,6 +454,6 @@ func (g *EtcdLogger) V(l int) bool {
 	return bool(glog.V(glog.Level(l)))
 }
 
-func EtcdTracingIsOpen() bool {
-	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.etcd.enable", false)
-}
+//func EtcdTracingIsOpen() bool {
+//	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.etcd.enable", false)
+//}

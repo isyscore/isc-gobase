@@ -17,3 +17,8 @@ const (
 	TRACE_HEAD_REMOTE_APPNAME = "t-head-remoteAppName"
 	TRACE_HEAD_ORIGNAL_URL    = "t-head-orignal-url"
 )
+
+const (
+	SAVE_HEAD        = "head"
+	SAVE_REMOTE_ADDR = "remote_addr"
+)

@@ -54,9 +54,7 @@ func AddRedisHook(hook redis.Hook) {
 
 func AddEtcdHook(hook etcd.GobaseEtcdHook) {
 	EtcdHooks = append(EtcdHooks, hook)
-	if etcd.EtcdTracingIsOpen() {
-		client := bean.GetBean(constants.BeanNameEtcdPre)
-		etcdClient := client.(*etcd.EtcdClientWrap)
-		etcdClient.AddHook(hook)
-	}
+	client := bean.GetBean(constants.BeanNameEtcdPre)
+	etcdClient := client.(*etcd.EtcdClientWrap)
+	etcdClient.AddHook(hook)
 }
