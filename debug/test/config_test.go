@@ -19,8 +19,11 @@ func TestWatcher(t *testing.T) {
 	}
 
 	debug.Init()
-	debug.AddWatcher("test", func(key string, value string) {
-		fmt.Println("有变化 key=", key, ", value=", value)
+	debug.AddWatcher("debug.test", func(key string, value string) {
+		fmt.Println("最新的值1 key=", key, ", value=", value)
+	})
+	debug.AddWatcher("debug.test", func(key string, value string) {
+		fmt.Println("最新的值2 key=", key, ", value=", value)
 	})
 	debug.StartWatch()
 
@@ -39,5 +42,5 @@ func TestPush(t *testing.T) {
 	debug.Init()
 	var tim = time.TimeToStringYmdHmsS(time.Now())
 	fmt.Println(tim)
-	debug.Update("test", tim)
+	debug.Update("debug.test", tim)
 }
