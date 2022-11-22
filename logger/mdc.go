@@ -46,6 +46,8 @@ func GetMdc(key string) any {
 
 	if mdcMapTem == nil {
 		mdcMapTem = map[string]any{}
+		MdcStorage.Set(mdcMapTem)
+		return ""
 	}
 	mdcMap := mdcMapTem.(map[string]any)
 	data, exist := mdcMap[key]

@@ -31,6 +31,7 @@ type store struct {
 }
 
 type storage struct {
+	ignore string
 }
 
 func (t *storage) Get() (v any) {

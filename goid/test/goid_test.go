@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/test"
+	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
 )
@@ -88,4 +89,33 @@ func BenchmarkNativeGoid(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = goid.NativeGoid()
 	}
+}
+
+
+var h1 goid.LocalStorage
+var h2 goid.LocalStorage
+var h3 goid.LocalStorage
+var h4 goid.LocalStorage
+
+func init() {
+	h1 = goid.NewLocalStorage()
+	h2 = goid.NewLocalStorage()
+	h3 = goid.NewLocalStorage()
+	h4 = goid.NewLocalStorage()
+}
+
+func TestGoidGet(t *testing.T) {
+	h1.Set("11")
+	h2.Set("12")
+	h3.Set("13")
+	h4.Set("14")
+	h1V := h1.Get()
+	h2V := h2.Get()
+	h3V := h3.Get()
+	h4V := h4.Get()
+
+	assert.Equal(t, "11", h1V)
+	assert.Equal(t, "12", h2V)
+	assert.Equal(t, "13", h3V)
+	assert.Equal(t, "14", h4V)
 }

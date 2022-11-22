@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/isyscore/isc-gobase/goid"
+	"github.com/isyscore/isc-gobase/server/rsp"
+	"sync"
+
 	//"github.com/isyscore/isc-gobase/tracing"
 	"io"
 	"net/http"
@@ -20,7 +23,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/isyscore/isc-gobase/server/rsp"
 
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
@@ -51,18 +53,40 @@ var engine *gin.Engine = nil
 var pprofHave = false
 var headerStorage goid.LocalStorage
 
+var loadLock sync.Mutex
+var serverLoaded = false
+
+//type methodTrees []methodTree
+
+var ginHandlers []gin.HandlerFunc
+
 func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 	printVersionAndProfile()
 	headerStorage = goid.NewLocalStorage()
+}
 
-	if config.ExistConfigFile() && config.GetValueBoolDefault("base.server.enable", false) {
-		InitServer()
+// 提供给外部注册使用
+func AddGinHandlers(handler gin.HandlerFunc) {
+	if nil == ginHandlers {
+		var ginHandlersTem []gin.HandlerFunc
+		ginHandlers = ginHandlersTem
 	}
+
+	ginHandlers = append(ginHandlers, handler)
 }
 
 func InitServer() {
+	loadLock.Lock()
+	defer loadLock.Unlock()
+	if serverLoaded {
+		return
+	}
+	if !config.ExistConfigFile() || !config.GetValueBoolDefault("base.server.enable", false) {
+		return
+	}
+
 	if !config.ExistConfigFile() {
 		logger.Error("没有找到任何配置文件，服务启动失败")
 		return
@@ -92,6 +116,10 @@ func InitServer() {
 	engine.Use(Cors(), gin.Recovery())
 	engine.Use(rsp.ResponseHandler())
 	engine.Use(HeadSaveHandler())
+
+	for _, handler := range ginHandlers {
+		engine.Use(handler)
+	}
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
@@ -124,6 +152,7 @@ func InitServer() {
 	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
 
 	logger.InitLog(appName)
+	serverLoaded = true
 }
 
 func ConfigChangeListener(event listener.BaseEvent) {
@@ -289,8 +318,8 @@ func RegisterCustomHealthCheck(apiBase string, status func() string, init func()
 
 func checkEngine() bool {
 	if engine == nil {
-		panic(fmt.Sprintf("服务实例没有初始化，请检查配置"))
-		return false
+		InitServer()
+		return true
 	}
 	return true
 }
