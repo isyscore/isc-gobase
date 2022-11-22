@@ -17,10 +17,10 @@ var RedisHooks []redis.Hook
 var EtcdHooks []etcd.GobaseEtcdHook
 
 func init() {
-	GormHooks = make([]gorm.Plugin, 1)
-	XormHooks = make([]contexts.Hook, 1)
-	RedisHooks = make([]redis.Hook, 1)
-	EtcdHooks = make([]etcd.GobaseEtcdHook, 1)
+	GormHooks = []gorm.Plugin{}
+	XormHooks = []contexts.Hook{}
+	RedisHooks = []redis.Hook{}
+	EtcdHooks = []etcd.GobaseEtcdHook{}
 }
 
 func AddGormHook(hook gorm.Plugin) {
