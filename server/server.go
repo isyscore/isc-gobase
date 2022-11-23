@@ -187,6 +187,10 @@ func StartServer() {
 		return
 	}
 
+	if engine == nil {
+		return
+	}
+
 	listener.PublishEvent(listener.ServerRunStartEvent{})
 
 	if !config.GetValueBoolDefault("base.server.enable", true) {
