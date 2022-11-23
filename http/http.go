@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/isyscore/isc-gobase/server"
 	"io"
 	"log"
 	"net"
@@ -327,6 +328,13 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 }
 
 func call(httpRequest *http.Request, url string) (int, http.Header, any, error) {
+	srcHead := server.GetHeader()
+	for headKey, srcHs := range srcHead {
+		for _, srcH := range srcHs {
+			httpRequest.Header.Add(headKey, srcH)
+		}
+	}
+
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
 		log.Printf("Error sending request to API endpoint. %+v", err)
 		return -1, nil, nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
@@ -365,6 +373,13 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 // 暂时先不处理
 
 func callIgnoreReturn(httpRequest *http.Request, url string) error {
+	srcHead := server.GetHeader()
+	for headKey, srcHs := range srcHead {
+		for _, srcH := range srcHs {
+			httpRequest.Header.Add(headKey, srcH)
+		}
+	}
+
 	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
 		log.Printf("Error sending request to API endpoint. %v", err)
 		return &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
