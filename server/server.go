@@ -327,6 +327,10 @@ func RegisterRoute(path string, method HttpMethod, handler gin.HandlerFunc) gin.
 	if !checkEngine() {
 		return nil
 	}
+	if engine == nil {
+		logger.Warn("server没有启动，请配置 base.server.enable 或者查看相关日志")
+		return nil
+	}
 	switch method {
 	case HmAll:
 		engine.GET(path, handler)
