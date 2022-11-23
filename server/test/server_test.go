@@ -121,15 +121,17 @@ func TestServer2(t *testing.T) {
 	server.Run()
 }
 
-// 环境变量请使用：base.profiles.active=xxx
+func init() {
+	// 添加服务器启动完成事件监听
+	listener.AddListener(listener.EventOfServerRunFinish, func(event listener.BaseEvent) {
+		logger.Info("应用启动完成")
+	})
+}
+
 func TestServerOnProfileIsPprof(t *testing.T) {
-	server.Get("data-test", func(c *gin.Context) {
+	server.Get("data", func(c *gin.Context) {
 		rsp.SuccessOfStandard(c, "data")
 	})
 
 	server.Run()
-}
-
-func init() {
-	server.AddGinHandlers(rsp.ResponseHandler())
 }

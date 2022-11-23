@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/debug"
 	"github.com/isyscore/isc-gobase/time"
 	"testing"
@@ -10,14 +9,6 @@ import (
 )
 
 func TestWatcher(t *testing.T) {
-	config.LoadYamlFile("./application-test1.yaml")
-	if config.GetValueBoolDefault("base.etcd.enable", false) {
-		err := config.GetValueObject("base.etcd", &config.EtcdCfg)
-		if err != nil {
-			return
-		}
-	}
-
 	debug.Init()
 	debug.AddWatcher("debug.test", func(key string, value string) {
 		fmt.Println("最新的值1 key=", key, ", value=", value)
@@ -31,14 +22,6 @@ func TestWatcher(t *testing.T) {
 }
 
 func TestPush(t *testing.T) {
-	config.LoadYamlFile("./application-test1.yaml")
-	if config.GetValueBoolDefault("base.etcd.enable", false) {
-		err := config.GetValueObject("base.etcd", &config.EtcdCfg)
-		if err != nil {
-			return
-		}
-	}
-
 	debug.Init()
 	var tim = time.TimeToStringYmdHmsS(time.Now())
 	fmt.Println(tim)

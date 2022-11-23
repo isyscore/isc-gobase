@@ -2,30 +2,94 @@ package debug
 
 import (
 	"context"
-
-	"github.com/isyscore/isc-gobase/extend/etcd"
+	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
+	"os"
+	"strings"
 )
 
-var etcdClient *etcd.EtcdClientWrap
+const (
+	DEBUG_ETCD_ENDPOINTS  = "debug.etcd.endpoints"
+	DEBUG_ETCD_USER       = "debug.etcd.user"
+	DEBUG_ETCD_PASSWORD   = "debug.etcd.password"
+	DEFAULT_ETCD_ENDPOINT = "etcd-service:22379"
+)
+
+var etcdClient *etcdClientV3.Client
 var keyListenerMap map[string][]KeyListener
 
 type KeyListener func(key string, value string)
 
 func Init() {
+	InitWithParameter(GetEtcdConfig())
+}
+
+func InitWithParameter(endpoints []string, user, password string) {
 	if etcdClient != nil {
 		return
 	}
-	etcdClientTem, err := etcd.NewEtcdClient()
-	if err != nil {
-		logger.Error("etcd初始化失败 %v", err.Error())
-	}
-
-	if etcdClientTem == nil {
+	_etcdClient := getEtcdClient(endpoints, user, password)
+	if _etcdClient == nil {
 		return
 	}
-	etcdClient = etcdClientTem
+
+	etcdClient = _etcdClient
+}
+
+func getEtcdClient(etcdPoints []string, user, password string) *etcdClientV3.Client {
+	// 客户端配置
+	etcdCfg := etcdClientV3.Config{
+		Endpoints: etcdPoints,
+		Username:  user,
+		Password:  password,
+	}
+
+	etcdClient, err := etcdClientV3.New(etcdCfg)
+	if err != nil {
+		logger.Error("生成etcd-client失败：%v", err.Error())
+		return nil
+	}
+
+	return etcdClient
+}
+
+// 优先级：vm配置 > 环境变量
+func GetEtcdConfig() ([]string, string, string) {
+	etcdEndpointStr := os.Getenv(DEBUG_ETCD_ENDPOINTS)
+	etcdEndpointStrOfConfig := config.GetValueString(DEBUG_ETCD_ENDPOINTS)
+	if etcdEndpointStrOfConfig != "" {
+		etcdEndpointStr = etcdEndpointStrOfConfig
+	}
+
+	if etcdEndpointStr == "" {
+		etcdEndpointStr = DEFAULT_ETCD_ENDPOINT
+	}
+
+	etcdEndpointsOriginal := strings.Split(etcdEndpointStr, ",")
+	var etcdEndpoints []string
+	for _, etcdEndpoint := range etcdEndpointsOriginal {
+		etcdEndpoint = strings.TrimSpace(etcdEndpoint)
+		if strings.HasPrefix(etcdEndpoint, "http://") {
+			etcdEndpoint = etcdEndpoint[len("http://"):]
+		}
+
+		etcdEndpoints = append(etcdEndpoints, etcdEndpoint)
+	}
+
+	etcdUser := os.Getenv(DEBUG_ETCD_USER)
+	etcdUserOfConfig := config.GetValueString(DEBUG_ETCD_USER)
+	if etcdUserOfConfig != "" {
+		etcdUser = etcdUserOfConfig
+	}
+
+	etcdPassword := os.Getenv(DEBUG_ETCD_PASSWORD)
+	etcdPasswordOfConfig := config.GetValueString(DEBUG_ETCD_PASSWORD)
+	if etcdPasswordOfConfig != "" {
+		etcdPassword = etcdPasswordOfConfig
+	}
+
+	return etcdEndpoints, etcdUser, etcdPassword
 }
 
 func AddWatcher(key string, keyListener KeyListener) {

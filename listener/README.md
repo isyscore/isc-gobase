@@ -70,8 +70,15 @@ isc-gobase内置了几类事件
 
 常用示例：
 ```go
-// 添加服务器启动完成事件监听
-listener.AddListener(listener.EventOfServerFinish, func(event listener.BaseEvent) {
-    logger.Info("应用启动完成")
-})
+func init() {
+    // 添加服务器启动完成事件监听
+    listener.AddListener(listener.EventOfServerRunFinish, func(event listener.BaseEvent) {
+        logger.Info("应用启动完成")
+    })
+}
+
+func main() {
+    server.Get("api/get", GetData)
+    server.Run()
+}
 ```
