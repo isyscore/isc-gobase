@@ -138,9 +138,9 @@ func (etcdWrap *EtcdClientWrap) AddHook(etcdHook GobaseEtcdHook) {
 }
 
 func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts ...etcdClientV3.OpOption) (*etcdClientV3.PutResponse, error) {
-	if !EtcdTracingIsOpen() {
-		return etcdWrap.Client.Put(ctx, key, val, opts...)
-	}
+	//if !EtcdTracingIsOpen() {
+	//	return etcdWrap.Client.Put(ctx, key, val, opts...)
+	//}
 	op := etcdClientV3.OpPut(key, val, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -154,9 +154,9 @@ func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts .
 }
 
 func (etcdWrap *EtcdClientWrap) Get(ctx context.Context, key string, opts ...etcdClientV3.OpOption) (*etcdClientV3.GetResponse, error) {
-	if !EtcdTracingIsOpen() {
-		return etcdWrap.Client.Get(ctx, key, opts...)
-	}
+	//if !EtcdTracingIsOpen() {
+	//	return etcdWrap.Client.Get(ctx, key, opts...)
+	//}
 	op := etcdClientV3.OpGet(key, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -169,9 +169,9 @@ func (etcdWrap *EtcdClientWrap) Get(ctx context.Context, key string, opts ...etc
 }
 
 func (etcdWrap *EtcdClientWrap) Delete(ctx context.Context, key string, opts ...etcdClientV3.OpOption) (*etcdClientV3.DeleteResponse, error) {
-	if !EtcdTracingIsOpen() {
-		return etcdWrap.Client.Delete(ctx, key, opts...)
-	}
+	//if !EtcdTracingIsOpen() {
+	//	return etcdWrap.Client.Delete(ctx, key, opts...)
+	//}
 	op := etcdClientV3.OpDelete(key, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -189,9 +189,9 @@ func (etcdWrap *EtcdClientWrap) Compact(ctx context.Context, rev int64, opts ...
 }
 
 func (etcdWrap *EtcdClientWrap) Do(ctx context.Context, op etcdClientV3.Op) (etcdClientV3.OpResponse, error) {
-	if !EtcdTracingIsOpen() {
-		return etcdWrap.Client.Do(ctx, op)
-	}
+	//if !EtcdTracingIsOpen() {
+	//	return etcdWrap.Client.Do(ctx, op)
+	//}
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
 	}
