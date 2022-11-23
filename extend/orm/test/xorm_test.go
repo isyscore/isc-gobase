@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func TestGorm1(t *testing.T) {
+func TestXorm1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
-	db, _ := orm2.NewGormDb()
+	db, _ := orm2.NewXormDb()
 
 	// 删除表
 	db.Exec("drop table isc_demo.gobase_demo")
@@ -27,25 +27,13 @@ func TestGorm1(t *testing.T) {
 		"  PRIMARY KEY (`id`)\n" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测试表'")
 
+	db.Table("gobase_demo").Insert(&GobaseDemo{Name: "zhou", Age: 18, Address: "杭州"})
 	// 新增
-	db.Create(&GobaseDemo{Name: "zhou", Age: 18, Address: "杭州"})
-	db.Create(&GobaseDemo{Name: "zhou", Age: 11, Address: "杭州2"})
+	db.Table("gobase_demo").Insert(&GobaseDemo{Name: "zhou", Age: 18, Address: "杭州"})
 
-	// 查询：一行
 	var demo GobaseDemo
-	db.First(&demo).Where("name=?", "zhou")
+	db.Table("gobase_demo").Where("name=?", "zhou").Get(&demo)
 
 	// 查询：多行
 	fmt.Println(demo)
-}
-
-type GobaseDemo struct {
-	Id         uint64
-	Name       string
-	Age        int
-	Address    string
-}
-
-func (GobaseDemo) TableName() string {
-	return "gobase_demo"
 }
