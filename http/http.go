@@ -1,8 +1,10 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/store"
 	"io"
 	"log"
@@ -30,6 +32,21 @@ const (
 	ContentTypeAll        string = "*/*"
 	ContentPostForm       string = "application/x-www-form-urlencoded"
 )
+
+var NetHttpHooks []GobaseHttpHook
+
+func init() {
+	NetHttpHooks = []GobaseHttpHook{}
+}
+
+type GobaseHttpHook interface {
+	Before(ctx context.Context, req *http.Request) context.Context
+	After(ctx context.Context, req *http.Request, res *http.Response, err error)
+}
+
+func AddHook(httpHook GobaseHttpHook) {
+	NetHttpHooks = append(NetHttpHooks, httpHook)
+}
 
 type NetError struct {
 	ErrMsg string
@@ -335,7 +352,23 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 		}
 	}
 
-	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
+	ctx := context.Background()
+
+	for _, hook := range NetHttpHooks {
+		goid.Go(func() {
+			hook.Before(ctx, httpRequest)
+		})
+	}
+
+	httpResponse, err := httpClient.Do(httpRequest)
+
+	for _, hook := range NetHttpHooks {
+		goid.Go(func() {
+			hook.After(ctx, httpRequest, httpResponse, err)
+		})
+	}
+
+	if err != nil && httpResponse == nil {
 		log.Printf("Error sending request to API endpoint. %+v", err)
 		return -1, nil, nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
 	} else {
