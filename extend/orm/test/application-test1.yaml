@@ -1,7 +1,7 @@
 base:
   datasource:
-    username: isyscore
-    password: Isysc0re
+    username: root
+    password: ZljIsysc0re123
     host: 10.30.30.78
     port: 23306
     # 目前支持: mysql、postgresql、sqlite、sqlserver

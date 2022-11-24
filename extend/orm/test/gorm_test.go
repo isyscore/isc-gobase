@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	orm2 "github.com/isyscore/isc-gobase/extend/orm"
@@ -9,6 +10,7 @@ import (
 
 func TestGorm1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
+	orm2.AddHook(&GobaseOrmHook{})
 	db, _ := orm2.NewGormDb()
 
 	// 删除表
@@ -35,6 +37,9 @@ func TestGorm1(t *testing.T) {
 	var demo GobaseDemo
 	db.First(&demo).Where("name=?", "zhou")
 
+	dd, _ := db.DB()
+	dd.Query("select * from gobase_demo")
+
 	// 查询：多行
 	fmt.Println(demo)
 }
@@ -49,3 +54,25 @@ type GobaseDemo struct {
 func (GobaseDemo) TableName() string {
 	return "gobase_demo"
 }
+
+type GobaseOrmHook struct {
+}
+
+func (*GobaseOrmHook) Before(ctx context.Context, parameters map[string]any) (context.Context, error){
+	fmt.Println("before")
+	fmt.Println(parameters)
+	return ctx, nil
+}
+
+func (*GobaseOrmHook) After(ctx context.Context, parameters map[string]any) (context.Context, error){
+	fmt.Println("after")
+	fmt.Println(parameters)
+	return ctx, nil
+}
+
+func (*GobaseOrmHook) Err(ctx context.Context, err error, parameters map[string]any) error {
+	fmt.Println(parameters)
+	return nil
+}
+
+

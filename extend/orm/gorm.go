@@ -1,11 +1,16 @@
 package orm
 
 import (
+	"database/sql"
+	driverMysql "github.com/go-sql-driver/mysql"
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
-	//"github.com/isyscore/isc-gobase/tracing"
+	"github.com/mattn/go-sqlite3"
+	"github.com/qustavo/sqlhooks/v2"
+
+	"github.com/lib/pq"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -14,12 +19,6 @@ import (
 	"strings"
 	"time"
 )
-
-var GormHooks []gorm.Plugin
-
-func init() {
-	GormHooks = []gorm.Plugin{}
-}
 
 func NewGormDb() (*gorm.DB, error) {
 	return doNewGormDb("", &gorm.Config{})
@@ -37,21 +36,6 @@ func NewGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) 
 	return doNewGormDb(datasourceName, gormConfig)
 }
 
-func AddGormHook(hook gorm.Plugin) {
-	GormHooks = append(GormHooks, hook)
-	gormDbs := bean.GetBeanWithNamePre(constants.BeanNameGormPre)
-	if gormDbs == nil {
-		return
-	}
-	for _, db := range gormDbs {
-		gormDb := db.(*gorm.DB)
-		err := gormDb.Use(hook)
-		if err != nil {
-			logger.Error("添加hook出错: %v", err.Error())
-		}
-	}
-}
-
 func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, error) {
 	datasourceConfig := config.DatasourceConfig{}
 	targetDatasourceName := "base.datasource"
@@ -64,18 +48,15 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 		return nil, err
 	}
 
+	// 注册原生的sql的hook
+	sqlRegister(datasourceConfig.DriverName)
+
 	var gormDb *gorm.DB
-	gormDb, err = gorm.Open(getDialect(datasourceConfig.DriverName, datasourceConfig), gormConfig)
+	dsn := getDbDsn(datasourceConfig.DriverName, datasourceConfig)
+	gormDb, err = gorm.Open(getDialect(dsn, datasourceConfig.DriverName), gormConfig)
 	if err != nil {
 		logger.Warn("获取数据库db异常：%v", err.Error())
 		return nil, err
-	}
-
-	for _, hook := range GormHooks {
-		err := gormDb.Use(hook)
-		if err != nil {
-			logger.Error("gorm添加hook出错: %v", err.Error())
-		}
 	}
 
 	d, _ := gormDb.DB()
@@ -117,19 +98,31 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 	return gormDb, nil
 }
 
-func getDialect(dbType string, datasourceConfig config.DatasourceConfig) gorm.Dialector {
-	dsn := getDbDsn(dbType, datasourceConfig)
-	switch dbType {
+func getDialect(dsn, driverName string) gorm.Dialector {
+	switch driverName {
 	case "mysql":
-		return mysql.Open(dsn)
+		return mysql.New(mysql.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
 	case "postgresql":
-		return postgres.Open(dsn)
+		return postgres.New(postgres.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
 	case "sqlite":
-		return sqlite.Open(dsn)
+		return sqlite.Dialector{DSN: dsn, DriverName: wrapDriverName(driverName)}
 	case "sqlserver":
-		return sqlserver.Open(dsn)
+		return sqlserver.New(sqlserver.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
 	}
 	return nil
+}
+
+func sqlRegister(driverName string) {
+	switch driverName {
+	case "mysql":
+		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{}))
+	case "postgresql":
+		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{}))
+	case "sqlite":
+		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
+	//case "sqlserver": 暂时不支持
+	//	sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
+	}
 }
 
 // 特殊字符处理
@@ -137,6 +130,6 @@ func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
 }
 
-//func OrmTracingIsOpen() bool {
-//	return config.GetValueBoolDefault("base.tracing.enable", false) && config.GetValueBoolDefault("base.tracing.orm.enable", false)
-//}
+func wrapDriverName(driverName string) string {
+	return driverName + "Hook"
+}

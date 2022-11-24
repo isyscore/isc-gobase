@@ -7,14 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/logger"
 	"time"
 	"xorm.io/xorm"
-	"xorm.io/xorm/contexts"
 )
-
-var XormHooks []contexts.Hook
-
-func init() {
-	XormHooks = []contexts.Hook{}
-}
 
 func NewXormDb() (*xorm.Engine, error) {
 	return doNewXormDb("", map[string]string{})
@@ -30,17 +23,6 @@ func NewXormDbWithName(datasourceName string) (*xorm.Engine, error) {
 
 func NewXormDbWithNameParams(datasourceName string, params map[string]string) (*xorm.Engine, error) {
 	return doNewXormDb(datasourceName, params)
-}
-
-func AddXormHook(hook contexts.Hook) {
-	XormHooks = append(XormHooks, hook)
-	xormDbs := bean.GetBeanWithNamePre(constants.BeanNameXormPre)
-	if xormDbs == nil {
-		return
-	}
-	for _, db := range xormDbs {
-		db.(*xorm.Engine).AddHook(hook)
-	}
 }
 
 func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine, error) {
@@ -61,10 +43,6 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 	if err != nil {
 		logger.Warn("获取数据库db异常：%v", err.Error())
 		return nil, err
-	}
-
-	for _, hook := range XormHooks {
-		xormDb.AddHook(hook)
 	}
 
 	maxIdleConns := config.GetValueInt("base.datasource.connect-pool.max-idle-conns")

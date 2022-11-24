@@ -26,7 +26,11 @@ require (
 )
 
 require (
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/lib/pq v1.10.2
+	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/qustavo/sqlhooks/v2 v2.1.0
 	go.etcd.io/etcd/client/v3 v3.5.5
 	go.uber.org/zap v1.17.0
 	google.golang.org/grpc v1.41.0
@@ -42,7 +46,6 @@ require (
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-openapi/spec v0.20.7 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
@@ -61,7 +64,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/microsoft/go-mssqldb v0.17.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
 	github.com/swaggo/swag v1.8.5 // indirect

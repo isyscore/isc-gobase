@@ -1,11 +1,72 @@
 package orm
 
 import (
+	"context"
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
 	"strings"
 )
+
+type GobaseSqlHook interface {
+	Before(ctx context.Context, parameters map[string]any) (context.Context, error)
+	After(ctx context.Context, parameters map[string]any) (context.Context, error)
+	Err(ctx context.Context, err error, parameters map[string]any) error
+}
+
+var SqlHooks []GobaseSqlHook
+
+func init() {
+	SqlHooks = []GobaseSqlHook{}
+}
+
+func AddHook(hook GobaseSqlHook) {
+	SqlHooks = append(SqlHooks, hook)
+}
+
+type GobaseSqlHookProxy struct {}
+
+func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+	for _, hook := range SqlHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		ctx, err := hook.Before(ctx, parametersMap)
+		if err != nil {
+			return ctx, err
+		}
+	}
+	return ctx, nil
+}
+
+func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+	for _, hook := range SqlHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		ctx, err := hook.After(ctx, parametersMap)
+		if err != nil {
+			return ctx, err
+		}
+	}
+	return ctx, nil
+}
+
+func (proxy *GobaseSqlHookProxy) OnError(ctx context.Context, err error, query string, args ...interface{}) error {
+	for _, hook := range SqlHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		err := hook.Err(ctx, err, parametersMap)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func getDbDsnWithName(datasourceName string) (string, error) {
 	datasourceConfig := config.DatasourceConfig{}
@@ -33,6 +94,7 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 	case "mysql":
 		// 格式：user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.DbName)
+		fmt.Println(dsn)
 		if len(sqlConfigMap) != 0 {
 			var kvList []string
 			for key, value := range sqlConfigMap {
@@ -62,3 +124,4 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 	}
 	return ""
 }
+
