@@ -6,6 +6,7 @@ import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
+	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/logger"
 	//"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
@@ -141,9 +142,6 @@ func (etcdWrap *EtcdClientWrap) AddHook(etcdHook GobaseEtcdHook) {
 }
 
 func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts ...etcdClientV3.OpOption) (*etcdClientV3.PutResponse, error) {
-	//if !EtcdTracingIsOpen() {
-	//	return etcdWrap.Client.Put(ctx, key, val, opts...)
-	//}
 	op := etcdClientV3.OpPut(key, val, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -157,9 +155,6 @@ func (etcdWrap *EtcdClientWrap) Put(ctx context.Context, key, val string, opts .
 }
 
 func (etcdWrap *EtcdClientWrap) Get(ctx context.Context, key string, opts ...etcdClientV3.OpOption) (*etcdClientV3.GetResponse, error) {
-	//if !EtcdTracingIsOpen() {
-	//	return etcdWrap.Client.Get(ctx, key, opts...)
-	//}
 	op := etcdClientV3.OpGet(key, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -172,9 +167,6 @@ func (etcdWrap *EtcdClientWrap) Get(ctx context.Context, key string, opts ...etc
 }
 
 func (etcdWrap *EtcdClientWrap) Delete(ctx context.Context, key string, opts ...etcdClientV3.OpOption) (*etcdClientV3.DeleteResponse, error) {
-	//if !EtcdTracingIsOpen() {
-	//	return etcdWrap.Client.Delete(ctx, key, opts...)
-	//}
 	op := etcdClientV3.OpDelete(key, opts...)
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
@@ -192,15 +184,14 @@ func (etcdWrap *EtcdClientWrap) Compact(ctx context.Context, rev int64, opts ...
 }
 
 func (etcdWrap *EtcdClientWrap) Do(ctx context.Context, op etcdClientV3.Op) (etcdClientV3.OpResponse, error) {
-	//if !EtcdTracingIsOpen() {
-	//	return etcdWrap.Client.Do(ctx, op)
-	//}
 	for _, hook := range etcdWrap.etcdHooks {
 		ctx = hook.Before(ctx, op)
 	}
 	rsp, err := etcdWrap.Client.Do(ctx, op)
 	for _, hook := range etcdWrap.etcdHooks {
-		hook.After(ctx, op, rsp, err)
+		goid.Go(func() {
+			hook.After(ctx, op, rsp, err)
+		})
 	}
 	return rsp, err
 }

@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/isyscore/isc-gobase/goid"
-	"github.com/isyscore/isc-gobase/store"
+
+	//"github.com/isyscore/isc-gobase/goid"
 	"io"
 	"log"
 	"net"
@@ -41,7 +42,7 @@ func init() {
 
 type GobaseHttpHook interface {
 	Before(ctx context.Context, req *http.Request) context.Context
-	After(ctx context.Context, req *http.Request, res *http.Response, err error)
+	After(ctx context.Context, rsp *http.Response, rspCode int, rspData any, err error)
 }
 
 func AddHook(httpHook GobaseHttpHook) {
@@ -345,29 +346,24 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 }
 
 func call(httpRequest *http.Request, url string) (int, http.Header, any, error) {
-	srcHead := store.GetHeader()
-	for headKey, srcHs := range srcHead {
-		for _, srcH := range srcHs {
-			httpRequest.Header.Add(headKey, srcH)
-		}
-	}
-
 	ctx := context.Background()
 
 	for _, hook := range NetHttpHooks {
-		goid.Go(func() {
-			hook.Before(ctx, httpRequest)
-		})
+		ctx = hook.Before(ctx, httpRequest)
 	}
 
 	httpResponse, err := httpClient.Do(httpRequest)
+	rspCode, rspHead, rspData, err := doParseResponse(httpResponse, url, err)
 
 	for _, hook := range NetHttpHooks {
 		goid.Go(func() {
-			hook.After(ctx, httpRequest, httpResponse, err)
+			hook.After(ctx, httpResponse, rspCode, rspData, err)
 		})
 	}
+	return rspCode, rspHead, rspData, err
+}
 
+func doParseResponse(httpResponse *http.Response, url string, err error) (int, http.Header, any, error) {
 	if err != nil && httpResponse == nil {
 		log.Printf("Error sending request to API endpoint. %+v", err)
 		return -1, nil, nil, &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
@@ -406,36 +402,21 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 // 暂时先不处理
 
 func callIgnoreReturn(httpRequest *http.Request, url string) error {
-	srcHead := store.GetHeader()
-	for headKey, srcHs := range srcHead {
-		for _, srcH := range srcHs {
-			httpRequest.Header.Add(headKey, srcH)
-		}
+	ctx := context.Background()
+
+	for _, hook := range NetHttpHooks {
+		ctx = hook.Before(ctx, httpRequest)
 	}
 
-	if httpResponse, err := httpClient.Do(httpRequest); err != nil && httpResponse == nil {
-		log.Printf("Error sending request to API endpoint. %v", err)
-		return &NetError{ErrMsg: "Error sending request, url: " + url + ", err" + err.Error()}
-	} else {
-		if httpResponse == nil {
-			log.Printf("httpResponse is nil\n")
-			return nil
-		}
+	httpResponse, err := httpClient.Do(httpRequest)
+	rspCode, _, rspData, err := doParseResponse(httpResponse, url, err)
 
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				log.Printf("Body close error(%v)", err)
-			}
-		}(httpResponse.Body)
-
-		code := httpResponse.StatusCode
-		if code != http.StatusOK {
-			body, _ := io.ReadAll(httpResponse.Body)
-			return &NetError{ErrMsg: "remote error, url: " + url + ", code " + strconv.Itoa(code) + ", message: " + string(body)}
-		}
-		return nil
+	for _, hook := range NetHttpHooks {
+		goid.Go(func() {
+			hook.After(ctx, httpResponse, rspCode, rspData, err)
+		})
 	}
+	return err
 }
 
 func callToStandard(httpRequest *http.Request, url string) (int, http.Header, any, error) {

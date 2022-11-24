@@ -4,21 +4,21 @@ import (
 	"context"
 	"fmt"
 	baseHttp "github.com/isyscore/isc-gobase/http"
+	"github.com/isyscore/isc-gobase/isc"
 	"net/http"
 	"testing"
+	"unsafe"
 )
 
 type DemoHttpHook struct {
 }
 
 func (*DemoHttpHook) Before(ctx context.Context, req *http.Request) context.Context {
-
-	fmt.Println("信息" + req.URL.Path)
 	return ctx
 }
 
-func (*DemoHttpHook) After(ctx context.Context, req *http.Request, res *http.Response, err error) {
-	fmt.Println("返回值")
+func (*DemoHttpHook) After(ctx context.Context, rsp *http.Response, rspCode int, rspData any, err error) {
+
 }
 
 func init() {
@@ -26,20 +26,15 @@ func init() {
 }
 
 func TestGetSimple(t *testing.T) {
-	// {"code":"success","data":"ok","message":"成功"}
-	baseHttp.GetSimple("http://10.30.30.78:29013/api/core/license/osinfo")
+	_, _, data, err := baseHttp.GetSimple("http://10.30.30.78:29013/api/core/license/osinfo")
 
-	//if err != nil {
-	//	fmt.Printf("error = %v\n", err)
-	//	return
-	//}
-	//fmt.Println(string(data.([]byte)))
-	//
-	//// "ok"
-	//_, _, data, err = baseHttp.GetSimpleOfStandard("http://localhost:8082/api/api/app/sample/test/get")
-	//if err != nil {
-	//	fmt.Printf("error = %v\n", err)
-	//	return
-	//}
-	//fmt.Println(string(data.([]byte)))
+	if err != nil {
+		fmt.Printf("error = %v\n", err)
+		return
+	}
+	fmt.Println("结果： " + string(data.([]byte)))
+
+	datas := isc.ToInt(unsafe.Sizeof(data))
+
+	fmt.Println("====" + isc.ToString(datas))
 }
