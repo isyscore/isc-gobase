@@ -1,14 +1,17 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	orm2 "github.com/isyscore/isc-gobase/extend/orm"
 	"testing"
+	"xorm.io/xorm/contexts"
 )
 
 func TestXorm1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
+	orm2.AddXormHook(&GobaseXormHook{})
 	db, _ := orm2.NewXormDb()
 
 	// 删除表
@@ -34,6 +37,23 @@ func TestXorm1(t *testing.T) {
 	var demo GobaseDemo
 	db.Table("gobase_demo").Where("name=?", "zhou").Get(&demo)
 
+	dd := db.DB()
+	dd.Query("select * from gobase_demo")
+
 	// 查询：多行
 	fmt.Println(demo)
+}
+
+
+type GobaseXormHook struct {
+}
+
+func (*GobaseXormHook) BeforeProcess(c *contexts.ContextHook) (context.Context, error) {
+	fmt.Println("before-xorm")
+	return c.Ctx, nil
+}
+
+func (*GobaseXormHook) AfterProcess(c *contexts.ContextHook) error {
+	fmt.Println("after-xorm")
+	return nil
 }

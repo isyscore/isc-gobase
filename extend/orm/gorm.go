@@ -1,16 +1,16 @@
 package orm
 
 import (
+	"context"
 	"database/sql"
 	driverMysql "github.com/go-sql-driver/mysql"
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/logger"
+	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
 	"github.com/qustavo/sqlhooks/v2"
-
-	"github.com/lib/pq"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -94,35 +94,8 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 			d.SetConnMaxIdleTime(t)
 		}
 	}
-	bean.AddBean(constants.BeanNameGormPre + datasourceName, gormDb)
+	bean.AddBean(constants.BeanNameGormPre+datasourceName, gormDb)
 	return gormDb, nil
-}
-
-func getDialect(dsn, driverName string) gorm.Dialector {
-	switch driverName {
-	case "mysql":
-		return mysql.New(mysql.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
-	case "postgresql":
-		return postgres.New(postgres.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
-	case "sqlite":
-		return sqlite.Dialector{DSN: dsn, DriverName: wrapDriverName(driverName)}
-	case "sqlserver":
-		return sqlserver.New(sqlserver.Config{DSN: dsn, DriverName: wrapDriverName(driverName)})
-	}
-	return nil
-}
-
-func sqlRegister(driverName string) {
-	switch driverName {
-	case "mysql":
-		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{}))
-	case "postgresql":
-		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{}))
-	case "sqlite":
-		sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
-	//case "sqlserver": 暂时不支持
-	//	sql.Register(wrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
-	}
 }
 
 // 特殊字符处理
@@ -130,6 +103,94 @@ func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
 }
 
-func wrapDriverName(driverName string) string {
+
+func getDialect(dsn, driverName string) gorm.Dialector {
+	switch driverName {
+	case "mysql":
+		return mysql.New(mysql.Config{DSN: dsn, DriverName: WrapDriverName(driverName)})
+	case "postgresql":
+		return postgres.New(postgres.Config{DSN: dsn, DriverName: WrapDriverName(driverName)})
+	case "sqlite":
+		return sqlite.Dialector{DSN: dsn, DriverName: WrapDriverName(driverName)}
+	case "sqlserver":
+		return sqlserver.New(sqlserver.Config{DSN: dsn, DriverName: WrapDriverName(driverName)})
+	}
+	return nil
+}
+
+func sqlRegister(driverName string) {
+	switch driverName {
+	case "mysql":
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{}))
+	case "postgresql":
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{}))
+	case "sqlite":
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
+		//case "sqlserver": 暂时不支持
+		//	sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
+	}
+}
+
+func WrapDriverName(driverName string) string {
 	return driverName + "Hook"
+}
+
+type GobaseGormHook interface {
+	Before(ctx context.Context, parameters map[string]any) (context.Context, error)
+	After(ctx context.Context, parameters map[string]any) (context.Context, error)
+	Err(ctx context.Context, err error, parameters map[string]any) error
+}
+
+var gormHooks []GobaseGormHook
+
+func init() {
+	gormHooks = []GobaseGormHook{}
+}
+
+func AddGormHook(hook GobaseGormHook) {
+	gormHooks = append(gormHooks, hook)
+}
+
+type GobaseSqlHookProxy struct {}
+
+func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+	for _, hook := range gormHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		ctx, err := hook.Before(ctx, parametersMap)
+		if err != nil {
+			return ctx, err
+		}
+	}
+	return ctx, nil
+}
+
+func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+	for _, hook := range gormHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		ctx, err := hook.After(ctx, parametersMap)
+		if err != nil {
+			return ctx, err
+		}
+	}
+	return ctx, nil
+}
+
+func (proxy *GobaseSqlHookProxy) OnError(ctx context.Context, err error, query string, args ...interface{}) error {
+	for _, hook := range gormHooks {
+		parametersMap := map[string]any{
+			"query":query,
+			"args": args,
+		}
+		err := hook.Err(ctx, err, parametersMap)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 func TestGorm1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
-	orm2.AddHook(&GobaseOrmHook{})
+	orm2.AddGormHook(&GobaseOrmHookDemo{})
 	db, _ := orm2.NewGormDb()
 
 	// 删除表
@@ -55,22 +55,22 @@ func (GobaseDemo) TableName() string {
 	return "gobase_demo"
 }
 
-type GobaseOrmHook struct {
+type GobaseOrmHookDemo struct {
 }
 
-func (*GobaseOrmHook) Before(ctx context.Context, parameters map[string]any) (context.Context, error){
+func (*GobaseOrmHookDemo) Before(ctx context.Context, parameters map[string]any) (context.Context, error){
 	fmt.Println("before")
 	fmt.Println(parameters)
 	return ctx, nil
 }
 
-func (*GobaseOrmHook) After(ctx context.Context, parameters map[string]any) (context.Context, error){
+func (*GobaseOrmHookDemo) After(ctx context.Context, parameters map[string]any) (context.Context, error){
 	fmt.Println("after")
 	fmt.Println(parameters)
 	return ctx, nil
 }
 
-func (*GobaseOrmHook) Err(ctx context.Context, err error, parameters map[string]any) error {
+func (*GobaseOrmHookDemo) Err(ctx context.Context, err error, parameters map[string]any) error {
 	fmt.Println(parameters)
 	return nil
 }
