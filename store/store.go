@@ -15,7 +15,11 @@ func init() {
 }
 
 func GetRequest() *http.Request {
-	return RequestStorage.Get().(*http.Request)
+	req := RequestStorage.Get()
+	if req == nil {
+		return nil
+	}
+	return req.(*http.Request)
 }
 
 func GetHeader() http.Header {
