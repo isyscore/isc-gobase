@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/server/rsp"
 	"github.com/isyscore/isc-gobase/store"
-	"sync"
-
-	//"github.com/isyscore/isc-gobase/tracing"
 	"io"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -495,35 +493,4 @@ func RequestSaveHandler() gin.HandlerFunc {
 		store.RequestStorage.Set(c.Request)
 		logger.PutHead(c.Request.Header)
 	}
-}
-
-func GetRequest() *http.Request {
-	return store.RequestStorage.Get().(*http.Request)
-}
-
-func GetHeader() http.Header {
-	req := store.RequestStorage.Get()
-	if req == nil {
-		return nil
-	}
-	reqS := req.(*http.Request)
-	return reqS.Header
-}
-
-func GetRemoteAddr() string {
-	req := store.RequestStorage.Get()
-	if req == nil {
-		return ""
-	}
-	reqS := req.(*http.Request)
-	return reqS.RemoteAddr
-}
-
-func GetHeaderWithKey(headKey string) string {
-	req := store.RequestStorage.Get()
-	if req == nil {
-		return ""
-	}
-	reqS := req.(*http.Request)
-	return reqS.Header.Get(headKey)
 }

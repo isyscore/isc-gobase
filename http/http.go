@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/isyscore/isc-gobase/server"
+	"github.com/isyscore/isc-gobase/store"
 	"io"
 	"log"
 	"net"
@@ -328,7 +329,7 @@ func PatchOfStandard(url string, header http.Header, parameterMap map[string]str
 }
 
 func call(httpRequest *http.Request, url string) (int, http.Header, any, error) {
-	srcHead := server.GetHeader()
+	srcHead := store.GetHeader()
 	for headKey, srcHs := range srcHead {
 		for _, srcH := range srcHs {
 			httpRequest.Header.Add(headKey, srcH)
@@ -373,7 +374,7 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 // 暂时先不处理
 
 func callIgnoreReturn(httpRequest *http.Request, url string) error {
-	srcHead := server.GetHeader()
+	srcHead := store.GetHeader()
 	for headKey, srcHs := range srcHead {
 		for _, srcH := range srcHs {
 			httpRequest.Header.Add(headKey, srcH)
