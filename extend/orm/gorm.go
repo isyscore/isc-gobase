@@ -40,6 +40,9 @@ func NewGormDbWithNameAndConfig(datasourceName string, gormConfig *gorm.Config) 
 func AddGormHook(hook gorm.Plugin) {
 	GormHooks = append(GormHooks, hook)
 	gormDbs := bean.GetBeanWithNamePre(constants.BeanNameGormPre)
+	if gormDbs == nil {
+		return
+	}
 	for _, db := range gormDbs {
 		gormDb := db.(*gorm.DB)
 		err := gormDb.Use(hook)

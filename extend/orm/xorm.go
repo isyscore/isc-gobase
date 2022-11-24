@@ -35,6 +35,9 @@ func NewXormDbWithNameParams(datasourceName string, params map[string]string) (*
 func AddXormHook(hook contexts.Hook) {
 	XormHooks = append(XormHooks, hook)
 	xormDbs := bean.GetBeanWithNamePre(constants.BeanNameXormPre)
+	if xormDbs == nil {
+		return
+	}
 	for _, db := range xormDbs {
 		db.(*xorm.Engine).AddHook(hook)
 	}

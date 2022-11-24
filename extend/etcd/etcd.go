@@ -119,6 +119,9 @@ func NewEtcdClientWithCfg(etcdCfg etcdClientV3.Config) (*EtcdClientWrap, error) 
 func AddEtcdHook(hook GobaseEtcdHook) {
 	EtcdHooks = append(EtcdHooks, hook)
 	client := bean.GetBean(constants.BeanNameEtcdPre)
+	if client == nil {
+		return
+	}
 	etcdClient := client.(*EtcdClientWrap)
 	etcdClient.AddHook(hook)
 }
