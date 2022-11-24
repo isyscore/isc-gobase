@@ -58,19 +58,19 @@ func (GobaseDemo) TableName() string {
 type GobaseOrmHookDemo struct {
 }
 
-func (*GobaseOrmHookDemo) Before(ctx context.Context, parameters map[string]any) (context.Context, error){
+func (*GobaseOrmHookDemo) Before(ctx context.Context, driverName string, parameters map[string]any) (context.Context, error){
 	fmt.Println("before")
 	fmt.Println(parameters)
 	return ctx, nil
 }
 
-func (*GobaseOrmHookDemo) After(ctx context.Context, parameters map[string]any) (context.Context, error){
+func (*GobaseOrmHookDemo) After(ctx context.Context, driverName string, parameters map[string]any) (context.Context, error){
 	fmt.Println("after")
 	fmt.Println(parameters)
 	return ctx, nil
 }
 
-func (*GobaseOrmHookDemo) Err(ctx context.Context, err error, parameters map[string]any) error {
+func (*GobaseOrmHookDemo) Err(ctx context.Context, driverName string, err error, parameters map[string]any) error {
 	fmt.Println("err")
 	fmt.Println(err.Error())
 	return nil

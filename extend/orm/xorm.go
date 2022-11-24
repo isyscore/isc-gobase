@@ -1,6 +1,7 @@
 package orm
 
 import (
+	"context"
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
@@ -10,10 +11,28 @@ import (
 	"xorm.io/xorm/contexts"
 )
 
-var XormHooks []contexts.Hook
+type GobaseXormHook interface {
+	BeforeProcess(c *contexts.ContextHook, driverName string) (context.Context, error)
+	AfterProcess(c *contexts.ContextHook, driverName string) error
+}
+
+var defaultXormHooks []DefaultXormHook
+
+type DefaultXormHook struct {
+	driverName string
+	gobaseXormHook GobaseXormHook
+}
+
+func (defaultHook *DefaultXormHook)BeforeProcess(c *contexts.ContextHook) (context.Context, error) {
+	return defaultHook.gobaseXormHook.BeforeProcess(c, defaultHook.driverName)
+}
+
+func (defaultHook *DefaultXormHook)AfterProcess(c *contexts.ContextHook) error {
+	return defaultHook.gobaseXormHook.AfterProcess(c, defaultHook.driverName)
+}
 
 func init() {
-	XormHooks = []contexts.Hook{}
+	defaultXormHooks = []DefaultXormHook{}
 }
 
 func NewXormDb() (*xorm.Engine, error) {
@@ -32,14 +51,15 @@ func NewXormDbWithNameParams(datasourceName string, params map[string]string) (*
 	return doNewXormDb(datasourceName, params)
 }
 
-func AddXormHook(hook contexts.Hook) {
-	XormHooks = append(XormHooks, hook)
+func AddXormHook(hook GobaseXormHook) {
+	defaultXormHook := DefaultXormHook{gobaseXormHook: hook}
+	defaultXormHooks = append(defaultXormHooks, defaultXormHook)
 	xormDbs := bean.GetBeanWithNamePre(constants.BeanNameXormPre)
 	if xormDbs == nil {
 		return
 	}
 	for _, db := range xormDbs {
-		db.(*xorm.Engine).AddHook(hook)
+		db.(*xorm.Engine).AddHook(&defaultXormHook)
 	}
 }
 
@@ -63,8 +83,9 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 		return nil, err
 	}
 
-	for _, hook := range XormHooks {
-		xormDb.AddHook(hook)
+	for _, hook := range defaultXormHooks {
+		hook.driverName = datasourceConfig.DriverName
+		xormDb.AddHook(&hook)
 	}
 
 	maxIdleConns := config.GetValueInt("base.datasource.connect-pool.max-idle-conns")

@@ -121,11 +121,11 @@ func getDialect(dsn, driverName string) gorm.Dialector {
 func sqlRegister(driverName string) {
 	switch driverName {
 	case "mysql":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{}))
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 	case "postgresql":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{}))
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 	case "sqlite":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
+		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 		//case "sqlserver": 暂时不支持
 		//	sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
 	}
@@ -136,9 +136,9 @@ func WrapDriverName(driverName string) string {
 }
 
 type GobaseGormHook interface {
-	Before(ctx context.Context, parameters map[string]any) (context.Context, error)
-	After(ctx context.Context, parameters map[string]any) (context.Context, error)
-	Err(ctx context.Context, err error, parameters map[string]any) error
+	Before(ctx context.Context, driverName string, parameters map[string]any) (context.Context, error)
+	After(ctx context.Context, driverName string, parameters map[string]any) (context.Context, error)
+	Err(ctx context.Context, driverName string, err error, parameters map[string]any) error
 }
 
 var gormHooks []GobaseGormHook
@@ -151,7 +151,9 @@ func AddGormHook(hook GobaseGormHook) {
 	gormHooks = append(gormHooks, hook)
 }
 
-type GobaseSqlHookProxy struct {}
+type GobaseSqlHookProxy struct {
+	DriverName string
+}
 
 func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
 	var ctxFinal context.Context
@@ -160,7 +162,7 @@ func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args 
 			"query":query,
 			"args": args,
 		}
-		_ctx, err := hook.Before(ctx, parametersMap)
+		_ctx, err := hook.Before(ctx, proxy.DriverName, parametersMap)
 		if err != nil {
 			return _ctx, err
 		} else {
@@ -176,7 +178,7 @@ func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args .
 			"query":query,
 			"args": args,
 		}
-		ctx, err := hook.After(ctx, parametersMap)
+		ctx, err := hook.After(ctx, proxy.DriverName, parametersMap)
 		if err != nil {
 			return ctx, err
 		}
@@ -190,7 +192,7 @@ func (proxy *GobaseSqlHookProxy) OnError(ctx context.Context, err error, query s
 			"query":query,
 			"args": args,
 		}
-		err := hook.Err(ctx, err, parametersMap)
+		err := hook.Err(ctx, proxy.DriverName, err, parametersMap)
 		if err != nil {
 			return err
 		}

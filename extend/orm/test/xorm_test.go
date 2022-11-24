@@ -48,12 +48,12 @@ func TestXorm1(t *testing.T) {
 type GobaseXormHook struct {
 }
 
-func (*GobaseXormHook) BeforeProcess(c *contexts.ContextHook) (context.Context, error) {
+func (*GobaseXormHook) BeforeProcess(c *contexts.ContextHook, driverName string) (context.Context, error) {
 	fmt.Println("before-xorm")
 	return c.Ctx, nil
 }
 
-func (*GobaseXormHook) AfterProcess(c *contexts.ContextHook) error {
+func (*GobaseXormHook) AfterProcess(c *contexts.ContextHook, driverName string) error {
 	fmt.Println("after-xorm")
 	return nil
 }
