@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/server/rsp"
+	"github.com/isyscore/isc-gobase/store"
 	"sync"
 
 	//"github.com/isyscore/isc-gobase/tracing"
@@ -50,7 +50,6 @@ var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
 var pprofHave = false
-var requestStorage goid.LocalStorage
 
 var loadLock sync.Mutex
 var serverLoaded = false
@@ -63,7 +62,6 @@ func init() {
 	isc.PrintBanner()
 	config.LoadConfig()
 	printVersionAndProfile()
-	requestStorage = goid.NewLocalStorage()
 }
 
 // 提供给外部注册使用
@@ -494,17 +492,17 @@ func getPathAppendApiModel(path string) string {
 
 func RequestSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestStorage.Set(c.Request)
+		store.RequestStorage.Set(c.Request)
 		logger.PutHead(c.Request.Header)
 	}
 }
 
 func GetRequest() *http.Request {
-	return requestStorage.Get().(*http.Request)
+	return store.RequestStorage.Get().(*http.Request)
 }
 
 func GetHeader() http.Header {
-	req := requestStorage.Get()
+	req := store.RequestStorage.Get()
 	if req == nil {
 		return nil
 	}
@@ -513,7 +511,7 @@ func GetHeader() http.Header {
 }
 
 func GetRemoteAddr() string {
-	req := requestStorage.Get()
+	req := store.RequestStorage.Get()
 	if req == nil {
 		return ""
 	}
@@ -522,7 +520,7 @@ func GetRemoteAddr() string {
 }
 
 func GetHeaderWithKey(headKey string) string {
-	req := requestStorage.Get()
+	req := store.RequestStorage.Get()
 	if req == nil {
 		return ""
 	}

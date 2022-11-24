@@ -2,18 +2,12 @@ package logger
 
 import (
 	"github.com/isyscore/isc-gobase/constants"
-	"github.com/isyscore/isc-gobase/goid"
+	"github.com/isyscore/isc-gobase/store"
 	"net/http"
 )
 
-var MdcStorage goid.LocalStorage
-
-func init() {
-	MdcStorage = goid.NewLocalStorage()
-}
-
 func PutHead(httpHead http.Header) {
-	mdcMapTem := MdcStorage.Get()
+	mdcMapTem := store.MdcStorage.Get()
 
 	if mdcMapTem == nil {
 		mdcMapTem = map[string]any{}
@@ -27,26 +21,26 @@ func PutHead(httpHead http.Header) {
 	mdcMap[constants.TRACE_HEAD_REMOTE_IP] = httpHead.Get(constants.TRACE_HEAD_REMOTE_IP)
 	mdcMap[constants.TRACE_HEAD_REMOTE_APPNAME] = httpHead.Get(constants.TRACE_HEAD_REMOTE_APPNAME)
 	mdcMap[constants.TRACE_HEAD_ORIGNAL_URL] = httpHead.Get(constants.TRACE_HEAD_ORIGNAL_URL)
-	MdcStorage.Set(mdcMap)
+	store.MdcStorage.Set(mdcMap)
 }
 
 func PutMdc(key string, value any) {
-	mdcMapTem := MdcStorage.Get()
+	mdcMapTem := store.MdcStorage.Get()
 
 	if mdcMapTem == nil {
 		mdcMapTem = map[string]any{}
 	}
 	mdcMap := mdcMapTem.(map[string]any)
 	mdcMap[key] = value
-	MdcStorage.Set(mdcMap)
+	store.MdcStorage.Set(mdcMap)
 }
 
 func GetMdc(key string) any {
-	mdcMapTem := MdcStorage.Get()
+	mdcMapTem := store.MdcStorage.Get()
 
 	if mdcMapTem == nil {
 		mdcMapTem = map[string]any{}
-		MdcStorage.Set(mdcMapTem)
+		store.MdcStorage.Set(mdcMapTem)
 		return ""
 	}
 	mdcMap := mdcMapTem.(map[string]any)
