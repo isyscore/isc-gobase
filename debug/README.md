@@ -157,18 +157,14 @@ base:
   debug:
     # 线上调试功能开启，默认：true-开启
     enable: true
+debug:
   etcd:
-    # 是否启用etcd，默认: false-关闭
-    enable: true
-    # etcd的服务ip:port列表
-    endpoints:
-      - 10.10.10.10:2379
-    # 用户
-    username: xxx
+    # 多个域名配置，中间逗号分隔
+    endpoints: {ip}:{port},{ip}:{port},{ip}:{port}
+    # 用户名
+    user: xxx
     # 密码
     password: xxx
-    # 拨号超时：是指连接失败后的超时时间；配置示例：1s、1000ms
-    dial-timeout: 5s
 ```
 
 提供如下三个api
@@ -179,11 +175,11 @@ func Init() {}
 // 添加对某个key的监听
 func AddWatcher(key string, keyListener KeyListener) {}
 
-// 更新某个key
-func Update(key, value string) {}
-
 // 开始监听
 func StartWatch() {}
+
+// 更新某个key
+func Update(key, value string) {}
 ```
 
 示例

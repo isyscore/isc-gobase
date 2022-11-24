@@ -5,8 +5,10 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
+	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -22,6 +24,9 @@ var keyListenerMap map[string][]KeyListener
 type KeyListener func(key string, value string)
 
 func Init() {
+	if !config.GetValueBoolDefault("base.debug.enable", true) {
+		return
+	}
 	InitWithParameter(GetEtcdConfig())
 }
 
@@ -29,12 +34,38 @@ func InitWithParameter(endpoints []string, user, password string) {
 	if etcdClient != nil {
 		return
 	}
+
+	for _, endpoint := range endpoints {
+		if !ipPortAvailable(endpoint) {
+			// 如果想使用调试模式，请在环境变量里面或者配置文件里面配置如下
+			// debug.etcd.endpoints：多个{ip}:{port}格式，中间以逗号（英文逗号）分隔
+			// debug.etcd.user
+			// debug.etcd.password
+			logger.Warn("调试模式【%v】不可用，调试功能暂时不支持", endpoint)
+			return
+		}
+	}
+
 	_etcdClient := getEtcdClient(endpoints, user, password)
 	if _etcdClient == nil {
 		return
 	}
 
 	etcdClient = _etcdClient
+}
+
+func ipPortAvailable(ipAndPort string) bool {
+	conn, err := net.DialTimeout("tcp", ipAndPort, 2 * time.Second)
+	if err != nil {
+		return false
+	} else {
+		if conn != nil {
+			conn.Close()
+			return true
+		} else {
+			return false
+		}
+	}
 }
 
 func getEtcdClient(etcdPoints []string, user, password string) *etcdClientV3.Client {
@@ -94,7 +125,6 @@ func GetEtcdConfig() ([]string, string, string) {
 
 func AddWatcher(key string, keyListener KeyListener) {
 	if etcdClient == nil {
-		logger.Error("请先调用方法：debug.Init() 用于初始化调试模式")
 		return
 	}
 
