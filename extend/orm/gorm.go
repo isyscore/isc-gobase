@@ -154,17 +154,20 @@ func AddGormHook(hook GobaseGormHook) {
 type GobaseSqlHookProxy struct {}
 
 func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+	var ctxFinal context.Context
 	for _, hook := range gormHooks {
 		parametersMap := map[string]any{
 			"query":query,
 			"args": args,
 		}
-		ctx, err := hook.Before(ctx, parametersMap)
+		_ctx, err := hook.Before(ctx, parametersMap)
 		if err != nil {
-			return ctx, err
+			return _ctx, err
+		} else {
+			ctxFinal = _ctx
 		}
 	}
-	return ctx, nil
+	return ctxFinal, nil
 }
 
 func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args ...interface {}) (context.Context, error) {

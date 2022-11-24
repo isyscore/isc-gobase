@@ -14,7 +14,7 @@ func TestGorm1(t *testing.T) {
 	db, _ := orm2.NewGormDb()
 
 	// 删除表
-	db.Exec("drop table isc_demo.gobase_demo")
+	db.Exec("drop table isc_demo.gobase_demo1")
 
 	//新增表
 	db.Exec("CREATE TABLE gobase_demo(\n" +
@@ -71,7 +71,8 @@ func (*GobaseOrmHookDemo) After(ctx context.Context, parameters map[string]any) 
 }
 
 func (*GobaseOrmHookDemo) Err(ctx context.Context, err error, parameters map[string]any) error {
-	fmt.Println(parameters)
+	fmt.Println("err")
+	fmt.Println(err.Error())
 	return nil
 }
 
