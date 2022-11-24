@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/isyscore/isc-gobase/server"
 	"github.com/isyscore/isc-gobase/store"
 	"io"
 	"log"
