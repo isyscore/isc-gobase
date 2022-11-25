@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,7 @@ const (
 var etcdClient *etcdClientV3.Client
 var keyListenerMap map[string][]KeyListener
 
+var loadLock sync.Mutex
 type KeyListener func(key string, value string)
 
 func Init() {
@@ -31,6 +33,8 @@ func Init() {
 }
 
 func InitWithParameter(endpoints []string, user, password string) {
+	loadLock.Lock()
+	defer loadLock.Unlock()
 	if etcdClient != nil {
 		return
 	}
