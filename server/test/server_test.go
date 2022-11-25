@@ -126,6 +126,11 @@ func init() {
 	listener.AddListener(listener.EventOfServerRunFinish, func(event listener.BaseEvent) {
 		logger.Info("应用启动完成")
 	})
+
+	// 添加服务器启动完成事件监听
+	listener.AddListener(listener.EventOfServerStop, func(event listener.BaseEvent) {
+		logger.Info("应用退出")
+	})
 }
 
 func TestServerOnProfileIsPprof(t *testing.T) {
