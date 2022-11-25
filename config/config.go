@@ -536,8 +536,15 @@ func SetValue(key string, value any) {
 		for k, v := range valueMap {
 			resultMap[key + "." + k] = v
 		}
-	} else {
-		resultMap[key] = value
+	} else if reflect.ValueOf(value).Kind() == reflect.Slice || reflect.ValueOf(value).Kind() == reflect.Array {
+		values := []any{}
+		err := isc.DataToObject(isc.ObjectToJson(value), &values)
+		if err != nil {
+			return
+		}
+		for i, v := range values {
+			resultMap[key + "[" + isc.ToString(i) + "]"] = v
+		}
 	}
 
 	appProperty.ValueMap = resultMap
@@ -555,6 +562,29 @@ func SetValue(key string, value any) {
 		return
 	}
 	appProperty.ValueDeepMap = resultDeepMap
+}
+
+func parseProperties(key string, value any, resultMap map[string]any) (map[string]any, error) {
+	if reflect.ValueOf(value).Kind() == reflect.Map || reflect.ValueOf(value).Kind() == reflect.Struct {
+		valueMap, err := isc.JsonToMap(isc.ObjectToJson(value))
+		if err != nil {
+			return resultMap, err
+		}
+		for k, v := range valueMap {
+			resultMap[key + "." + k] = v
+		}
+	} else if reflect.ValueOf(value).Kind() == reflect.Slice || reflect.ValueOf(value).Kind() == reflect.Array {
+		values := []any{}
+		err := isc.DataToObject(isc.ObjectToJson(value), &values)
+		if err != nil {
+			return resultMap, err
+		}
+		for i, v := range values {
+			resultMap[key + "[" + isc.ToString(i) + "]"] = v
+			// todo 这里要添加一些东西
+		}
+	}
+	return resultMap, nil
 }
 
 func GetValueString(key string) string {

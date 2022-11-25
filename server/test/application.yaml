@@ -56,5 +56,16 @@ base:
     panic: false
     console:
       writeFile: false
-
+  etcd:
+    # 是否启用etcd
+    enable: true
+    # etcd的服务ip:port列表
+    endpoints:
+      - 10.30.30.78:52379
+    # 用户
+    username: root
+    # 密码
+    password: ZljIsysc0re123
+    # 拨号超时：是指连接失败后的超时时间；配置示例：1s、1000ms
+    dial-timeout: 5s
 
