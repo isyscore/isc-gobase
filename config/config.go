@@ -527,7 +527,19 @@ func SetValue(key string, value any) {
 	if err != nil {
 		return
 	}
-	resultMap[key] = value
+
+	if reflect.ValueOf(value).Kind() == reflect.Map || reflect.ValueOf(value).Kind() == reflect.Struct {
+		valueMap, err := isc.JsonToMap(isc.ObjectToJson(value))
+		if err != nil {
+			return
+		}
+		for k, v := range valueMap {
+			resultMap[key + "." + k] = v
+		}
+	} else {
+		resultMap[key] = value
+	}
+
 	appProperty.ValueMap = resultMap
 
 	mapProperties, err := isc.MapToProperties(resultMap)
