@@ -148,24 +148,20 @@ func UpdateConfig(c *gin.Context) {
 }
 
 func UpdateConfigJson(c *gin.Context) {
-	envProperty := EnvProperty{}
-	err := isc.DataToObject(c.Request.Body, &envProperty)
-	if err != nil {
-		log.Printf("解析失败，%v", err.Error())
-		return
-	}
-
 	valueMap := map[string]any{}
-	err = isc.DataToObject(envProperty.Value, &valueMap)
+	err := isc.DataToObject(c.Request.Body, &valueMap)
 	if err != nil {
 		log.Printf("解析失败，%v", err.Error())
 		return
 	}
 
-	SetValue(envProperty.Key, valueMap)
+	key, _ := valueMap["key"]
+	value, _ := valueMap["value"]
+
+	SetValue(key.(string), value)
 
 	// 发布配置变更事件
-	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: key.(string), Value: isc.ToJsonString(value)})
 }
 
 // 多种格式优先级：json > properties > yaml > yml
