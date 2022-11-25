@@ -6,7 +6,7 @@
 ### 单数据源
 #### 代码
 ```go
-import "github.com/isyscore/isc-gobase/orm"
+import "github.com/isyscore/isc-gobase/extend/orm"
 
 // gorm：获取默认配置库实例
 orm.NewGormDb()
@@ -55,7 +55,7 @@ base:
 ### 多数据源
 #### 代码
 ```go
-import "github.com/isyscore/isc-gobase/orm"
+import "github.com/isyscore/isc-gobase/extend/orm"
 
 // gorm：根据数据源配置名获取库实例
 orm.NewGormDbWithName(datasourceName string)
