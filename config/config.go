@@ -147,6 +147,27 @@ func UpdateConfig(c *gin.Context) {
 	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
 }
 
+func UpdateConfigJson(c *gin.Context) {
+	envProperty := EnvProperty{}
+	err := isc.DataToObject(c.Request.Body, &envProperty)
+	if err != nil {
+		log.Printf("解析失败，%v", err.Error())
+		return
+	}
+
+	valueMap := map[string]any{}
+	err = isc.DataToObject(envProperty.Value, &valueMap)
+	if err != nil {
+		log.Printf("解析失败，%v", err.Error())
+		return
+	}
+
+	SetValue(envProperty.Key, valueMap)
+
+	// 发布配置变更事件
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
+}
+
 // 多种格式优先级：json > properties > yaml > yml
 func doLoadConfigFromAbsPath(resourceAbsPath string) {
 	if !strings.HasSuffix(resourceAbsPath, "/") {
