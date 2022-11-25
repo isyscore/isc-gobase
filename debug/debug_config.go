@@ -26,7 +26,7 @@ var loadLock sync.Mutex
 type KeyListener func(key string, value string)
 
 func Init() {
-	if !config.GetValueBoolDefault("base.debug.enable", true) {
+	if !config.GetValueBoolDefault("debug.enable", true) {
 		return
 	}
 	InitWithParameter(GetEtcdConfig())

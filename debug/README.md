@@ -153,11 +153,9 @@ go tool pprof -http=:18080 http://localhost:xxx/debug/pprof/goroutine
 
 集群化的配置变更功能目前底层使用的是etcd，因此需要接入如下
 ```yaml
-base:
-  debug:
-    # 线上调试功能开启，默认：true-开启
-    enable: true
 debug:
+  # 线上调试功能开启，默认：true-开启
+  enable: true
   etcd:
     # 多个域名配置，中间逗号分隔
     endpoints: {ip}:{port},{ip}:{port},{ip}:{port}
