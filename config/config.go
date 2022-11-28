@@ -553,7 +553,11 @@ func parseProperties(key string, value any, resultMap map[string]any) (map[strin
 			resultMap, err = parseProperties(key + "[" + isc.ToString(i) + "]", v, resultMap)
 		}
 	} else {
-		resultMap[key] = value
+		if reflect.ValueOf(value).Kind() == reflect.String && isc.ToString(value) != "" {
+			resultMap[key] = value
+		} else if value == nil{
+			resultMap[key] = value
+		}
 	}
 	return resultMap, nil
 }
