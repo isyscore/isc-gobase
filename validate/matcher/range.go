@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	t0 "time"
+	"unicode/utf8"
 
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/compiler"
@@ -61,7 +62,7 @@ var digitRegex = regexp.MustCompile("^(0)|^[-+]?([1-9]+\\d*|0\\.(\\d*)|[1-9]\\d*
 // 时间的前后计算匹配：(-|+)yMd(h|H)msS
 var timePlusRegex = regexp.MustCompile("^([-+])?(\\d*y)?(\\d*M)?(\\d*d)?(\\d*H|\\d*h)?(\\d*m)?(\\d*s)?$")
 
-func (rangeMatch *RangeMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
+func (rangeMatch *RangeMatch) Match(_ map[string]interface{}, _ any, field reflect.StructField, fieldValue any) bool {
 	env := map[string]any{
 		"begin": rangeMatch.Begin,
 		"end":   rangeMatch.End,
@@ -71,7 +72,7 @@ func (rangeMatch *RangeMatch) Match(_ any, field reflect.StructField, fieldValue
 	if IsCheckNumber(fieldKind) {
 		env["value"] = fieldValue
 	} else if fieldKind == reflect.String {
-		env["value"] = len(fmt.Sprintf("%v", fieldValue))
+		env["value"] = utf8.RuneCountInString(fmt.Sprintf("%v", fieldValue))
 	} else if fieldKind == reflect.Slice {
 		env["value"] = reflect.ValueOf(fieldValue).Len()
 	} else if field.Type.String() == "time.Time" {

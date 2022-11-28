@@ -20,7 +20,7 @@ type ModelMatch struct {
 
 var modelMap = map[string]*regexp.Regexp{}
 
-func (modelMatch *ModelMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
+func (modelMatch *ModelMatch) Match(_ map[string]interface{}, _ any, field reflect.StructField, fieldValue any) bool {
 	if nil == fieldValue {
 		return false
 	}

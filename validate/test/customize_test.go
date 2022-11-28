@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/isyscore/isc-gobase/validate"
 	"github.com/isyscore/isc-gobase/validate/test/fun"
-	"testing"
 )
 
 func TestCustomize1(t *testing.T) {
@@ -160,32 +161,63 @@ func TestCustomize5_1(t *testing.T) {
 func TestCustomize6(t *testing.T) {
 	var value fun.CustomizeEntity6
 	var result bool
+	var pMap map[string]interface{}
 
 	// 测试 正常情况
-	value = fun.CustomizeEntity6{Name: nil}
+	value = fun.CustomizeEntity6{}
+	pMap = map[string]interface{}{
+		"name": "zhou",
+		"age":  20,
+	}
+	result, _ = validate.CheckWithParameter(pMap, value, "name1")
+	True(t, result)
+
+	// 测试 正常情况
+	value = fun.CustomizeEntity6{Name2: "zhou"}
+	pMap = map[string]interface{}{
+		"age": 20,
+	}
+	result, _ = validate.CheckWithParameter(pMap, value, "name2")
+	True(t, result)
+
+	// 测试 正常情况
+	value = fun.CustomizeEntity6{Name3: "zhou"}
+	pMap = map[string]interface{}{
+		"age": 20,
+	}
+	result, _ = validate.CheckWithParameter(pMap, value, "name3")
+	True(t, result)
+}
+
+func TestCustomize7(t *testing.T) {
+	var value fun.CustomizeEntity7
+	var result bool
+
+	// 测试 正常情况
+	value = fun.CustomizeEntity7{Name: nil}
 	result, _ = validate.Check(value, "name")
 	False(t, result)
 
 	// 测试 正常情况
 	//name := "df"
-	//value = fun.CustomizeEntity6{Name: &name}
+	//value = fun.CustomizeEntity7{Name: &name}
 	//result, _ = validate.Check(value, "name")
 	//True(t, result)
 }
 
-func TestCustomize6_1(t *testing.T) {
-	var value fun.CustomizeEntity6
-	var value1 fun.CustomizeEntity6
+func TestCustomize7_1(t *testing.T) {
+	var value fun.CustomizeEntity7
+	var value1 fun.CustomizeEntity7
 	var result bool
 
 	// 测试 正常情况
-	value = fun.CustomizeEntity6{Flag: nil}
+	value = fun.CustomizeEntity7{Flag: nil}
 	result, msg := validate.Check(value, "flag")
 	FalseMsg(t, result, msg)
 
 	// 测试 正常情况
 	flag := true
-	value = fun.CustomizeEntity6{Flag: &flag}
+	value = fun.CustomizeEntity7{Flag: &flag}
 	result, _ = validate.Check(value, "flag")
 	True(t, result)
 
@@ -194,12 +226,12 @@ func TestCustomize6_1(t *testing.T) {
 	result, msg = validate.Check(value1, "flag")
 	FalseMsg(t, result, msg)
 
-	value = fun.CustomizeEntity6{Flag2: nil}
+	value = fun.CustomizeEntity7{Flag2: nil}
 	result, msg = validate.Check(value, "flag2")
 	FalseMsg(t, result, msg)
 
 	flag = true
-	value = fun.CustomizeEntity6{Flag2: &flag}
+	value = fun.CustomizeEntity7{Flag2: &flag}
 	result, _ = validate.Check(value, "flag2")
 	True(t, result)
 }

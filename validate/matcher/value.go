@@ -14,7 +14,7 @@ type ValueMatch struct {
 	Values []any
 }
 
-func (valueMatch *ValueMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
+func (valueMatch *ValueMatch) Match(_ map[string]interface{}, _ any, field reflect.StructField, fieldValue any) bool {
 	values := valueMatch.Values
 
 	fieldRelValue := fieldValue

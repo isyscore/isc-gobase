@@ -1,13 +1,13 @@
 package matcher
 
 import (
-	"reflect"
-
 	"github.com/antonmedv/expr/vm"
+	"reflect"
 )
 
 type Matcher interface {
-	Match(object any, field reflect.StructField, fieldValue any) bool
+	//Match(object any, field reflect.StructField, fieldValue any) bool
+	Match(parameterMap map[string]interface{}, object interface{}, field reflect.StructField, fieldValue interface{}) bool
 	IsEmpty() bool
 	GetWhitMsg() string
 	GetBlackMsg() string

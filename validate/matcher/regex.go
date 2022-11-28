@@ -14,7 +14,7 @@ type RegexMatch struct {
 	Reg *regexp.Regexp
 }
 
-func (regexMatch *RegexMatch) Match(_ any, field reflect.StructField, fieldValue any) bool {
+func (regexMatch *RegexMatch) Match(_ map[string]interface{}, _ any, field reflect.StructField, fieldValue any) bool {
 	if regexMatch.Reg.MatchString(fmt.Sprintf("%v", fieldValue)) {
 		regexMatch.SetBlackMsg("属性 %v 的值 %v 命中禁用的正则表达式 %v ", field.Name, fieldValue, regexMatch.Reg.String())
 		return true

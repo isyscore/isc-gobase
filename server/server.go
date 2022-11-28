@@ -43,7 +43,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.4.3"
+var GoBaseVersion = "1.4.5"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
@@ -171,7 +171,6 @@ func ErrHandler() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
 
 func apiPreAndModule() string {
 	ap := config.GetValueStringDefault("base.api.prefix", "")
