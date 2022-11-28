@@ -48,20 +48,12 @@ func NewClient() (goredis.UniversalClient, error) {
 	for _, hook := range RedisHooks {
 		rdbClient.AddHook(hook)
 	}
-	bean.AddBean(constants.BeanNameRedisPre, rdbClient)
+	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
 	return rdbClient, nil
 }
 
 func AddRedisHook(hook goredis.Hook) {
 	RedisHooks = append(RedisHooks, hook)
-	redisDb := bean.GetBeanWithNamePre(constants.BeanNameRedisPre)
-	if redisDb == nil {
-		return
-	}
-	if len(redisDb) > 0 {
-		rd := redisDb[0].(goredis.UniversalClient)
-		rd.AddHook(hook)
-	}
 }
 
 func getStandaloneConfig() *goredis.Options {
