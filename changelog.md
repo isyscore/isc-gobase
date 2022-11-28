@@ -12,7 +12,7 @@
 7. 新增：logger包的日志记录格式中的traceId和userId
 8. 新增：server的最前缀filter功能
 #### 优化
-1. 调整：go-redis的包结构，不兼容
+1. 调整：go-redis的包结构，不兼容旧版本
 2. 优化：返回值code的处理
 3. 优化：返回值code的处理
 4. 调整：logger的日志
