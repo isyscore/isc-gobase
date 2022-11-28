@@ -48,7 +48,7 @@ func NewClient() (goredis.UniversalClient, error) {
 	for _, hook := range RedisHooks {
 		rdbClient.AddHook(hook)
 	}
-	bean.AddBean(constants.BeanNameRedisPre, &rdbClient)
+	bean.AddBean(constants.BeanNameRedisPre, rdbClient)
 	return rdbClient, nil
 }
 
