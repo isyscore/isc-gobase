@@ -134,20 +134,6 @@ func GetConfigValue(c *gin.Context) {
 }
 
 func UpdateConfig(c *gin.Context) {
-	envProperty := EnvProperty{}
-	err := isc.DataToObject(c.Request.Body, &envProperty)
-	if err != nil {
-		log.Printf("解析失败，%v", err.Error())
-		return
-	}
-
-	SetValue(envProperty.Key, envProperty.Value)
-
-	// 发布配置变更事件
-	listener.PublishEvent(listener.ConfigChangeEvent{Key: envProperty.Key, Value: envProperty.Value})
-}
-
-func UpdateConfigJson(c *gin.Context) {
 	valueMap := map[string]any{}
 	err := isc.DataToObject(c.Request.Body, &valueMap)
 	if err != nil {
@@ -528,24 +514,7 @@ func SetValue(key string, value any) {
 		return
 	}
 
-	if reflect.ValueOf(value).Kind() == reflect.Map || reflect.ValueOf(value).Kind() == reflect.Struct {
-		valueMap, err := isc.JsonToMap(isc.ObjectToJson(value))
-		if err != nil {
-			return
-		}
-		for k, v := range valueMap {
-			resultMap[key + "." + k] = v
-		}
-	} else if reflect.ValueOf(value).Kind() == reflect.Slice || reflect.ValueOf(value).Kind() == reflect.Array {
-		values := []any{}
-		err := isc.DataToObject(isc.ObjectToJson(value), &values)
-		if err != nil {
-			return
-		}
-		for i, v := range values {
-			resultMap[key + "[" + isc.ToString(i) + "]"] = v
-		}
-	}
+	resultMap, err = parseProperties(key, value, resultMap)
 
 	appProperty.ValueMap = resultMap
 
@@ -571,7 +540,7 @@ func parseProperties(key string, value any, resultMap map[string]any) (map[strin
 			return resultMap, err
 		}
 		for k, v := range valueMap {
-			resultMap[key + "." + k] = v
+			resultMap, err = parseProperties(key + "." + k, v, resultMap)
 		}
 	} else if reflect.ValueOf(value).Kind() == reflect.Slice || reflect.ValueOf(value).Kind() == reflect.Array {
 		values := []any{}
@@ -581,8 +550,10 @@ func parseProperties(key string, value any, resultMap map[string]any) (map[strin
 		}
 		for i, v := range values {
 			resultMap[key + "[" + isc.ToString(i) + "]"] = v
-			// todo 这里要添加一些东西
+			resultMap, err = parseProperties(key + "[" + isc.ToString(i) + "]", v, resultMap)
 		}
+	} else {
+		resultMap[key] = value
 	}
 	return resultMap, nil
 }

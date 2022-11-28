@@ -271,7 +271,6 @@ func RegisterConfigWatchEndpoint(apiBase string) gin.IRoutes {
 	RegisterRoute(apiBase+"/config/values/yaml", HmGet, config.GetConfigDeepValues)
 	RegisterRoute(apiBase+"/config/value/:key", HmGet, config.GetConfigValue)
 	RegisterRoute(apiBase+"/config/update", HmPut, config.UpdateConfig)
-	RegisterRoute(apiBase+"/config/update/json", HmPut, config.UpdateConfigJson)
 	return engine
 }
 
