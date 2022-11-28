@@ -90,7 +90,7 @@ base:
           - /xxx/x/xxxy
     exception:
       # 异常返回打印
-      print: false
+      print:
         # 是否启用：true, false；默认 false
         enable: true
         # 一些异常httpStatus不打印；默认可不填

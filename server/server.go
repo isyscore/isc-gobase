@@ -108,7 +108,7 @@ func InitServer() {
 			pprof.Register(engine)
 		}
 	}
-	engine.Use(Cors(), gin.Recovery())
+	engine.Use(Cors(), gin.Recovery(), ErrHandler())
 	engine.Use(RequestSaveHandler())
 	engine.Use(rsp.ResponseHandler())
 
@@ -159,6 +159,19 @@ func ConfigChangeListener(event listener.BaseEvent) {
 		}
 	}
 }
+
+func ErrHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				rsp.FailedOfStandard(c, 500, fmt.Sprintf("业务异常：%v", err))
+				return
+			}
+		}()
+		c.Next()
+	}
+}
+
 
 func apiPreAndModule() string {
 	ap := config.GetValueStringDefault("base.api.prefix", "")
@@ -466,10 +479,12 @@ func AllWith(path string, header []string, versionName []string, handler gin.Han
 	return RegisterRouteWithHeaders(getPathAppendApiModel(path), HmAll, header, versionName, handler)
 }
 
-func Use(middleware ...gin.HandlerFunc) {
-	if engine != nil {
-		engine.Use(middleware...)
+func Use(middleware ...gin.HandlerFunc) gin.IRoutes {
+	if !checkEngine() {
+		return nil
 	}
+	engine.Use(middleware...)
+	return engine
 }
 
 func getPathAppendApiModel(path string) string {

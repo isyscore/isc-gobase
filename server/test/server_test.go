@@ -134,9 +134,16 @@ func init() {
 }
 
 func TestServerOnProfileIsPprof(t *testing.T) {
+	server.Use(ApiVersionInterceptor())
 	server.Get("data", func(c *gin.Context) {
 		rsp.SuccessOfStandard(c, "data")
 	})
 
 	server.Run()
+}
+
+func ApiVersionInterceptor() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+	}
 }
