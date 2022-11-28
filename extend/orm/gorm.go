@@ -103,7 +103,6 @@ func specialCharChange(url string) string {
 	return strings.ReplaceAll(url, "/", "%2F")
 }
 
-
 func getDialect(dsn, driverName string) gorm.Dialector {
 	switch driverName {
 	case "mysql":
@@ -119,13 +118,20 @@ func getDialect(dsn, driverName string) gorm.Dialector {
 }
 
 func sqlRegister(driverName string) {
+	name := WrapDriverName(driverName)
+	for _, driver := range sql.Drivers() {
+		if driver == name {
+			return
+		}
+	}
+
 	switch driverName {
 	case "mysql":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
+		sql.Register(name, sqlhooks.Wrap(&driverMysql.MySQLDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 	case "postgresql":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{DriverName: driverName}))
+		sql.Register(name, sqlhooks.Wrap(&pq.Driver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 	case "sqlite":
-		sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
+		sql.Register(name, sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{DriverName: driverName}))
 		//case "sqlserver": 暂时不支持
 		//	sql.Register(WrapDriverName(driverName), sqlhooks.Wrap(&sqlite3.SQLiteDriver{}, &GobaseSqlHookProxy{}))
 	}
@@ -155,12 +161,12 @@ type GobaseSqlHookProxy struct {
 	DriverName string
 }
 
-func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args ...interface{}) (context.Context, error) {
 	var ctxFinal context.Context
 	for _, hook := range gormHooks {
 		parametersMap := map[string]any{
-			"query":query,
-			"args": args,
+			"query": query,
+			"args":  args,
 		}
 		_ctx, err := hook.Before(ctx, proxy.DriverName, parametersMap)
 		if err != nil {
@@ -172,11 +178,11 @@ func (proxy *GobaseSqlHookProxy) Before(ctx context.Context, query string, args 
 	return ctxFinal, nil
 }
 
-func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args ...interface {}) (context.Context, error) {
+func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args ...interface{}) (context.Context, error) {
 	for _, hook := range gormHooks {
 		parametersMap := map[string]any{
-			"query":query,
-			"args": args,
+			"query": query,
+			"args":  args,
 		}
 		ctx, err := hook.After(ctx, proxy.DriverName, parametersMap)
 		if err != nil {
@@ -189,8 +195,8 @@ func (proxy *GobaseSqlHookProxy) After(ctx context.Context, query string, args .
 func (proxy *GobaseSqlHookProxy) OnError(ctx context.Context, err error, query string, args ...interface{}) error {
 	for _, hook := range gormHooks {
 		parametersMap := map[string]any{
-			"query":query,
-			"args": args,
+			"query": query,
+			"args":  args,
 		}
 		err := hook.Err(ctx, proxy.DriverName, err, parametersMap)
 		if err != nil {
