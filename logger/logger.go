@@ -291,7 +291,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 	}
 	linkName := fmt.Sprintf("app-%s.log", strL)
 	//linkName = filepath.Join(getLogDir(dir), linkName)
-	linkName = filepath.Join("./", linkName)
+	linkName = filepath.Join("./logs/", linkName)
 	logFile := strings.ReplaceAll(linkName, ".log", fmt.Sprintf("-%s.log", strTime))
 	if idx > 0 {
 		logFile = strings.ReplaceAll(logFile, ".log", fmt.Sprintf(".%d.log", idx))
