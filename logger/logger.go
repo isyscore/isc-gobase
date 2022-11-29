@@ -321,7 +321,7 @@ func createFileLeveWriter(level zerolog.Level, strTime string, idx int, dir, app
 			return "[" + time.Now().Format(time.FmtYMdHmsSSS) + "]"
 		},
 		FormatLevel: func(i any) string {
-			return strings.ToUpper(fmt.Sprintf("[%s] [%-2s]", appName, i))
+			return strings.ToUpper(fmt.Sprintf("[%s] [%v] [%v] [%-2s]", appName, GetMdc(constants.TRACE_HEAD_ID), GetMdc(constants.TRACE_HEAD_USER_ID), i))
 		},
 
 		FormatCaller: callerFormatter,
