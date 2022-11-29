@@ -134,7 +134,7 @@ func Check(object any, fieldNames ...string) (bool, string) {
 
 			// 核查结果：任何一个属性失败，则返回失败
 			goid.Go(func() {
-				go check(object, field, fieldValue.Interface(), ch)
+				check(object, field, fieldValue.Interface(), ch)
 			})
 			checkResult := <-ch
 			if !checkResult.Result {
