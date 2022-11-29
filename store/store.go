@@ -14,6 +14,15 @@ func init() {
 	MdcStorage = goid.NewLocalStorage()
 }
 
+func RequestHeadAdd(key, value string) {
+	req := RequestStorage.Get()
+	if req == nil {
+		return
+	}
+	_req := req.(*http.Request)
+	_req.Header.Set(key, value)
+}
+
 func GetRequest() *http.Request {
 	req := RequestStorage.Get()
 	if req == nil {
