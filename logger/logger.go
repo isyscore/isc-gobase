@@ -62,7 +62,7 @@ func init() {
 		cfg.Max.History = 7
 	}
 
-	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
+	appName := ""
 
 	//日志级别设置，默认Info
 	zerolog.ErrorHandler = func(err error) {
