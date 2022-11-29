@@ -109,11 +109,11 @@ func InitServer() {
 		}
 	}
 	engine.Use(Cors(), gin.Recovery(), ErrHandler())
+	engine.Use(rsp.ResponseHandler())
+	engine.Use(RequestSaveHandler())
 	for _, handler := range ginHandlers {
 		engine.Use(handler)
 	}
-	engine.Use(rsp.ResponseHandler())
-	engine.Use(RequestSaveHandler())
 
 	// 注册 健康检查endpoint
 	if config.GetValueBoolDefault("base.endpoint.health.enable", false) {
