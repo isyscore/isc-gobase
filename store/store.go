@@ -31,13 +31,13 @@ func GetRequest() *http.Request {
 	return req.(*http.Request)
 }
 
-func GetHeader() http.Header {
+func GetHeader() *http.Header {
 	req := RequestStorage.Get()
 	if req == nil {
 		return nil
 	}
 	reqS := req.(*http.Request)
-	return reqS.Header
+	return &reqS.Header
 }
 
 func GetRemoteAddr() string {
