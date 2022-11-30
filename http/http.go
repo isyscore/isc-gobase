@@ -356,9 +356,7 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 	rspCode, rspHead, rspData, err := doParseResponse(httpResponse, url, err)
 
 	for _, hook := range NetHttpHooks {
-		goid.Go(func() {
-			hook.After(ctx, httpResponse, rspCode, rspData, err)
-		})
+		hook.After(ctx, httpResponse, rspCode, rspData, err)
 	}
 	return rspCode, rspHead, rspData, err
 }
