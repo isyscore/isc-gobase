@@ -139,7 +139,7 @@ func CheckWithParameter(parameterMap map[string]interface{}, object interface{},
 
 			// 核查结果：任何一个属性失败，则返回失败
 			goid.Go(func() {
-				go check(parameterMap, object, field, fieldValue.Interface(), ch)
+				check(parameterMap, object, field, fieldValue.Interface(), ch)
 			})
 			checkResult := <-ch
 			if !checkResult.Result {

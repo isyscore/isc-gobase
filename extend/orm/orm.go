@@ -33,7 +33,6 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 	case "mysql":
 		// 格式：user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.DbName)
-		fmt.Println(dsn)
 		if len(sqlConfigMap) != 0 {
 			var kvList []string
 			for key, value := range sqlConfigMap {

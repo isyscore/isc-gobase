@@ -34,7 +34,7 @@ base:
     driver-name: mysql
     # 数据库名
     db-name: xx_db
-    # sqlite的的数据库路径
+    # sqlite的的数据库路径；只有sqlite需要配置这个
     sqlite-path: xxx.db
     # 示例：charset=utf8&parseTime=True&loc=Local 等url后面的配置，直接配置即可
     url-config:

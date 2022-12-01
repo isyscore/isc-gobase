@@ -2,21 +2,25 @@ package test
 
 import (
 	"context"
+	goredis "github.com/go-redis/redis/v8"
 	redis2 "github.com/isyscore/isc-gobase/extend/redis"
-	"github.com/isyscore/isc-gobase/logger"
 	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
 )
 
-func TestRedis(t *testing.T) {
+var rdb goredis.UniversalClient
+
+func init() {
 	// 客户端获取
-	rdb, err := redis2.NewClient()
+	_rdb, err := redis2.NewClient()
 	if err != nil {
-		logger.Warn("连接redis错误 %v", err)
 		return
 	}
+	rdb = _rdb
+}
 
+func TestRedis(t *testing.T) {
 	// 添加和读取
 	key := "test_key"
 	value := "test_value"

@@ -19,6 +19,6 @@ base:
       # 最大连接数
       max-open-conns: 10
       # 连接可重用最大时间；带字符（s：秒，m：分钟，h：小时）
-      max-life-time: 10s
+      max-life-time: 290s
       # 连接空闲的最大时间；带字符（s：秒，m：分钟，h：小时）
       max-idle-time: 10s

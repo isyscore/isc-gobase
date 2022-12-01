@@ -14,21 +14,21 @@ func init() {
 	MdcStorage = goid.NewLocalStorage()
 }
 
+func RequestHeadSet(key, value string) {
+	req := RequestStorage.Get()
+	if req == nil {
+		return
+	}
+	_req := req.(*http.Request)
+	_req.Header.Set(key, value)
+}
+
 func GetRequest() *http.Request {
 	req := RequestStorage.Get()
 	if req == nil {
 		return nil
 	}
 	return req.(*http.Request)
-}
-
-func GetHeader() http.Header {
-	req := RequestStorage.Get()
-	if req == nil {
-		return nil
-	}
-	reqS := req.(*http.Request)
-	return reqS.Header
 }
 
 func GetRemoteAddr() string {

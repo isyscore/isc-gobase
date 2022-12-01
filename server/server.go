@@ -43,7 +43,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.4.5"
+var GoBaseVersion = "1.4.6"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
@@ -109,9 +109,8 @@ func InitServer() {
 		}
 	}
 	engine.Use(Cors(), gin.Recovery(), ErrHandler())
-	engine.Use(RequestSaveHandler())
 	engine.Use(rsp.ResponseHandler())
-
+	engine.Use(RequestSaveHandler())
 	for _, handler := range ginHandlers {
 		engine.Use(handler)
 	}
