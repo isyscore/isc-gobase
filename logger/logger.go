@@ -29,7 +29,6 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
-	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/listener"
 	"io"
 	"io/fs"
