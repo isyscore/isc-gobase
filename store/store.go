@@ -66,3 +66,16 @@ func GetUserId() string {
 	reqS := req.(*http.Request)
 	return reqS.Header.Get(constants.TRACE_HEAD_USER_ID)
 }
+
+func CleanMdc() {
+	MdcStorage.Del()
+}
+
+func CleanRequest() {
+	RequestStorage.Del()
+}
+
+func CleanStore() {
+	CleanMdc()
+	CleanRequest()
+}
