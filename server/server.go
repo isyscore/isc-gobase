@@ -261,6 +261,9 @@ func RegisterPlugin(plugin gin.HandlerFunc) gin.IRoutes {
 }
 
 func Engine() *gin.Engine {
+	if !checkEngine() {
+		return nil
+	}
 	return engine
 }
 
