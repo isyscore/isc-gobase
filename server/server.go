@@ -505,5 +505,10 @@ func RequestSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		store.RequestStorage.Set(c.Request)
 		logger.PutHead(c.Request.Header)
+
+		defer func() {
+			store.Clean()
+		}()
+		c.Next()
 	}
 }

@@ -75,7 +75,7 @@ func CleanRequest() {
 	RequestStorage.Del()
 }
 
-func CleanStore() {
+func Clean() {
 	CleanMdc()
 	CleanRequest()
 }
