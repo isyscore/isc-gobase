@@ -12,7 +12,6 @@ import (
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 	"io"
 	"time"
 )
@@ -31,7 +30,7 @@ func init() {
 	}
 
 	EtcdHooks = []GobaseEtcdHook{}
-	grpclog.SetLoggerV2(&EtcdLogger{})
+	//grpclog.SetLoggerV2(&EtcdLogger{})
 }
 
 func NewEtcdClient() (*EtcdClientWrap, error) {
