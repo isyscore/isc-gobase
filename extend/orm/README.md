@@ -67,7 +67,10 @@ orm.NewGormDbWithNameAndConfig(gormConfig *gorm.Config)
 orm.NewXormDbWithName(datasourceName string)
 
 // xorm：根据数据源配置名获取库实例，自定义参数
-NewXormDbWithNameParams(datasourceName string, params map[string]string)
+orm.NewXormDbWithNameParams(datasourceName string, params map[string]string)
+
+// xorm：主从接口
+orm.NewXormDbMasterSlave(masterDatasourceName string, slaveDatasourceNames []string, policies ...xorm.GroupPolicy)
 ```
 #### 配置
 ```yml
