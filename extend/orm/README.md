@@ -2,6 +2,9 @@
 对业内的常见Orm进行封装，进行方便使用，目前支持的有
 - gorm
 - xorm
+  
+注意：<br/>
+xorm: 这个是xorm.io不是go-xorm，go-xorm暂时不支持
 
 ### 单数据源
 #### 代码
