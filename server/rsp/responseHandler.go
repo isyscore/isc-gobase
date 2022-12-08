@@ -89,7 +89,7 @@ func ResponseHandler() gin.HandlerFunc {
 			Cost:       time.Now().Sub(startTime).String(),
 		}
 
-		if reqPrint && !rspPrint && !expPrint {
+		if reqPrint && !rspPrint {
 			printReq(request.Uri, request)
 		}
 
