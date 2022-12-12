@@ -9,8 +9,6 @@ import (
 	"github.com/isyscore/isc-gobase/goid"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
-	"google.golang.org/grpc/grpclog"
-
 	//"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
@@ -33,7 +31,7 @@ func init() {
 	}
 
 	EtcdHooks = []GobaseEtcdHook{}
-	grpclog.SetLoggerV2(&EtcdLogger{})
+	//grpclog.SetLoggerV2(&EtcdLogger{})
 }
 
 func NewEtcdClient() (*EtcdClientWrap, error) {
@@ -418,19 +416,19 @@ func (etcdWrap *EtcdClientWrap) ActiveConnection() *grpc.ClientConn {
 type EtcdLogger struct{}
 
 func (g *EtcdLogger) Info(args ...interface{}) {
-	//logger.Info("", args...)
+	logger.Info("", args...)
 }
 
 func (g *EtcdLogger) Infoln(args ...interface{}) {
-	//logger.Info("", args...)
+	logger.Info("", args...)
 }
 
 func (g *EtcdLogger) Infof(format string, args ...interface{}) {
-	//logger.Info(format, args)
+	logger.Info(format, args)
 }
 
 func (g *EtcdLogger) InfoDepth(depth int, args ...interface{}) {
-	//logger.Info("", args...)
+	logger.Info("", args...)
 }
 
 func (g *EtcdLogger) Warning(args ...interface{}) {
