@@ -7,6 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/goid"
+	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/logger"
 	//"github.com/isyscore/isc-gobase/tracing"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
@@ -86,10 +87,35 @@ func NewEtcdClient() (*EtcdClientWrap, error) {
 		}
 	}
 
-	etcdClient, err := etcdClientV3.New(etcdCfg)
-	if err != nil {
-		logger.Error("生成etcd-client失败：%v", err.Error())
-		return nil, err
+	var etcdClient *etcdClientV3.Client
+	if config.EtcdCfg.DialRetry == "" {
+		_etcdClient, err := etcdClientV3.New(etcdCfg)
+		if err != nil {
+			logger.Error("生成etcd-client失败：%v", err.Error())
+			return nil, err
+		}
+		etcdClient = _etcdClient
+	} else if config.EtcdCfg.DialRetry == "always" {
+		for {
+			_etcdClient, err := etcdClientV3.New(etcdCfg)
+			if err != nil {
+				logger.Error("尝试连接etcd 失败：%v", err.Error())
+				continue
+			}
+			etcdClient = _etcdClient
+			break
+		}
+	} else {
+		retryTimes := isc.ToInt(config.EtcdCfg.DialRetry)
+		for i := 0; i < retryTimes; i++ {
+			_etcdClient, err := etcdClientV3.New(etcdCfg)
+			if err != nil {
+				logger.Error("尝试连接etcd 第[%v]次失败：%v", i+1, err.Error())
+				continue
+			}
+			etcdClient = _etcdClient
+			break
+		}
 	}
 
 	var etcdClientWrap EtcdClientWrap

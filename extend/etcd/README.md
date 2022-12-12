@@ -22,6 +22,8 @@ base:
     dial-keep-alive-time: 5s
     # 拨号保持连接超时：是客户端等待响应保持连接探测的时间，如果在此时间内没有收到响应，则连接将被关闭；配置示例：1s、1000ms
     dial-keep-alive-timeout: 5s
+    # 拨号重试策略: 默认为空：表示默认不重试；1、2、3...表示重试多少次；always：表示一直重试
+    dial-retry: 1
     # 最大呼叫：发送MSG大小是客户端请求发送的字节限制；默认：(2MB)2 * 1024 * 1024
     max-call-send-msg-size: 2 * 1024 * 1024
     # 最大调用recv MSG大小是客户端响应接收限制；默认：math.MaxInt32

@@ -233,6 +233,9 @@ type EtcdConfig struct {
 	// 拨号保持连接超时：是客户端等待响应保持连接探测的时间，如果在此时间内没有收到响应，则连接将被关闭；配置示例：1s、1000ms
 	DialKeepAliveTimeout string
 
+	// 拨号重试策略: 默认为空：表示默认不重试；1、2、3...表示重试多少次；always：表示一直重试
+	DialRetry string
+
 	// 最大呼叫：发送MSG大小是客户端请求发送的字节限制
 	MaxCallSendMsgSize int
 
