@@ -405,7 +405,9 @@ func callIgnoreReturn(httpRequest *http.Request, url string) error {
 	ctx := context.Background()
 
 	for _, hook := range NetHttpHooks {
-		ctx = hook.Before(ctx, httpRequest)
+		_ctx, httpHeader := hook.Before(ctx, httpRequest)
+		httpRequest.Header = httpHeader
+		ctx = _ctx
 	}
 
 	httpResponse, err := httpClient.Do(httpRequest)
