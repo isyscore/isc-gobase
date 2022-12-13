@@ -58,6 +58,17 @@ func Get(key string) any {
 	return ""
 }
 
+func Keys() []string {
+	mdcMapTem := headKeyValueStorage.Get()
+
+	if mdcMapTem == nil {
+		return []string{}
+	}
+
+	mdcMap := mdcMapTem.(cmap.ConcurrentMap)
+	return mdcMap.Keys()
+}
+
 func Clean() {
 	headKeyValueStorage.Del()
 }
