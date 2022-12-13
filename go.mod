@@ -16,6 +16,7 @@ require (
 	github.com/lib/pq v1.10.2
 	github.com/magiconair/properties v1.8.5
 	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/orcaman/concurrent-map v1.0.0
 	github.com/qustavo/sqlhooks/v2 v2.1.0
 	github.com/rs/zerolog v1.26.1
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
