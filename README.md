@@ -65,7 +65,6 @@ root@user ~> curl http://localhost:8080/api/get
 | [server](/server)| 服务处理 |
 | [goid](/goid)| 局部id传递处理（theadlocal） |
 | [json](/json)| json字符串处理工具 |
-| [redis](/extend/redis)| go-redis的封装 |
 | [cache](/cache)| 缓存工具 |
 | [time](/time)| 时间管理工具 |
 | [file](/file)| 文件管理工具 |
@@ -74,6 +73,9 @@ root@user ~> curl http://localhost:8080/api/get
 | [listener](/listener)| 事件监听机制 |
 | [bean](/bean)| 对象管理工具 |
 | [debug](/debug)| 线上调试工具统一介绍文档 |
+| [extend/orm](/extend/orm)| gorm、xorm的封装 |
+| [extend/etcd](/extend/etcd)| etcd封装 |
+| [extend/redis](/extend/redis)| go-redis的封装 |
 
 ### isc-gobase 项目测试
 根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块

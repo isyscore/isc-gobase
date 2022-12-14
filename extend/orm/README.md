@@ -2,6 +2,9 @@
 对业内的常见Orm进行封装，进行方便使用，目前支持的有
 - gorm
 - xorm
+  
+注意：<br/>
+xorm: 这个是xorm.io不是go-xorm，go-xorm暂时不支持
 
 ### 单数据源
 #### 代码
@@ -67,7 +70,10 @@ orm.NewGormDbWithNameAndConfig(gormConfig *gorm.Config)
 orm.NewXormDbWithName(datasourceName string)
 
 // xorm：根据数据源配置名获取库实例，自定义参数
-NewXormDbWithNameParams(datasourceName string, params map[string]string)
+orm.NewXormDbWithNameParams(datasourceName string, params map[string]string)
+
+// xorm：主从接口
+orm.NewXormDbMasterSlave(masterDatasourceName string, slaveDatasourceNames []string, policies ...xorm.GroupPolicy)
 ```
 #### 配置
 ```yml

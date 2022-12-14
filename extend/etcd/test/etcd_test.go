@@ -31,3 +31,20 @@ func Test1(t *testing.T) {
 	})
 	fmt.Println(rsp)
 }
+
+func TestRetry(t *testing.T) {
+	config.LoadYamlFile("./application-retry.yaml")
+	if config.GetValueBoolDefault("base.etcd.enable", false) {
+		err := config.GetValueObject("base.etcd", &config.EtcdCfg)
+		if err != nil {
+			return
+		}
+	}
+
+	_, err := etcd.NewEtcdClient()
+	if err != nil {
+		fmt.Println("")
+	} else {
+		fmt.Println("链接etcd 成功")
+	}
+}

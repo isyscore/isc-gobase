@@ -109,8 +109,8 @@ func InitServer() {
 		}
 	}
 	engine.Use(Cors(), gin.Recovery(), ErrHandler())
-	engine.Use(rsp.ResponseHandler())
 	engine.Use(RequestSaveHandler())
+	engine.Use(rsp.ResponseHandler())
 	for _, handler := range ginHandlers {
 		engine.Use(handler)
 	}
@@ -261,6 +261,9 @@ func RegisterPlugin(plugin gin.HandlerFunc) gin.IRoutes {
 }
 
 func Engine() *gin.Engine {
+	if !checkEngine() {
+		return nil
+	}
 	return engine
 }
 
@@ -503,7 +506,11 @@ func getPathAppendApiModel(path string) string {
 
 func RequestSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		store.RequestStorage.Set(c.Request)
-		logger.PutHead(c.Request.Header)
+		store.PutFromHead(c.Request.Header)
+
+		defer func() {
+			store.Clean()
+		}()
+		c.Next()
 	}
 }

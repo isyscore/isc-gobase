@@ -41,7 +41,7 @@ func init() {
 }
 
 type GobaseHttpHook interface {
-	Before(ctx context.Context, req *http.Request) context.Context
+	Before(ctx context.Context, req *http.Request) (context.Context, http.Header)
 	After(ctx context.Context, rsp *http.Response, rspCode int, rspData any, err error)
 }
 
@@ -349,7 +349,9 @@ func call(httpRequest *http.Request, url string) (int, http.Header, any, error) 
 	ctx := context.Background()
 
 	for _, hook := range NetHttpHooks {
-		ctx = hook.Before(ctx, httpRequest)
+		_ctx, httpHeader := hook.Before(ctx, httpRequest)
+		httpRequest.Header = httpHeader
+		ctx = _ctx
 	}
 
 	httpResponse, err := httpClient.Do(httpRequest)
@@ -403,7 +405,9 @@ func callIgnoreReturn(httpRequest *http.Request, url string) error {
 	ctx := context.Background()
 
 	for _, hook := range NetHttpHooks {
-		ctx = hook.Before(ctx, httpRequest)
+		_ctx, httpHeader := hook.Before(ctx, httpRequest)
+		httpRequest.Header = httpHeader
+		ctx = _ctx
 	}
 
 	httpResponse, err := httpClient.Do(httpRequest)

@@ -89,7 +89,7 @@ func ResponseHandler() gin.HandlerFunc {
 			Cost:       time.Now().Sub(startTime).String(),
 		}
 
-		if reqPrint && !rspPrint && !expPrint {
+		if reqPrint && !rspPrint {
 			printReq(request.Uri, request)
 		}
 
@@ -149,7 +149,7 @@ func printReq(requestUri string, requestData Request) {
 
 	reqLogLevel := config.GetValueString("base.server.request.print.level")
 	if printFlag {
-		logger.Record(reqLogLevel, "请求：%v", isc.ObjectToJson(requestData))
+		logger.Record(reqLogLevel, "请求：%v", isc.ToJsonString(requestData))
 	}
 	return
 }
@@ -178,7 +178,7 @@ func printRsq(requestUri string, responseMessage Response) {
 
 	rspLogLevel := config.GetValueString("base.server.response.print.level")
 	if printFlag {
-		logger.Record(rspLogLevel, "响应：%v", isc.ObjectToJson(responseMessage))
+		logger.Record(rspLogLevel, "响应：%v", isc.ToJsonString(responseMessage))
 	}
 }
 

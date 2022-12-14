@@ -119,3 +119,66 @@ func TestGoidGet(t *testing.T) {
 	assert.Equal(t, "13", h3V)
 	assert.Equal(t, "14", h4V)
 }
+
+func TestGoidClean(t *testing.T) {
+	st := goid.NewLocalStorage()
+	st.Set("vv")
+	goid.Go(func() {
+		fmt.Println("sleep")
+		time.Sleep(2*time.Second)
+		fmt.Println("wake")
+
+		fmt.Println(st.Get())
+	})
+	st.Del()
+	fmt.Println("clean")
+	time.Sleep(4*time.Second)
+	fmt.Println("end")
+}
+
+//func TestGoidChange(t *testing.T) {
+//	st := goid.NewLocalStorage()
+//	st.Set("vv")
+//	goid.Go(func() {
+//		fmt.Println("sleep")
+//		time.Sleep(2*time.Second)
+//		fmt.Println("wake")
+//
+//		fmt.Println(st.Get())
+//	})
+//	st.Set("vv0")
+//	fmt.Println("clean")
+//	time.Sleep(4*time.Second)
+//	fmt.Println("end")
+//}
+//
+//
+//func TestGoidChange2(t *testing.T) {
+//	st := goid.NewLocalStorage()
+//	st.Set("vv")
+//	goid.Go(func() {
+//		fmt.Println("sleep")
+//		time.Sleep(2*time.Second)
+//		fmt.Println("setValue")
+//		st.Set("vv-children")
+//	})
+//	time.Sleep(3*time.Second)
+//	fmt.Println("parent-wake")
+//	fmt.Println(st.Get())
+//}
+//
+//func TestGoidChange3(t *testing.T) {
+//	st := goid.NewLocalStorage()
+//	st.Set("vv")
+//	goid.Go(func() {
+//		fmt.Println("sleep")
+//		time.Sleep(2*time.Second)
+//		fmt.Println("wake")
+//		fmt.Println(st.Get())
+//	})
+//	st.Del()
+//	fmt.Println("clean")
+//	time.Sleep(3*time.Second)
+//	fmt.Println("parent-wake")
+//	fmt.Println(st.Get())
+//}
