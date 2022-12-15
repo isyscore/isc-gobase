@@ -4,12 +4,17 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/constants"
 	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/listener"
+	"github.com/isyscore/isc-gobase/store"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"path/filepath"
+	"os"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -53,7 +58,7 @@ func GetLogger(loggerName string) *logrus.Logger {
 	formatters := &StandardFormatter{}
 	logger.Formatter = formatters
 
-	loggerDir := config.GetValueStringDefault("base.logger.dir", "./logs/")
+	loggerDir := config.GetValueStringDefault("base.logger.home", "./logs/")
 	logger.AddHook(lfshook.NewHook(lfshook.WriterMap{
 		logrus.DebugLevel: rotateLog(loggerDir, "debug"),
 		logrus.InfoLevel:  rotateLog(loggerDir, "info"),
@@ -65,6 +70,29 @@ func GetLogger(loggerName string) *logrus.Logger {
 
 	loggerMap[loggerName] = logger
 	return logger
+}
+
+func InitLog() {
+	rootLogger = GetLogger("root")
+
+	_gColor := config.GetValueBoolDefault("base.logger.color.enable", false)
+	gColor = _gColor
+
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
+}
+
+func ConfigChangeListener(event listener.BaseEvent) {
+	ev := event.(listener.ConfigChangeEvent)
+	if ev.Key == "base.logger.level" {
+		SetGlobalLevel(ev.Value)
+	}
+}
+
+func SetGlobalLevel(strLevel string) {
+	level, err := logrus.ParseLevel(strLevel)
+	if err != nil {
+		GetLogger("root").SetLevel(level)
+	}
 }
 
 func Info(format string, v ...any) {
@@ -92,8 +120,7 @@ func Fatal(format string, v ...any) {
 }
 
 func Record(level, format string, v ...any) {
-	level = strings.ToLower(level)
-	switch level {
+	switch strings.ToLower(level) {
 	case "debug":
 		Debug(format, v)
 	case "info":
@@ -128,7 +155,7 @@ func rotateLog(path, level string) *rotatelogs.RotateLogs {
 	maxHistoryStr := config.GetValueStringDefault("base.logger.rotate.max-history", "60d")
 	rotateTimeStr := config.GetValueStringDefault("base.logger.rotate.time", "1d")
 
-	rotateOptions := []rotatelogs.Option{rotatelogs.WithLinkName(path+"app-"+level+".log")}
+	rotateOptions := []rotatelogs.Option{rotatelogs.WithLinkName(path + "app-" + level + ".log")}
 	if maxSizeStr != "" {
 		rotateOptions = append(rotateOptions, rotatelogs.WithRotationSize(isc.ParseByteSize(maxSizeStr)))
 	}
@@ -167,8 +194,8 @@ func (m *StandardFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	timestamp := entry.Time.Format("2006-01-02 15:04:05")
 	var funPath string
 	if entry.HasCaller() {
-		fName := filepath.Base(entry.Caller.File)
-		funPath = fmt.Sprintf("%s %s:%d", entry.Caller.Function, fName, entry.Caller.Line)
+		frame := getCallerFrame()
+		funPath = fmt.Sprintf("%s:%d#%s", shortLogPath(frame.File), frame.Line, functionName(frame))
 	} else {
 		funPath = fmt.Sprintf("%s", entry.Message)
 	}
@@ -194,11 +221,110 @@ func (m *StandardFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		case logrus.PanicLevel:
 			levelColor = red
 		}
-		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s %s\n", levelColor, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, fieldsStr)
+		newLog = fmt.Sprintf("[%s] \x1b[%dm%s [%s]\x1b[0m [%s] [%v] \x1b[%dm%s\x1b[0m \x1b[%dm%s\x1b[0m %s %s\n",
+			timestamp,
+			black,
+			os.Getenv("HOSTNAME"),
+			config.GetValueStringDefault("base.application.name", "-"),
+			store.Get(constants.TRACE_HEAD_ID), store.Get(constants.TRACE_HEAD_USER_ID),
+			levelColor,
+			strings.ToUpper(entry.Level.String()),
+			black,
+			funPath,
+			entry.Message,
+			fieldsStr)
 	} else {
-		newLog = fmt.Sprintf("%s\t %s %s %s %s\n", strings.ToUpper(entry.Level.String()), timestamp, funPath, entry.Message, fieldsStr)
+		newLog = fmt.Sprintf("[%s] %s [%s] [%s] [%v] %s %s %s %s\n",
+			timestamp,
+			os.Getenv("HOSTNAME"),
+			config.GetValueStringDefault("base.application.name", "-"),
+			store.Get(constants.TRACE_HEAD_ID), store.Get(constants.TRACE_HEAD_USER_ID),
+			strings.ToUpper(entry.Level.String()),
+			funPath,
+			entry.Message,
+			fieldsStr)
 	}
 
 	b.WriteString(newLog)
 	return b.Bytes(), nil
+}
+
+const (
+	maximumCallerDepth    int = 25
+	knownBaseLoggerFrames int = 5
+)
+
+var callerInitOnce sync.Once
+var minimumCallerDepth = 0
+var baseLoggerPackage string
+
+func getPackageName(f string) string {
+	for {
+		lastPeriod := strings.LastIndex(f, ".")
+		lastSlash := strings.LastIndex(f, "/")
+		if lastPeriod > lastSlash {
+			f = f[:lastPeriod]
+		} else {
+			break
+		}
+	}
+	return f
+}
+
+func getCallerFrame() *runtime.Frame {
+	pcs := make([]uintptr, maximumCallerDepth)
+	callerInitOnce.Do(func() {
+		pcs := make([]uintptr, maximumCallerDepth)
+		_ = runtime.Callers(0, pcs)
+
+		for i := 0; i < maximumCallerDepth; i++ {
+			funcName := runtime.FuncForPC(pcs[i]).Name()
+			if strings.Contains(funcName, "baselog.getCallerFrame") {
+				baseLoggerPackage = getPackageName(funcName)
+				break
+			}
+		}
+
+		minimumCallerDepth = knownBaseLoggerFrames
+	})
+
+	pcs = make([]uintptr, maximumCallerDepth)
+	depth := runtime.Callers(minimumCallerDepth, pcs)
+	frames := runtime.CallersFrames(pcs[:depth])
+
+	for f, again := frames.Next(); again; f, again = frames.Next() {
+		pkg := getPackageName(f.Function)
+		if pkg != baseLoggerPackage && pkg != "github.com/sirupsen/logrus"{
+			return &f
+		}
+	}
+	return nil
+}
+
+func functionName(frame *runtime.Frame) string {
+	pathMeta := strings.Split(frame.Function, ".")
+	if len(pathMeta) > 1 {
+		return pathMeta[len(pathMeta)-1]
+	}
+	return frame.Function
+}
+
+func shortLogPath(logPath string) string {
+	loggerPath := config.GetValueStringDefault("base.logger.path.type", "short")
+	if loggerPath == "short" {
+		pathMeta := strings.Split(logPath, string(os.PathSeparator))
+		if len(pathMeta) > 1 {
+			return pathMeta[len(pathMeta)-2] + string(os.PathSeparator) + pathMeta[len(pathMeta)-1]
+		}
+		return logPath
+	} else if loggerPath == "full" {
+		pathMeta := strings.Split(logPath, "@2/project")
+		if len(pathMeta) > 1 {
+			pathMeta[0] = "../.."
+			return strings.Join(pathMeta, "")
+		}
+		return logPath
+	} else {
+		return logPath
+	}
 }

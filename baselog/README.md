@@ -19,7 +19,7 @@ base:
   logger:
     level: info
     # 日志文件目录，默认工程目录的logs文件夹
-    dir: ./logs/
+    home: ./logs/
     color:
       # 启用：true/false，默认：false
       enable: false
@@ -31,6 +31,9 @@ base:
       max-history: 60d
       # 多久滚动一次；默认一天
       time: 1d
+    path:
+      # 日志展示格式：full-全路径；short-短路径；默认short
+      type: short
 ```
 
 ### 线上日志级别动态修改
