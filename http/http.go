@@ -230,7 +230,7 @@ func PostForm(url string, header http.Header, parameterMap map[string]any) (int,
     ctx := context.Background()
     for _, hook := range NetHttpHooks {
         _ctx, httpHeader := hook.Before(ctx, httpReq)
-        httpRequest.Header = httpHeader
+        httpReq.Header = httpHeader
         ctx = _ctx
     }
 
