@@ -104,6 +104,18 @@ func ConfigChangeListener(event listener.BaseEvent) {
 	ev := event.(listener.ConfigChangeEvent)
 	if ev.Key == "base.logger.level" {
 		SetGlobalLevel(ev.Value)
+	} else if strings.HasPrefix(ev.Key, "base.logger.group") {
+		words := strings.Split(ev.Key, ".")
+		if len(words) != 5 {
+			return
+		}
+		_group := words[3]
+		_level := words[4]
+		le, err := logrus.ParseLevel(_level)
+		if err != nil {
+			return
+		}
+		Group(_group).SetLevel(le)
 	}
 }
 

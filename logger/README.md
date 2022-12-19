@@ -38,8 +38,14 @@ base:
       type: short
     # 指定分组
     group:
-      demo1: info
-      demo2: debug
+      # 分组1
+      group1:
+        # 分组1的日志级别
+        level: info
+      # 分组2
+      group2:
+        # 分组2的日志级别
+        level: debug
 ```
 
 ## 更多用法
@@ -73,7 +79,7 @@ func main() {
 #### 2.2 指定分组修改
 如下为指定group名字为xxx的，设置日志级别为debug
 ```shell
-curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.logger.group.xxxx", "value":"debug"}'
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"base.logger.group.xxxx.level", "value":"debug"}'
 ```
 ```go
 func main() {
