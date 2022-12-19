@@ -60,12 +60,12 @@ func GetLogger(loggerName string) *logrus.Logger {
 
     loggerDir := config.GetValueStringDefault("base.logger.home", "./logs/")
     logger.AddHook(lfshook.NewHook(lfshook.WriterMap{
-        logrus.DebugLevel: rotateLog(loggerDir, "debug"),
-        logrus.InfoLevel:  rotateLog(loggerDir, "info"),
-        logrus.WarnLevel:  rotateLog(loggerDir, "warn"),
-        logrus.ErrorLevel: rotateLog(loggerDir, "error"),
-        logrus.PanicLevel: rotateLog(loggerDir, "panic"),
-        logrus.FatalLevel: rotateLog(loggerDir, "fatal"),
+        logrus.DebugLevel: rotateLogWithCache(loggerDir, "debug"),
+        logrus.InfoLevel:  rotateLogWithCache(loggerDir, "info"),
+        logrus.WarnLevel:  rotateLogWithCache(loggerDir, "warn"),
+        logrus.ErrorLevel: rotateLogWithCache(loggerDir, "error"),
+        logrus.PanicLevel: rotateLogWithCache(loggerDir, "panic"),
+        logrus.FatalLevel: rotateLogWithCache(loggerDir, "fatal"),
     }, formatters))
     lgLevel, err := logrus.ParseLevel(config.GetValueStringDefault("base.logger.level", "info"))
     if err != nil {
@@ -80,13 +80,14 @@ func GetLogger(loggerName string) *logrus.Logger {
 func InitLog() {
     rootLogger = GetLogger("root")
     loggerDir := config.GetValueStringDefault("base.logger.home", "./logs/")
+    // todo
     rootLogger.AddHook(lfshook.NewHook(lfshook.WriterMap{
-        logrus.DebugLevel: rotateLog(loggerDir, "debug"),
-        logrus.InfoLevel:  rotateLog(loggerDir, "info"),
-        logrus.WarnLevel:  rotateLog(loggerDir, "warn"),
-        logrus.ErrorLevel: rotateLog(loggerDir, "error"),
-        logrus.PanicLevel: rotateLog(loggerDir, "panic"),
-        logrus.FatalLevel: rotateLog(loggerDir, "fatal"),
+        logrus.DebugLevel: rotateLogWithCache(loggerDir, "debug"),
+        logrus.InfoLevel:  rotateLogWithCache(loggerDir, "info"),
+        logrus.WarnLevel:  rotateLogWithCache(loggerDir, "warn"),
+        logrus.ErrorLevel: rotateLogWithCache(loggerDir, "error"),
+        logrus.PanicLevel: rotateLogWithCache(loggerDir, "panic"),
+        logrus.FatalLevel: rotateLogWithCache(loggerDir, "fatal"),
     }, &StandardFormatter{}))
     lgLevel, err := logrus.ParseLevel(config.GetValueStringDefault("base.logger.level", "info"))
     if err != nil {
@@ -158,10 +159,6 @@ func Record(level, format string, v ...any) {
 }
 
 func rotateLog(path, level string) *rotatelogs.RotateLogs {
-    if pRotateValue, exist := rotateMap[path+"-"+level]; exist {
-        return pRotateValue
-    }
-
     if rotateMap == nil {
         rotateMap = map[string]*rotatelogs.RotateLogs{}
     }
@@ -192,6 +189,14 @@ func rotateLog(path, level string) *rotatelogs.RotateLogs {
     data, _ := rotatelogs.New(path+"app-"+level+".%Y%m%d.log", rotateOptions...)
     rotateMap[path+"-"+level] = data
     return data
+}
+
+func rotateLogWithCache(path, level string) *rotatelogs.RotateLogs {
+    if pRotateValue, exist := rotateMap[path+"-"+level]; exist {
+        return pRotateValue
+    }
+
+    return rotateLog(path, level)
 }
 
 type StandardFormatter struct{}

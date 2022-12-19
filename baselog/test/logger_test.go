@@ -86,3 +86,12 @@ func TestLoggerPathFull(t *testing.T) {
 
     baselog.Info("test")
 }
+
+func TestLoggerRotate(t *testing.T) {
+    config.LoadYamlFile("./application-rotate.yaml")
+    baselog.InitLog()
+
+    for i := 0; i < 10000; i++ {
+        baselog.Info("test")
+    }
+}
