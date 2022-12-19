@@ -314,7 +314,7 @@ func getCallerFrame() *runtime.Frame {
 
 		for i := 0; i < maximumCallerDepth; i++ {
 			funcName := runtime.FuncForPC(pcs[i]).Name()
-			if strings.Contains(funcName, "baselog.getCallerFrame") {
+			if strings.Contains(funcName, "logger.getCallerFrame") {
 				baseLoggerPackage = getPackageName(funcName)
 				break
 			}
