@@ -349,7 +349,7 @@ func shortLogPath(logPath string) string {
 	if loggerPath == "short" {
 		pathMeta := strings.Split(logPath, string(os.PathSeparator))
 		if len(pathMeta) > 3 {
-			return pathMeta[len(pathMeta)-3] + pathMeta[len(pathMeta)-2] + string(os.PathSeparator) + pathMeta[len(pathMeta)-1]
+			return pathMeta[len(pathMeta)-3] + string(os.PathSeparator) + pathMeta[len(pathMeta)-2] + string(os.PathSeparator) + pathMeta[len(pathMeta)-1]
 		}
 		return logPath
 	} else if loggerPath == "full" {
