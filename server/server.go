@@ -143,9 +143,7 @@ func InitServer() {
 	// 添加配置变更事件的监听
 	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListener)
 
-	appName := config.GetValueStringDefault("base.application.name", "isc-gobase")
-
-	logger.InitLog(appName)
+	logger.InitLog()
 	serverLoaded = true
 }
 
