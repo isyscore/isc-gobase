@@ -1,0 +1,9 @@
+base:
+  application:
+    # 服务名
+    name: isc-demo
+  logger:
+    # 日志路径打印长短配置
+    path:
+      # 日志展示格式：full-全路径；short-短路径；默认short
+      type: full
