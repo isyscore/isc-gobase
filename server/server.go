@@ -506,7 +506,7 @@ func getPathAppendApiModel(path string) string {
 
 func RequestSaveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		store.PutFromHead(c.Request.Header)
+		store.PutFromHead(c.Request.Header.Clone())
 
 		defer func() {
 			store.Clean()
