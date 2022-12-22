@@ -4,8 +4,6 @@ import (
     "context"
     "encoding/json"
     "fmt"
-    "github.com/isyscore/isc-gobase/goid"
-
     //"github.com/isyscore/isc-gobase/goid"
     "io"
     "log"
@@ -434,9 +432,7 @@ func callIgnoreReturn(httpRequest *http.Request, url string) error {
     rspCode, _, rspData, err := doParseResponse(httpResponse, err)
 
     for _, hook := range NetHttpHooks {
-        goid.Go(func() {
-            hook.After(ctx, httpResponse, rspCode, rspData, err)
-        })
+        hook.After(ctx, httpResponse, rspCode, rspData, err)
     }
     return err
 }
