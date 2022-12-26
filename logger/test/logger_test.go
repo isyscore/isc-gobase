@@ -73,6 +73,26 @@ func TestGroupLevelChange1(t *testing.T) {
 	logger.Group("group2").Infof("hello %v", "group2 change info2")
 }
 
+// 日志分组的级别变更
+func TestGroupLevelChange2(t *testing.T) {
+	config.LoadYamlFile("./application-group.yaml")
+	logger.InitLog()
+
+	// info
+	logger.Debug("hello %v", "debug")
+	logger.Info("hello %v", "info")
+	logger.Warn("hello %v", "warn")
+
+	// 只有g1的打印
+	logger.Group("g1").Debugf("hello %v", "g1 debug")
+	logger.Group("g1").Infof("hello %v", "g1 info")
+	logger.Group("g1").Warnf("hello %v", "g1 warn")
+
+	logger.Group("g2").Debugf("hello %v", "g2 debug")
+	logger.Group("g2").Infof("hello %v", "g2 info")
+	logger.Group("g2").Warnf("hello %v", "g2 warn")
+}
+
 func TestLoggerPathShort(t *testing.T) {
 	config.LoadYamlFile("./application-short.yaml")
 	logger.InitLog()

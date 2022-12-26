@@ -46,6 +46,9 @@ func init() {
 }
 
 func Group(groupName string) *logrus.Logger {
+	if groupName == "" {
+		return rootLogger
+	}
 	if logger, exit := loggerMap[groupName]; exit {
 		return logger
 	}
@@ -67,7 +70,17 @@ func Group(groupName string) *logrus.Logger {
 		logrus.PanicLevel: rotateLogWithCache(loggerDir, "panic"),
 		logrus.FatalLevel: rotateLogWithCache(loggerDir, "fatal"),
 	}, formatters))
-	lgLevel, err := logrus.ParseLevel(config.GetValueStringDefault("base.logger.level", "info"))
+
+	var finalGroupLevel string
+	rootLevel := config.GetValueStringDefault("base.logger.level", "info")
+	groupLevel := config.GetValueString("base.logger.group." + groupName + ".level")
+	if groupLevel != "" {
+		finalGroupLevel = groupLevel
+	} else {
+		finalGroupLevel = rootLevel
+	}
+
+	lgLevel, err := logrus.ParseLevel(finalGroupLevel)
 	if err != nil {
 		lgLevel = logrus.InfoLevel
 	}
