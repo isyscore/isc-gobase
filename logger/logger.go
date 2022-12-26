@@ -123,7 +123,7 @@ func ConfigChangeListener(event listener.BaseEvent) {
 			return
 		}
 		_group := words[3]
-		_level := words[4]
+		_level := ev.Value
 		le, err := logrus.ParseLevel(_level)
 		if err != nil {
 			return
