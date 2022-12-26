@@ -147,7 +147,7 @@ func UpdateConfig(c *gin.Context) {
 	SetValue(key.(string), value)
 
 	// 发布配置变更事件
-	listener.PublishEvent(listener.ConfigChangeEvent{Key: key.(string), Value: isc.ToJsonString(value)})
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: key.(string), Value: isc.ObjectToJson(value)})
 }
 
 // 多种格式优先级：json > properties > yaml > yml
