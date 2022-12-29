@@ -27,7 +27,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/yusufpapurcu/wmi v1.2.2
-	go.etcd.io/etcd/client/v3 v3.5.5
+	go.etcd.io/etcd/client/v3 v3.5.6
 	go.uber.org/zap v1.17.0
 	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7
 	golang.org/x/text v0.3.7
@@ -90,8 +90,8 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.6 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.6 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b // indirect
