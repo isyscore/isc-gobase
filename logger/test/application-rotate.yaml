@@ -1,0 +1,13 @@
+base:
+  application:
+    # 服务名
+    name: isc-demo
+  logger:
+    # 日志滚动策略
+    rotate:
+      # 日志滚动size；默认300MB
+      max-size: 300MB
+      # 日志文件最大保留天数；默认60天
+      max-history: 60d
+      # 多久滚动一次；默认一天
+      time: 1d

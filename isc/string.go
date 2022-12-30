@@ -665,3 +665,48 @@ func FormatSize(fileSize int64) (size string) {
 		return fmt.Sprintf("%.2fEB", float64(fileSize)/float64(EB))
 	}
 }
+
+func ParseByteSize(byteStr string) (size int64) {
+	if byteStr == "" {
+		return 0
+	}
+
+	if strings.HasSuffix(byteStr, "GB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * GB
+	}
+
+	if strings.HasSuffix(byteStr, "MB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * MB
+	}
+
+	if strings.HasSuffix(byteStr, "KB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * KB
+	}
+
+	byteStr = strings.ToUpper(byteStr)
+	if strings.HasSuffix(byteStr, "EB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * EB
+	}
+
+	if strings.HasSuffix(byteStr, "PB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * PB
+	}
+
+	if strings.HasSuffix(byteStr, "TB") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-2])
+		return byteNum * TB
+	}
+
+	if strings.HasSuffix(byteStr, "B") {
+		byteNum := ToInt64(byteStr[:len(byteStr)-1])
+		return byteNum * B
+	}
+
+	// 其他的暂时不支持
+	return 0
+}

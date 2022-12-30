@@ -1,0 +1,25 @@
+base:
+  application:
+    # 服务名
+    name: isc-demo
+  logger:
+    # 日志级别（大小写不敏感）：debug、info、warn、error、fatal、panic；默认：info
+    level: debug
+    # 日志文件目录，默认工程目录的logs文件夹
+    home: ./logs/
+    # 日志颜色配置
+    color:
+      # 启用：true/false，默认：false
+      enable: true
+    # 日志滚动策略
+    rotate:
+      # 日志滚动size；默认300MB
+      max-size: 300MB
+      # 日志文件最大保留天数；默认60天
+      max-history: 60d
+      # 多久滚动一次；默认一天
+      time: 1d
+    # 日志路径打印长短配置
+    path:
+      # 日志展示格式：full-全路径；short-短路径；默认short
+      type: short
