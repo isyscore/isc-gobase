@@ -219,3 +219,45 @@ func ConfigChangeListener(event listener.BaseEvent) {
 其中动态变更只对api实时调用的方式有效
 
 ---
+
+### 9. 支持配置的占位符
+version > 1.4.13
+```yaml
+place:
+  name: "test"
+  name2: "test2"
+
+test:
+  name: ${place.name}
+  name2: ${place.name2}
+```
+格式支持：yml、yaml、json和properties
+```json
+{
+  "place":{
+    "name":"test",
+    "name2":"test2"
+  },
+  "test":{
+    "name":"${place.name}",
+    "name2":"${place.name2}"
+  }
+}
+```
+```properties
+place.name=test
+place.name2=test2
+test.name=${place.name}
+test.name2=${place.name2}
+```
+#### 注意：
+该版本暂时不支持非叶子节点数据，比如如下的就无法获取
+```properties
+place:
+  name: "test"
+  name2: "test2"
+
+test:
+  # 如下无法读取数据
+  tt: ${place}
+```

@@ -1,0 +1,10 @@
+{
+  "place":{
+    "name":"test",
+    "name2":"test2"
+  },
+  "test":{
+    "name":"${place.name}",
+    "name2":"${place.name2}"
+  }
+}

@@ -117,3 +117,39 @@ func TestConfigInit(t *testing.T) {
 	assert.Equal(t, config.GetValueString("a.b.d"), "d-value")
 	assert.Equal(t, config.GetValueString("a.b.e.f"), "f-value")
 }
+
+// 测试：yaml占位符的功能
+func TestPlaceHolder1(t *testing.T) {
+	config.LoadFile("./application-place1.yml")
+
+	assert.Equal(t, config.GetValueString("place.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name2"), "test2")
+}
+
+// 测试：yaml占位符的功能
+func TestPlaceHolder2(t *testing.T) {
+	config.LoadFile("./application-place1.yaml")
+
+	assert.Equal(t, config.GetValueString("place.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name2"), "test2")
+}
+
+// 测试：yaml占位符的功能
+func TestPlaceHolder3(t *testing.T) {
+	config.LoadFile("./application-place1.json")
+
+	assert.Equal(t, config.GetValueString("place.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name2"), "test2")
+}
+
+// 测试：yaml占位符的功能
+func TestPlaceHolder4(t *testing.T) {
+	config.LoadFile("./application-place1.properties")
+
+	assert.Equal(t, config.GetValueString("place.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name"), "test")
+	assert.Equal(t, config.GetValueString("test.name2"), "test2")
+}

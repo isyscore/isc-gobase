@@ -262,6 +262,7 @@ func PropertiesToMap(contentOfProperties string) (map[string]any, error) {
 		return nil, &ConvertError{errMsg: "the content is illegal for properties"}
 	}
 
+	var keyChangeMap = make(map[string]string)
 	var resultMap = make(map[string]any)
 	propertiesLineWordList := GetPropertiesItemLineList(contentOfProperties)
 	for _, line := range propertiesLineWordList {
@@ -278,9 +279,20 @@ func PropertiesToMap(contentOfProperties string) (map[string]any, error) {
 			value = YamlNewLineDom + value
 		}
 
+		if strings.HasPrefix(value, "${") && strings.HasSuffix(value, "}") {
+			// 记录两个key，原始key和替代key
+			keyChangeMap[key] = value[2:len(value)-1]
+			continue
+		}
 		resultMap[key] = value
 	}
 
+	// 将两个key进行替换
+	for keyOriginal, keyNewChange := range keyChangeMap {
+		if value, exist := resultMap[keyNewChange]; exist {
+			resultMap[keyOriginal] = value
+		}
+	}
 	return resultMap, nil
 }
 

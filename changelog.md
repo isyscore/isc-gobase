@@ -12,6 +12,7 @@
 7. 新增：logger包的日志记录格式中的traceId和userId
 8. 新增：server的最前缀filter功能 
 9. 新增：validate包新增业务自定义参数传递功能
+10. 新增：config包新增yaml、yml、json和properties配置文件的占位符功能
 #### 优化
 1. 调整：go-redis的包结构，不兼容旧版本
 2. 优化：返回值code的处理
