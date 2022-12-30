@@ -65,8 +65,11 @@ func Event1Lister3(event listener.BaseEvent) {
 
 ### 内置监听器
 isc-gobase内置了几类事件
-- ServerPostEvent: 服务启动完成事件
-- ServerFinishEvent: 服务关闭事件
+- EventOfServerRunStart: 服务开启运行事件
+- EventOfServerRunFinish: 服务启动完成事件
+- EventOfServerStop: 服务关闭事件
+- EventOfConfigChange: 配置变更事件
+
 
 常用示例：
 ```go
