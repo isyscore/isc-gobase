@@ -43,7 +43,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.4.x"
+var GoBaseVersion = "1.5.0"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
