@@ -4,12 +4,11 @@ import (
 	"context"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
+	baseNet "github.com/isyscore/isc-gobase/system/net"
 	etcdClientV3 "go.etcd.io/etcd/client/v3"
-	"net"
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 const (
@@ -40,7 +39,7 @@ func InitWithParameter(endpoints []string, user, password string) {
 	}
 
 	for _, endpoint := range endpoints {
-		if !ipPortAvailable(endpoint) {
+		if !baseNet.IpPortAvailable(endpoint) {
 			// 如果想使用调试模式，请在环境变量里面或者配置文件里面配置如下
 			// debug.etcd.endpoints：多个{ip}:{port}格式，中间以逗号（英文逗号）分隔
 			// debug.etcd.user
@@ -56,20 +55,6 @@ func InitWithParameter(endpoints []string, user, password string) {
 	}
 
 	etcdClient = _etcdClient
-}
-
-func ipPortAvailable(ipAndPort string) bool {
-	conn, err := net.DialTimeout("tcp", ipAndPort, 2 * time.Second)
-	if err != nil {
-		return false
-	} else {
-		if conn != nil {
-			conn.Close()
-			return true
-		} else {
-			return false
-		}
-	}
 }
 
 func getEtcdClient(etcdPoints []string, user, password string) *etcdClientV3.Client {
