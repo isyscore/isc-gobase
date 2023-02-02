@@ -108,7 +108,11 @@ func InitServer() {
 			pprof.Register(engine)
 		}
 	}
-	engine.Use(Cors(), gin.Recovery(), ErrHandler())
+
+	if config.GetValueBoolDefault("base.server.cors.enable", true) {
+		engine.Use(Cors())
+	}
+	engine.Use(gin.Recovery(), ErrHandler())
 	engine.Use(RequestSaveHandler())
 	engine.Use(rsp.ResponseHandler())
 	for _, handler := range ginHandlers {

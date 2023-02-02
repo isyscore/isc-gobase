@@ -60,6 +60,9 @@ base:
       pprof:
         # pprof开关是否可以开启，默认false
         enable: false
+    cors:
+      # 是否启用跨域配置，默认启用
+      enable: true
     request:
       print:
         # 是否打印：true, false；默认 false
