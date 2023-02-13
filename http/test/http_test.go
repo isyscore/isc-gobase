@@ -21,10 +21,6 @@ func (*DemoHttpHook) After(ctx context.Context, rsp *http.Response, rspCode int,
 
 }
 
-func init() {
-	baseHttp.AddHook(&DemoHttpHook{})
-}
-
 func TestGetSimple(t *testing.T) {
 	_, _, data, err := baseHttp.GetSimple("http://10.30.30.78:29013/api/core/license/osinfo")
 
