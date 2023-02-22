@@ -43,7 +43,7 @@ const (
 	HmGetPost
 )
 
-var GoBaseVersion = "1.5.0"
+var GoBaseVersion = "1.5.1"
 var ApiPrefix = "/api"
 
 var engine *gin.Engine = nil
@@ -108,7 +108,11 @@ func InitServer() {
 			pprof.Register(engine)
 		}
 	}
-	engine.Use(Cors(), gin.Recovery(), ErrHandler())
+
+	if config.GetValueBoolDefault("base.server.cors.enable", true) {
+		engine.Use(Cors())
+	}
+	engine.Use(gin.Recovery(), ErrHandler())
 	engine.Use(RequestSaveHandler())
 	engine.Use(rsp.ResponseHandler())
 	for _, handler := range ginHandlers {
