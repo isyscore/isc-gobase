@@ -206,6 +206,7 @@ func doLoadConfigFromAbsPath(resourceAbsPath string) {
 			SetValue("base.profiles.active", profile)
 			currentProfile := getProfileFromFileName(fileName)
 			if currentProfile == profile {
+				configExist = true
 				AppendFile(resourceAbsPath + fileName)
 			}
 		}

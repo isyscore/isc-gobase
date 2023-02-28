@@ -139,6 +139,30 @@ func SetGlobalLevel(strLevel string) {
 	}
 }
 
+func InfoDirect(v ...any) {
+	rootLogger.Info(v...)
+}
+
+func WarnDirect(v ...any) {
+	rootLogger.Warn(v...)
+}
+
+func ErrorDirect(v ...any) {
+	rootLogger.Error(v...)
+}
+
+func FatalDirect(v ...any) {
+	rootLogger.Fatal(v...)
+}
+
+func PanicDirect(v ...any) {
+	rootLogger.Panic(v...)
+}
+
+func DebugDirect(v ...any) {
+	rootLogger.Debug(v...)
+}
+
 func Info(format string, v ...any) {
 	rootLogger.Infof(format, v...)
 }

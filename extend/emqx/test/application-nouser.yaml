@@ -1,0 +1,7 @@
+base:
+  emqx:
+    # 是否开启emqx，默认关闭
+    enable: true
+    servers:
+      # 域名格式2
+      - "tcp://10.30.30.78:11883"

@@ -1,0 +1,31 @@
+base:
+  emqx:
+    # 是否开启emqx，默认关闭
+    enable: true
+    servers:
+      # 域名格式1
+      - "tcp://{user}:{password}@{host}:{port}"
+      # 域名格式2
+      - "tcp://{host}:{port}"
+    client-id: "xxxx"
+    username: "xxxx"
+    password: "xxxx"
+    # 是否清理session，默认为true
+    clean-session: true
+    order: true
+    will-enabled: true
+    will-topic: "xxx-topic"
+    will-qos: 0
+    will-retained: false
+    protocol-version: 0
+    keep-alive: 30
+    ping-timeout: "10s"
+    connect-timeout: "30s"
+    max-reconnect-interval: "10m"
+    auto-reconnect: true
+    connect-retry-interval: "30s"
+    connect-retry: false
+    write-timeout: 0
+    resume-subs: false
+    max-resume-pub-in-flight: 0
+    auto-ack-disabled: false
