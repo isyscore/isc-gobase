@@ -9,7 +9,6 @@ import (
 	"time"
 	"xorm.io/xorm"
 	"xorm.io/xorm/contexts"
-	"xorm.io/xorm/log"
 )
 
 type GobaseXormHook interface {
