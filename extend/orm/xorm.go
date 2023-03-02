@@ -9,6 +9,7 @@ import (
 	"time"
 	"xorm.io/xorm"
 	"xorm.io/xorm/contexts"
+	"xorm.io/xorm/log"
 )
 
 type GobaseXormHook interface {
@@ -111,6 +112,7 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 		}
 	}
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
+	xormDb.SetLogger(&XormLoggerAdapter{})
 	return xormDb, nil
 }
 
@@ -129,8 +131,58 @@ func NewXormDbMasterSlave(masterDatasourceName string, slaveDatasourceNames []st
 			return nil, err
 		}
 
+		slaveDb.SetLogger(&XormLoggerAdapter{})
 		slaveDbs = append(slaveDbs, slaveDb)
 	}
 
+	masterDb.SetLogger(&XormLoggerAdapter{})
 	return xorm.NewEngineGroup(masterDb, slaveDbs, policies...)
+}
+
+type XormLoggerAdapter struct {
+}
+
+// BeforeSQL implements ContextLogger
+func (l *XormLoggerAdapter) BeforeSQL(ctx log.LogContext) {}
+
+// AfterSQL implements ContextLogger
+func (l *XormLoggerAdapter) AfterSQL(ctx log.LogContext) {}
+
+// Debugf implements ContextLogger
+func (l *XormLoggerAdapter) Debugf(format string, v ...interface{}) {
+	logger.Debug(format, v)
+}
+
+// Errorf implements ContextLogger
+func (l *XormLoggerAdapter) Errorf(format string, v ...interface{}) {
+	logger.Error(format, v)
+}
+
+// Infof implements ContextLogger
+func (l *XormLoggerAdapter) Infof(format string, v ...interface{}) {
+	logger.Info(format, v)
+}
+
+// Warnf implements ContextLogger
+func (l *XormLoggerAdapter) Warnf(format string, v ...interface{}) {
+	logger.Warn(format, v)
+}
+
+// Level implements ContextLogger
+func (l *XormLoggerAdapter) Level() log.LogLevel {
+	return log.LOG_INFO
+}
+
+// SetLevel implements ContextLogger
+func (l *XormLoggerAdapter) SetLevel(lv log.LogLevel) {
+}
+
+// ShowSQL implements ContextLogger
+func (l *XormLoggerAdapter) ShowSQL(show ...bool) {
+
+}
+
+// IsShowSQL implements ContextLogger
+func (l *XormLoggerAdapter) IsShowSQL() bool {
+	return true
 }
