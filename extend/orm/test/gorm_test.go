@@ -10,7 +10,7 @@ import (
 
 func TestGorm1(t *testing.T) {
 	config.LoadYamlFile("./application-test1.yaml")
-	orm2.AddGormHook(&GobaseOrmHookDemo{})
+	//orm2.AddGormHook(&GobaseOrmHookDemo{})
 	db, _ := orm2.NewGormDb()
 
 	// 删除表

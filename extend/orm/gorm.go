@@ -49,7 +49,9 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 	}
 
 	// 注册原生的sql的hook
-	sqlRegister(datasourceConfig.DriverName)
+	if len(gormHooks) != 0 {
+		sqlRegister(datasourceConfig.DriverName)
+	}
 
 	var gormDb *gorm.DB
 	dsn := getDbDsn(datasourceConfig.DriverName, datasourceConfig)
@@ -138,7 +140,10 @@ func sqlRegister(driverName string) {
 }
 
 func WrapDriverName(driverName string) string {
-	return driverName + "Hook"
+	if len(gormHooks) != 0 {
+		return driverName + "Hook"
+	}
+	return driverName
 }
 
 type GobaseGormHook interface {
