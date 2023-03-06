@@ -8,7 +8,7 @@ import (
 func TestSet(t *testing.T) {
 	l := isc.NewListWithItems(1, 2, 3, 4, 1, 2, 3, 4, 5, 6)
 	t.Logf("%v", l)
-	ls := l.ToSet()
+	ls := isc.ListToSet(l)
 	t.Logf("%v", ls)
 
 	s := isc.NewSetWithItems(1, 2, 3, 4, 1, 2, 3, 4, 5, 6)
