@@ -4,20 +4,20 @@ import (
 	"fmt"
 )
 
-type ISCSet[T any] ISCList[T]
+type ISCSet[T comparable] map[T]struct{}
 
 // NewSet 初始化并指定存储对象的类型
-func NewSet[T any]() ISCSet[T] {
+func NewSet[T comparable]() ISCSet[T] {
 	return ISCSet[T]{}
 }
 
-func NewSetWithList[T any](list []T) ISCSet[T] {
+func NewSetWithList[T comparable](list []T) ISCSet[T] {
 	s := ISCSet[T]{}
 	s.AddAll(list...)
 	return s
 }
 
-func NewSetWithItems[T any](items ...T) ISCSet[T] {
+func NewSetWithItems[T comparable](items ...T) ISCSet[T] {
 	s := ISCSet[T]{}
 	s.AddAll(items...)
 	return s
@@ -30,8 +30,8 @@ func (s ISCSet[T]) Size() int {
 
 // Add 添加元素
 func (s *ISCSet[T]) Add(item T) error {
-	if !ISCList[T](*s).Contains(item) {
-		*s = append(*s, item)
+	if !s.Contains(item) {
+		(*s)[item] = struct{}{}
 		return nil
 	} else {
 		return fmt.Errorf("%v already exists in set", item)
@@ -47,8 +47,8 @@ func (s *ISCSet[T]) AddAll(items ...T) {
 
 // Delete 删除指定Key元素
 func (s *ISCSet[T]) Delete(item T) error {
-	if idx := ISCList[T](*s).IndexOf(item); idx != -1 {
-		*s = append((*s)[:idx], (*s)[idx+1:]...)
+	if s.Contains(item) {
+		delete(*s, item)
 		return nil
 	} else {
 		return fmt.Errorf("%v not exists in set", item)
@@ -57,7 +57,8 @@ func (s *ISCSet[T]) Delete(item T) error {
 
 // Contains 判断key是否存在
 func (s ISCSet[T]) Contains(item T) bool {
-	return ISCList[T](s).Contains(item)
+	_, ok := s[item]
+	return ok
 }
 
 // Clear 重置
@@ -66,5 +67,9 @@ func (s *ISCSet[T]) Clear() {
 }
 
 func (s ISCSet[T]) ToList() ISCList[T] {
-	return ISCList[T](s)
+	res := NewList[T]()
+	for k := range s {
+		res.Add(k)
+	}
+	return res
 }
