@@ -48,3 +48,6 @@ func Equal(t *testing.T, objects ...any) {
 		}
 	}
 }
+
+func main() {
+}
