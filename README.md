@@ -1,3 +1,5 @@
+https://github.com/isyscore/isc-gobase/actions/workflows/go.yml/badge.svg
+
 # isc-gobase
 
 isc-gobase 框架是杭州指令集智能科技有限公司在java转go的实践中沉淀总结的一套至简化工具框架。遵从大道至简原则，让开发者在开发go的项目方面使用更简单
