@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  build:
+  Init:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,12 +30,27 @@ jobs:
       - name: Init
         run: |
           go mod tidy
-          ln $JAVA_HOME/include/jni.h /usr/local/include 
-          ln $JAVA_HOME/include/linux/jni_md.h /usr/local/include 
+          sudo ln $JAVA_HOME/include/jni.h /usr/local/include 
+          sudo ln $JAVA_HOME/include/linux/jni_md.h /usr/local/include 
+          sudo ln $JAVA_HOME/lib/server/libjvm.so /usr/local/lib
 
 
       - name: Build
         run: go build -v ./...
 
       - name: Test
-        run: go test -v ./...
+        run: |
+          go test ./config/test
+          go test ./isc/test
+          go test ./validate/test
+          go test ./compress/test
+          go test ./cron/test
+          go test ./encoding/test
+          go test ./file/test
+          go test ./goid/test
+          go test ./i18n/test
+          go test ./coder/test
+          go test ./time/test
+          go test ./listener/test
+          go test ./bean/test
+

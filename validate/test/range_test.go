@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+var (
+	LocationCST, err = time.LoadLocation("Asia/Shanghai")
+)
+
 // 整数类型1
 type RangeIntEntity1 struct {
 	Name string
@@ -447,17 +451,17 @@ func TestRangeTime1(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity1{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity1{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity1{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity1{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 
 	//测试 异常情况
-	value = RangeTimeEntity1{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity1{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-09-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 }
@@ -469,17 +473,17 @@ func TestRangeTime2(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity2{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity2{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
-	value = RangeTimeEntity2{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity2{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity2{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity2{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, ]] 中", result, false)
 }
@@ -491,12 +495,12 @@ func TestRangeTime3(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity3{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity3{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity3{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity3{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [(, 2019-07-23 12:00:23.321]] 中", result, false)
 }
@@ -508,17 +512,17 @@ func TestRangeTime4(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity4{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity4{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity4{CreateTime: time.Date(2018, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity4{CreateTime: time.Date(2018, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 
 	//测试 异常情况
-	value = RangeTimeEntity4{CreateTime: time.Date(9018, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity4{CreateTime: time.Date(9018, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [9018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 }
@@ -530,12 +534,12 @@ func TestRangeTime5(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity5{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity5{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity5{CreateTime: time.Date(2218, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity5{CreateTime: time.Date(2218, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2218-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [past] 中", result, false)
 }
@@ -547,12 +551,12 @@ func TestRangeTime6(t *testing.T) {
 	var err string
 
 	//测试 正常情况
-	value = RangeTimeEntity6{CreateTime: time.Date(2119, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity6{CreateTime: time.Date(2119, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
-	value = RangeTimeEntity6{CreateTime: time.Date(1918, 7, 24, 12, 0, 23, 321, time.Local)}
+	value = RangeTimeEntity6{CreateTime: time.Date(1918, 7, 24, 12, 0, 23, 321, LocationCST)}
 	result, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [1918-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [future] 中", result, false)
 }
