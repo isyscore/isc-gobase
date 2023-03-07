@@ -1,4 +1,4 @@
-![CI](https://github.com/heermos/isc-gobase/actions/workflows/go.yml/badge.svg)
+![CI](https://github.com/isyscore/isc-gobase/actions/workflows/go.yml/badge.svg)
 
 # isc-gobase
 
