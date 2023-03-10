@@ -202,3 +202,17 @@ func TestXorm1(t *testing.T) {
 
 ### 注意
 请不要在业务中使用init方法获取db，因为这个时候config的配置还没有加载出来
+
+## 框架配置
+上面全都是数据库的配置，对于一些orm框架本身也会有一些配置，这里支持下(version >= 1.5.2)
+支持配置：
+- 打印sql
+- 打印sql的日志级别
+- 打印慢查询
+- 打印慢查询的超时配置
+```yaml
+base:
+  orm:
+    show-sql: true
+    level: info
+```

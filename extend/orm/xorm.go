@@ -110,6 +110,9 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 			xormDb.SetConnMaxLifetime(t)
 		}
 	}
+
+	// todo 配置化处理
+	//xormDb.ShowSQL(true)
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
 	return xormDb, nil
 }
