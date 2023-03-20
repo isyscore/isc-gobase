@@ -56,11 +56,9 @@ func Group(groupNames... string) *logrus.Logger {
 		}
 	}
 
-	if loggerMap == nil {
-		loggerMap = map[string]*logrus.Logger{}
-	}
-
-	if resultLogger == nil {
+	if resultLogger != nil {
+		return resultLogger
+	}  else {
 		resultLogger = logrus.New()
 		resultLogger.SetReportCaller(true)
 		formatters := &StandardFormatter{}
