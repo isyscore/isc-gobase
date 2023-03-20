@@ -2,7 +2,8 @@
 ### v1.5.2
 #### 新增
 1. 新增：增加emqx的配置化
-1. 新增：增加orm的配置，支持xorm，gorm（doing）
+2. 新增：增加orm的配置，支持xorm，gorm（doing）
+3. 新增：增加logger包的group的多值分组标签
 
 #### 优化
 #### 修复
