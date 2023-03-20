@@ -116,3 +116,10 @@ func TestLoggerRotate(t *testing.T) {
 	//	time.Sleep(1 * time.Second)
 	//}
 }
+
+func TestLoggerGroup2(t *testing.T) {
+	config.LoadYamlFile("./application-group2.yaml")
+	logger.InitLog()
+
+	logger.Group("g1", "g2").Debug("test")
+}

@@ -45,7 +45,69 @@ func init() {
 	gColor = _gColor
 }
 
-func Group(groupName string) *logrus.Logger {
+func Group(groupNames... string) *logrus.Logger {
+	var resultLogger *logrus.Logger
+	groupNamesOfUnContain := []string{}
+	for _, groupName := range groupNames {
+		if logger, exit := loggerMap[groupName]; exit {
+			resultLogger = logger
+		} else {
+			groupNamesOfUnContain = append(groupNamesOfUnContain, groupName)
+		}
+	}
+
+	if loggerMap == nil {
+		loggerMap = map[string]*logrus.Logger{}
+	}
+
+	if resultLogger == nil {
+		resultLogger = logrus.New()
+		resultLogger.SetReportCaller(true)
+		formatters := &StandardFormatter{}
+		resultLogger.Formatter = formatters
+
+		loggerDir := config.GetValueStringDefault("base.logger.home", "./logs/")
+		resultLogger.AddHook(lfshook.NewHook(lfshook.WriterMap{
+			logrus.DebugLevel: rotateLogWithCache(loggerDir, "debug"),
+			logrus.InfoLevel:  rotateLogWithCache(loggerDir, "info"),
+			logrus.WarnLevel:  rotateLogWithCache(loggerDir, "warn"),
+			logrus.ErrorLevel: rotateLogWithCache(loggerDir, "error"),
+			logrus.PanicLevel: rotateLogWithCache(loggerDir, "panic"),
+			logrus.FatalLevel: rotateLogWithCache(loggerDir, "fatal"),
+		}, formatters))
+	}
+
+	// 值最大的级别，对应的level最小，比如Debug对应的数值比Info要大
+	maxValueLevel := logrus.PanicLevel
+	for _, groupName := range groupNamesOfUnContain {
+		var finalGroupLevel string
+		rootLevel := config.GetValueStringDefault("base.logger.level", "info")
+		groupLevel := config.GetValueString("base.logger.group." + groupName + ".level")
+		if groupLevel != "" {
+			finalGroupLevel = groupLevel
+		} else {
+			finalGroupLevel = rootLevel
+		}
+
+		lgLevel, err := logrus.ParseLevel(finalGroupLevel)
+		if err != nil {
+			lgLevel = logrus.InfoLevel
+		}
+
+		if lgLevel > maxValueLevel {
+			maxValueLevel = lgLevel
+		}
+	}
+
+	resultLogger.SetLevel(maxValueLevel)
+
+	for _, groupName := range groupNamesOfUnContain {
+		loggerMap[groupName] = resultLogger
+	}
+	return resultLogger
+}
+
+func doGroup(groupName string) *logrus.Logger {
 	if groupName == "" {
 		return rootLogger
 	}
