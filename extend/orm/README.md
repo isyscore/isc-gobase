@@ -212,6 +212,17 @@ base:
   orm:
     show-sql: true
 ```
+#### 线上动态开启和关闭sql的话
+```yaml
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"baes.orm.show-sql", "value":"true"}'
+```
+或者如下
+```yaml
+curl -X PUT http://localhost:xxx/{api-prefix}/{api-module}/config/update -d '{"key":"baes.logger.group.orm.level", "value":"debug"}'
+```
+这两个配置功能是等同的，一个是直接基于logger来修改，一个是基于orm的配置来修改
+
+
 
 ### 更多配置
 在一些场景下，也需要mysql本身提供一些配置，就是最近遇到gorm默认在mariadb下面是报失败，因此增加了这样的配置（version >= 1.5.2）
