@@ -116,6 +116,9 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 	xormDb.ShowSQL(true)
 	xormDb.SetLogger(&XormLoggerAdapter{})
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
+
+	// 添加orm的配置监听器
+	addListenerOfOrm()
 	return xormDb, nil
 }
 

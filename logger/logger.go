@@ -223,6 +223,10 @@ func DebugDirect(v ...any) {
 	rootLogger.Debug(v...)
 }
 
+func TraceDirect(v ...any) {
+	rootLogger.Trace(v...)
+}
+
 func Info(format string, v ...any) {
 	rootLogger.Infof(format, v...)
 }
@@ -237,6 +241,10 @@ func Error(format string, v ...any) {
 
 func Debug(format string, v ...any) {
 	rootLogger.Debugf(format, v...)
+}
+
+func Trace(format string, v ...any) {
+	rootLogger.Tracef(format, v...)
 }
 
 func Panic(format string, v ...any) {

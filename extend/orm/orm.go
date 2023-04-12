@@ -3,7 +3,10 @@ package orm
 import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
+	"github.com/isyscore/isc-gobase/isc"
+	"github.com/isyscore/isc-gobase/listener"
 	"github.com/isyscore/isc-gobase/logger"
+	"github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -61,4 +64,19 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 		return dsn
 	}
 	return ""
+}
+
+func addListenerOfOrm()  {
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListenerOfOrm)
+}
+
+func ConfigChangeListenerOfOrm(event listener.BaseEvent) {
+	ev := event.(listener.ConfigChangeEvent)
+	if ev.Key == "base.orm.show-sql" {
+		if isc.ToBool(ev.Value) {
+			logger.Group("orm").SetLevel(logrus.DebugLevel)
+		} else {
+			logger.Group("orm").SetLevel(logrus.InfoLevel)
+		}
+	}
 }

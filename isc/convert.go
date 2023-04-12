@@ -154,6 +154,10 @@ func ToString(value any) string {
 	if value == nil {
 		return ""
 	}
+	if reflect.TypeOf(value).Kind() == reflect.String {
+		return value.(string)
+	}
+
 	return fmt.Sprintf("%v", value)
 }
 

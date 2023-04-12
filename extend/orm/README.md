@@ -207,12 +207,30 @@ func TestXorm1(t *testing.T) {
 上面全都是数据库的配置，对于一些orm框架本身也会有一些配置，这里支持下(version >= 1.5.2)
 支持配置：
 - 打印sql
-- 打印sql的日志级别
-- 打印慢查询
-- 打印慢查询的超时配置
 ```yaml
 base:
   orm:
     show-sql: true
-    level: info
+```
+
+### 更多配置
+在一些场景下，也需要mysql本身提供一些配置，就是最近遇到gorm默认在mariadb下面是报失败，因此增加了这样的配置（version >= 1.5.2）
+```yaml
+base:
+  datasource:
+    mysql:
+      server-version: ""
+      skip-initialize-with-version: false
+      default-string-size: 0
+      disable-with-returning: false
+      disable-datetime-precision: false
+      dont-support-rename-index: false
+      dont-support-rename-column: false
+      dont-support-for-share-clause: false
+      dont-support-null-as-default-value: false
+```
+以上这些配置其实对应的是如下的代码，示例
+```go
+// 其中的`DisableWithReturning` 对应的就是上面的 base.datasource.mysql.disable-with-returning，其他更多的配置都在里面
+gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableWithReturning: true}))
 ```

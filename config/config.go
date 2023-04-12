@@ -145,9 +145,6 @@ func UpdateConfig(c *gin.Context) {
 	value, _ := valueMap["value"]
 
 	SetValue(key.(string), value)
-
-	// 发布配置变更事件
-	listener.PublishEvent(listener.ConfigChangeEvent{Key: key.(string), Value: isc.ObjectToJson(value)})
 }
 
 // 多种格式优先级：json > properties > yaml > yml
@@ -532,6 +529,9 @@ func SetValue(key string, value any) {
 		return
 	}
 	appProperty.ValueDeepMap = resultDeepMap
+
+	// 发布配置变更事件
+	listener.PublishEvent(listener.ConfigChangeEvent{Key: key, Value: isc.ToString(isc.ObjectToData(value))})
 }
 
 func parseProperties(key string, value any, resultMap map[string]any) (map[string]any, error) {

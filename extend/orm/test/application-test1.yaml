@@ -22,3 +22,9 @@ base:
       max-life-time: 290s
       # 连接空闲的最大时间；带字符（s：秒，m：分钟，h：小时）
       max-idle-time: 10s
+    mysql:
+      disable-with-returning: true
+  logger:
+    group:
+      orm:
+        level: debug
