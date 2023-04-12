@@ -233,6 +233,10 @@ func (l ISCList[T]) Equals(n ISCList[T]) bool {
 	return ListEquals(l, n)
 }
 
-func (l ISCList[T]) ToSet() ISCSet[T] {
-	return NewSetWithList(l)
+func ListToSet[T comparable](list ISCList[T]) ISCSet[T] {
+	res := ISCSet[T]{}
+	for _, v := range list {
+		_ = res.Add(v)
+	}
+	return res
 }
