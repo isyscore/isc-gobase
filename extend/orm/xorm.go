@@ -113,8 +113,8 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 		}
 	}
 
-	//xormDb.ShowSQL(true)
-	//xormDb.SetLogger(&XormLoggerAdapter{})
+	xormDb.ShowSQL(true)
+	xormDb.SetLogger(&XormLoggerAdapter{})
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
 	return xormDb, nil
 }
