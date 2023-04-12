@@ -29,5 +29,12 @@ key1:
   ok4:
     hao_de_ok: 12
     name_age: 32
+  json:
+    test_haode: 12
+    test_namehaha: 32
+  yaml:
+    test_haode: 12
+    test_namehaha: 32
+
 entity:
   name: 'name-original'

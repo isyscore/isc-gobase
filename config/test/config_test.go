@@ -80,6 +80,31 @@ type SmallEntity struct {
 	NameAge int
 }
 
+// 测试兼容标签：json、yaml
+func TestJsonOrYamlTag(t *testing.T) {
+	config.LoadConfig()
+
+	entity1 := SmallEntityJsonTag{}
+	_ = config.GetValueObject("key1.json", &entity1)
+	assert.Equal(t, entity1.NameAge, 32)
+	assert.Equal(t, entity1.HaoDeOk, 12)
+
+	entity2 := SmallEntityYamlTag{}
+	_ = config.GetValueObject("key1.yaml", &entity2)
+	assert.Equal(t, entity2.NameAge, 32)
+	assert.Equal(t, entity2.HaoDeOk, 12)
+}
+
+type SmallEntityJsonTag struct {
+	HaoDeOk int `json:"test_haode"`
+	NameAge int `json:"test_namehaha"`
+}
+
+type SmallEntityYamlTag struct {
+	HaoDeOk int `yaml:"test_haode"`
+	NameAge int `yaml:"test_namehaha"`
+}
+
 // 测试读取某个文件
 func TestRead(t *testing.T) {
 	config.LoadFile("./application-local.yaml")

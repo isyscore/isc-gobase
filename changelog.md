@@ -4,6 +4,7 @@
 1. 新增：增加emqx的配置化
 2. 新增：增加orm的配置，支持xorm，gorm（doing）
 3. 新增：增加logger包的group的多值分组标签
+4. 新增：增加config的配置转化对象中的兼容yaml和json的功能
 
 #### 修复
 1. 修复：修复gorm的启动不添加埋点下的异常

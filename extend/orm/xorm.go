@@ -2,6 +2,7 @@ package orm
 
 import (
 	"context"
+	"fmt"
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
@@ -9,6 +10,7 @@ import (
 	"time"
 	"xorm.io/xorm"
 	"xorm.io/xorm/contexts"
+	"xorm.io/xorm/log"
 )
 
 type GobaseXormHook interface {
@@ -111,8 +113,8 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 		}
 	}
 
-	// todo 配置化处理
 	//xormDb.ShowSQL(true)
+	//xormDb.SetLogger(&XormLoggerAdapter{})
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
 	return xormDb, nil
 }
@@ -136,5 +138,65 @@ func NewXormDbMasterSlave(masterDatasourceName string, slaveDatasourceNames []st
 	}
 
 	return xorm.NewEngineGroup(masterDb, slaveDbs, policies...)
+}
+
+// LoggerAdapter wraps a Logger interface as LoggerContext interface
+type XormLoggerAdapter struct {
+}
+
+// BeforeSQL implements ContextLogger
+func (l *XormLoggerAdapter) BeforeSQL(ctx log.LogContext) {}
+
+// AfterSQL implements ContextLogger
+func (l *XormLoggerAdapter) AfterSQL(ctx log.LogContext) {
+	var sessionPart string
+	v := ctx.Ctx.Value("__xorm_session_id")
+	if key, ok := v.(string); ok {
+		sessionPart = fmt.Sprintf(" [%s]", key)
+	}
+	if ctx.ExecuteTime > 0 {
+		logger.Group("orm").Debug("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime)
+	} else {
+		logger.Group("orm").Debug("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args)
+	}
+}
+
+// Debugf implements ContextLogger
+func (l *XormLoggerAdapter) Debugf(format string, v ...interface{}) {
+	logger.Group("orm").Debug(format, v)
+}
+
+// Errorf implements ContextLogger
+func (l *XormLoggerAdapter) Errorf(format string, v ...interface{}) {
+	logger.Error(format, v)
+}
+
+// Infof implements ContextLogger
+func (l *XormLoggerAdapter) Infof(format string, v ...interface{}) {
+	logger.Info(format, v)
+}
+
+// Warnf implements ContextLogger
+func (l *XormLoggerAdapter) Warnf(format string, v ...interface{}) {
+	logger.Warn(format, v)
+}
+
+// Level implements ContextLogger
+func (l *XormLoggerAdapter) Level() log.LogLevel {
+	return log.LOG_INFO
+}
+
+// SetLevel implements ContextLogger
+func (l *XormLoggerAdapter) SetLevel(lv log.LogLevel) {
+}
+
+// ShowSQL implements ContextLogger
+func (l *XormLoggerAdapter) ShowSQL(show ...bool) {
+
+}
+
+// IsShowSQL implements ContextLogger
+func (l *XormLoggerAdapter) IsShowSQL() bool {
+	return true
 }
 

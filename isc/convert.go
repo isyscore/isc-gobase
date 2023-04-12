@@ -617,6 +617,12 @@ func doInvokeValue(fieldMapValue reflect.Value, field reflect.StructField, field
 	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToUnderLine(field.Name)); exist {
 		// 兼容data_base_user格式读取
 		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, field.Tag.Get("yaml")); exist {
+		// 兼容标签：yaml
+		fValue = v
+	} else if v, exist := getValueFromMapValue(fieldMapValue, field.Tag.Get("json")); exist {
+		// 兼容标签：json
+		fValue = v
 	} else {
 		return
 	}
@@ -960,6 +966,9 @@ func doObjectChange(objType reflect.Type, object any) any {
 }
 
 func getValueFromMapValue(keyValues reflect.Value, key string) (reflect.Value, bool) {
+	if key == "" {
+		return reflect.ValueOf(nil), false
+	}
 	if keyValues.Kind() == reflect.Map {
 		if v1 := keyValues.MapIndex(reflect.ValueOf(key)); v1.IsValid() {
 			return v1, true
