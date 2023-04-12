@@ -78,6 +78,7 @@ root@user ~> curl http://localhost:8080/api/get
 | [extend/orm](/extend/orm)| gorm、xorm的封装 |
 | [extend/etcd](/extend/etcd)| etcd封装 |
 | [extend/redis](/extend/redis)| go-redis的封装 |
+| [extend/emqx](/extend/emqx)| emqx客户端的封装 |
 
 ### isc-gobase 项目测试
 根目录提供go_test.sh文件，统一执行所有gobase中包的测试模块
