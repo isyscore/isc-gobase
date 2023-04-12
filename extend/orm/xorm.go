@@ -155,9 +155,9 @@ func (l *XormLoggerAdapter) AfterSQL(ctx log.LogContext) {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
 	if ctx.ExecuteTime > 0 {
-		logger.Group("orm").Debug("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime)
+		logger.Group("orm").Debugf("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime)
 	} else {
-		logger.Group("orm").Debug("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args)
+		logger.Group("orm").Debugf("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args)
 	}
 }
 
