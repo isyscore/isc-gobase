@@ -66,10 +66,6 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 	return ""
 }
 
-func addListenerOfOrm()  {
-	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListenerOfOrm)
-}
-
 func ConfigChangeListenerOfOrm(event listener.BaseEvent) {
 	ev := event.(listener.ConfigChangeEvent)
 	if ev.Key == "base.orm.show-sql" {

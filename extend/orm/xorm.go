@@ -6,6 +6,7 @@ import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
+	"github.com/isyscore/isc-gobase/listener"
 	"github.com/isyscore/isc-gobase/logger"
 	"time"
 	"xorm.io/xorm"
@@ -118,7 +119,7 @@ func doNewXormDb(datasourceName string, params map[string]string) (*xorm.Engine,
 	bean.AddBean(constants.BeanNameXormPre + datasourceName, xormDb)
 
 	// 添加orm的配置监听器
-	addListenerOfOrm()
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListenerOfOrm)
 	return xormDb, nil
 }
 

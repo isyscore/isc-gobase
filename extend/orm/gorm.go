@@ -7,6 +7,7 @@ import (
 	"github.com/isyscore/isc-gobase/bean"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/constants"
+	"github.com/isyscore/isc-gobase/listener"
 	baseLogger "github.com/isyscore/isc-gobase/logger"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
@@ -102,7 +103,7 @@ func doNewGormDb(datasourceName string, gormConfig *gorm.Config) (*gorm.DB, erro
 	gormDb.Logger = &GormLoggerAdapter{}
 	bean.AddBean(constants.BeanNameGormPre+datasourceName, gormDb)
 	// 添加orm的配置监听器
-	addListenerOfOrm()
+	listener.AddListener(listener.EventOfConfigChange, ConfigChangeListenerOfOrm)
 
 	return gormDb, nil
 }
