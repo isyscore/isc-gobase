@@ -2,14 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/validate"
 	"github.com/isyscore/isc-gobase/validate/test/fun"
-	"math"
-	"math/rand"
 	"testing"
-	t0 "time"
 )
 
 func TestCustomize1(t *testing.T) {
@@ -238,89 +233,4 @@ func TestCustomize7_1(t *testing.T) {
 	value = fun.CustomizeEntity7{Flag2: &flag}
 	result, _ = validate.Check(value, "flag2")
 	True(t, result)
-}
-
-func TestFun(t *testing.T) {
-	rand.Seed(t0.Now().UnixNano())
-	////随机生成100以内的正整数
-	//
-	//a := 1
-	//b := 3
-	//
-	//// [-1.0, 1.0)
-	//fmt.Println((isc.ToFloat64(a))/(isc.ToFloat64(b)*1.0))
-	//
-	//Solos := []*Solo{}
-	//
-	//Solos = append(Solos, &Solo{score: 12.0})
-	//Solos = append(Solos, &Solo{score: 1.0})
-	//Solos = append(Solos, &Solo{score: 132.2})
-	//Solos = append(Solos, &Solo{score: 54.2})
-	//Solos = append(Solos, &Solo{score: 32.2})
-	//
-	//group := Group{solos: Solos}
-	//
-	//sort.Sort(group)
-	//
-	//for _, solo := range group.solos {
-	//	fmt.Println(solo.score)
-	//}
-	//
-	//rand.Shuffle(len(group.solos), func(i, j int) {
-	//	group.solos[i], group.solos[j] = group.solos[j], group.solos[i]
-	//})
-	//
-	//fmt.Println("======")
-	//for _, solo := range group.solos {
-	//	fmt.Println(solo.score)
-	//}
-	//
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//fmt.Println(rand.Intn(2))
-	//// 0,1
-	//fmt.Println(rand.Intn(2))
-
-
-	//datas := []int{1,2, 3, 4, 5}
-	//fmt.Println(datas[0:2])
-	//fmt.Println(datas[2:4])
-	//fmt.Println(datas[:len(datas)])
-
-	ratio := 0.3
-	num := 12
-
-	fmt.Println(isc.ToInt(math.Ceil(isc.ToFloat64(num) * ratio)))
-}
-
-// 个体
-type Solo struct {
-	// 评分
-	score float64
-}
-
-// 种群
-type Group struct {
-	// 参数
-	solos []*Solo
-}
-
-func (group Group) Len() int {
-	return len(group.solos)
-}
-
-func (group Group) Less(i, j int) bool {
-	return group.solos[i].score > group.solos[j].score
-}
-
-func (group Group) Swap(i, j int) {
-	group.solos[i], group.solos[j] = group.solos[j], group.solos[i]
 }
