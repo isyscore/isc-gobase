@@ -1,9 +1,9 @@
 # kafka
 这个是基于 github/Shopify/sarama 这个客户端的封装
 
-## 示例
+## 快速使用
 
-### 配置
+### 最小配置
 ```yaml
 base:
   kafka:
@@ -16,7 +16,7 @@ base:
       # 默认false
       return-success: true
 ```
-### 代码
+### 示例代码
 
 ```go
 // 生产者
