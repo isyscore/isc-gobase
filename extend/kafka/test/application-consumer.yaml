@@ -1,0 +1,49 @@
+base:
+  kafka:
+    addrs:
+      - 10.30.30.78:29092
+    # 是否激活，默认：false
+    enable: true
+    # 默认 sarama
+    client-id: c1
+    # 默认 256
+    channel-buffer-size: 111256
+    # 默认 true
+    api-versions-request: false
+    # 默认 V1_0_0_0，版本格式为V{x}_{x}_{x}_{x}；版本是否存在请见 Shopify/sarama 代码中的util.go包的版本
+    version: V1_1_1_0
+    consumer:
+      # 默认1
+      fetch-min: 1111
+      # 默认1048576，即：1024*1024
+      fetch-default: 111048576
+      # 默认2s
+      retry-backoff: 112s
+      # 默认500ms
+      max-wait-time: 11500ms
+      # 默认100ms
+      max-processing-time: 11100ms
+      # 默认false
+      return-errors: true
+      # 默认false
+      offsets-auto-commit-enable: true
+      # 默认1秒
+      offsets-auto-commit-interval: 1111s
+      # 默认-1
+      offsets-initial: -1
+      # 默认3
+      offsets-retry-max: 1113
+      # 消费组配置
+      group:
+        # 默认10s
+        session-timeout: 11110s
+        # 默认3s
+        heartbeat-interval: 1113s
+        # 默认60s
+        rebalance-timeout: 11160s
+        # 默认4
+        rebalance-retry-max: 1114
+        # 默认2秒
+        rebalance-retry-backoff: 1112s
+        # 默认true
+        reset-invalid-offsets: false

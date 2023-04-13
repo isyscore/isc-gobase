@@ -1,0 +1,10 @@
+base:
+  kafka:
+    addrs:
+      - 10.30.30.78:29092
+    # 是否激活，默认：false
+    enable: true
+    # 生产者配置
+    producer:
+      # 默认false
+      return-success: true

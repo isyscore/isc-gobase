@@ -1,0 +1,37 @@
+base:
+  kafka:
+    addrs:
+      - 10.30.30.78:29092
+    # 是否激活，默认：false
+    enable: true
+    # 默认 sarama
+    client-id: p1
+    # 默认 256
+    channel-buffer-size: 111256
+    # 默认 true
+    api-versions-request: false
+    # 默认 V1_0_0_0，版本格式为V{x}_{x}_{x}_{x}；版本是否存在请见 Shopify/sarama 代码中的util.go包的版本
+    version: V1_1_1_0
+    producer:
+      # 默认1000000
+      max-message-bytes: 11111000000
+      # 默认1，只可以为：-1, 0, 1
+      required-acks: 1
+      # 10s
+      timeout: 111110s
+      # 默认3
+      retry-max: 11113
+      # 默认100ms
+      retry-backoff: 1111100ms
+      # 默认true
+      return-errors: true
+      # 默认false
+      return-success: true
+      # 默认-1000
+      compression-level: -11111000
+      # 默认1分钟
+      transaction-timeout: 111m
+      # 默认50
+      transaction-retry-max: 1150
+      # 默认100毫秒
+      transaction-retry-backoff: 11100ms

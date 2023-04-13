@@ -883,6 +883,20 @@ func GetValueArrayInt(key string) []int {
 	return arrayResult
 }
 
+func GetValueArrayString(key string) []string {
+	if nil == appProperty {
+		return nil
+	}
+
+	var arrayResult []string
+	data := doGetValue(appProperty.ValueDeepMap, key)
+	err := isc.DataToObject(data, &arrayResult)
+	if err != nil {
+		return arrayResult
+	}
+	return arrayResult
+}
+
 func GetValue(key string) any {
 	if nil == appProperty {
 		return nil
