@@ -89,10 +89,20 @@ func TestJsonOrYamlTag(t *testing.T) {
 	assert.Equal(t, entity1.NameAge, 32)
 	assert.Equal(t, entity1.HaoDeOk, 12)
 
+	entity1_1 := SmallEntityJsonTag2{}
+	_ = config.GetValueObject("key1.json", &entity1_1)
+	assert.Equal(t, entity1_1.NameAge, 32)
+	assert.Equal(t, entity1_1.HaoDeOk, 12)
+
 	entity2 := SmallEntityYamlTag{}
 	_ = config.GetValueObject("key1.yaml", &entity2)
 	assert.Equal(t, entity2.NameAge, 32)
 	assert.Equal(t, entity2.HaoDeOk, 12)
+
+	entity2_1 := SmallEntityYamlTag2{}
+	_ = config.GetValueObject("key1.yaml", &entity2_1)
+	assert.Equal(t, entity2_1.NameAge, 32)
+	assert.Equal(t, entity2_1.HaoDeOk, 12)
 }
 
 type SmallEntityJsonTag struct {
@@ -100,9 +110,19 @@ type SmallEntityJsonTag struct {
 	NameAge int `json:"test_namehaha"`
 }
 
+type SmallEntityJsonTag2 struct {
+	HaoDeOk int `json:"test_haode,omitempty"`
+	NameAge int `json:"test_namehaha"`
+}
+
 type SmallEntityYamlTag struct {
 	HaoDeOk int `yaml:"test_haode"`
 	NameAge int `yaml:"test_namehaha"`
+}
+
+type SmallEntityYamlTag2 struct {
+	HaoDeOk int `yaml:"test_haode,omitempty"`
+	NameAge int `yaml:"test_namehaha,flow"`
 }
 
 // 测试读取某个文件

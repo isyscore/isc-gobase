@@ -621,14 +621,28 @@ func doInvokeValue(fieldMapValue reflect.Value, field reflect.StructField, field
 	} else if v, exist := getValueFromMapValue(fieldMapValue, BigCamelToUnderLine(field.Name)); exist {
 		// 兼容data_base_user格式读取
 		fValue = v
-	} else if v, exist := getValueFromMapValue(fieldMapValue, field.Tag.Get("yaml")); exist {
-		// 兼容标签：yaml
-		fValue = v
-	} else if v, exist := getValueFromMapValue(fieldMapValue, field.Tag.Get("json")); exist {
-		// 兼容标签：json
-		fValue = v
 	} else {
-		return
+		aliasJson := field.Tag.Get("json")
+		index := strings.Index(aliasJson, ",")
+		if index != -1 {
+			aliasJson = aliasJson[:index]
+		}
+		if v, exist := getValueFromMapValue(fieldMapValue, aliasJson); exist {
+			// 兼容标签：json
+			fValue = v
+		} else {
+			aliasYaml := field.Tag.Get("yaml")
+			index := strings.Index(aliasYaml, ",")
+			if index != -1 {
+				aliasYaml = aliasYaml[:index]
+			}
+			if v, exist := getValueFromMapValue(fieldMapValue, aliasYaml); exist {
+				// 兼容标签：yaml
+				fValue = v
+			} else {
+				return
+			}
+		}
 	}
 
 	if fieldValue.Kind() == reflect.Ptr {
