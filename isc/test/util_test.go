@@ -2,10 +2,9 @@ package test
 
 import (
 	"encoding/json"
+	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/test"
 	"testing"
-
-	"github.com/isyscore/isc-gobase/isc"
 )
 
 // 对以下的api进行测试
@@ -33,6 +32,22 @@ func TestMapToObject1(t *testing.T) {
 	_ = isc.MapToObject(inner1, &targetObj)
 	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1}", isc.ToJsonString(targetObj))
 }
+
+type ValueInnerEntity1Extend struct {
+	ValueInnerEntity1
+	Address string
+}
+
+//func TestMapToObject1_extend(t *testing.T) {
+//	inner1 := map[string]any{}
+//	inner1["name"] = "inner_1"
+//	inner1["age"] = 1
+//	inner1["address"] = 1
+//
+//	var targetObj ValueInnerEntity1Extend
+//	_ = isc.MapToObject(inner1, &targetObj)
+//	test.Equal(t, "{\"Name\":\"inner_1\",\"Age\":1,\"Address\":1}", isc.ToJsonString(targetObj))
+//}
 
 type ValueInnerEntity2 struct {
 	Name   string
