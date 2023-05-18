@@ -287,6 +287,7 @@ type IsBlankEntity1 struct {
 - 无符号整数：比较大小，uint、uint8、uint16、uint32、uint64
 - 浮点数：比较大小，float32、float64
 - 分片：匹配分片的长度
+- 字符串：匹配字符串的长度
 - 时间类型（time.Time）：时间的范围，时间格式支持如下
   - yyyy
   - yyyy-MM
