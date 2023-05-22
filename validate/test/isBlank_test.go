@@ -29,12 +29,12 @@ func TestIsBlank1(t *testing.T) {
 
 	//测试 正常情况
 	value = IsBlankEntity1{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = IsBlankEntity1{Age: 13}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值为空字符", result, false)
 }
 
@@ -46,12 +46,12 @@ func TestIsBlank2(t *testing.T) {
 
 	//测试 正常情况
 	value = IsBlankEntity2{Name: ""}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = IsBlankEntity2{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值为非空字符", result, false)
 }
 
@@ -62,12 +62,12 @@ func TestIsBlank3(t *testing.T) {
 
 	//测试 正常情况
 	value = IsBlankEntity3{Name: ""}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = IsBlankEntity3{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值为非空字符", result, false)
 }
 

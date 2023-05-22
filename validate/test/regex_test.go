@@ -17,17 +17,17 @@ func TestRegex(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueRegexEntity{Name: "zhouOKzhen"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = ValueRegexEntity{Age: 13}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueRegexEntity{Name: "chenzhen"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, "属性 Name 的值 chenzhen 没命中只允许的正则表达式 ^zhou.*zhen$ ", err, result, false)
 }
 

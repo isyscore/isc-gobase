@@ -22,17 +22,17 @@ func TestMkBase1(t *testing.T) {
 
 	//测试 正常情况
 	value = MikilinBaseEntity{Age: 12}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = MikilinBaseEntity{Age: 13, Name: "zhou"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = MikilinBaseEntity{Age: 13, Name: "陈真"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "[\"属性 Name 的值 陈真 不在只可用列表 [zhou 宋江] 中\",\"属性 Name 的值为非空字符\"]", result, false)
 }
 
@@ -43,17 +43,17 @@ func TestMkBase2(t *testing.T) {
 
 	//测试 正常情况
 	value = MikilinBaseEntity2{Age: 12}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = MikilinBaseEntity2{Age: 13, Name: "zhou"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = MikilinBaseEntity2{Age: 13, Name: "陈真"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, "[\"属性 Name 的值 陈真 不在只可用列表 [zhou 宋江] 中\",\"属性 Name 的值为非空字符\"]", err, result, false)
 }
 

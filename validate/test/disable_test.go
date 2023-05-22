@@ -17,11 +17,11 @@ func TestDisable1(t *testing.T) {
 
 	//测试 正常情况
 	value = DisableEntity1{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = DisableEntity1{Name: "chenzhen"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 }

@@ -84,22 +84,22 @@ func TestValueBase2(t *testing.T) {
 
 	//测试 正常情况
 	value = ValueBaseEntityOne{Age: 12}
-	result, err = validate.Check(value, "age")
+	result,_ , err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = ValueBaseEntityOne{Age: 13}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 Age 的值 13 不在只可用列表 [12] 中", result, false)
 
 	//测试 正常情况
 	value = ValueBaseEntityOne{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = ValueBaseEntityOne{Name: "宋江"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值 宋江 不在只可用列表 [zhou] 中", result, false)
 }
 
@@ -111,32 +111,32 @@ func TestValueBase(t *testing.T) {
 
 	//测试 正常情况
 	value = ValueBaseEntity{Age: 12}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = ValueBaseEntity{Age: 13}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueBaseEntity{Age: 14}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 Age 的值 14 不在只可用列表 [12 13] 中", false, result)
 
 	// 测试 正常情况
 	value = ValueBaseEntity{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = ValueBaseEntity{Name: "宋江"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueBaseEntity{Name: "陈真"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值 陈真 不在只可用列表 [zhou 宋江] 中", false, result)
 }
 
@@ -152,42 +152,42 @@ func TestValueBasePtr(t *testing.T) {
 	value = &ValueBasePtrEntity{}
 	age = 12
 	value.Age = &age
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = &ValueBasePtrEntity{}
 	age = 13
 	value.Age = &age
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = &ValueBasePtrEntity{}
 	age = 14
 	value.Age = &age
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 Age 的值 14 不在只可用列表 [12 13] 中", result, false)
 
 	// 测试 正常情况
 	value = &ValueBasePtrEntity{}
 	name = "zhou"
 	value.Name = &name
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
 	value = &ValueBasePtrEntity{}
 	name = "宋江"
 	value.Name = &name
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = &ValueBasePtrEntity{}
 	name = "陈真"
 	value.Name = &name
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 Name 的值 陈真 不在只可用列表 [zhou 宋江] 中", result, false)
 }
 
@@ -201,7 +201,7 @@ func TestValueStruct(t *testing.T) {
 		InnerAge:  2212,
 		InnerName: "inner_宋江",
 	}}
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
@@ -209,7 +209,7 @@ func TestValueStruct(t *testing.T) {
 		InnerAge:  2213,
 		InnerName: "inner_宋江",
 	}}
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
@@ -217,7 +217,7 @@ func TestValueStruct(t *testing.T) {
 		InnerAge:  2214,
 		InnerName: "inner_宋江",
 	}}
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, err, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", false, result)
 }
 
@@ -231,7 +231,7 @@ func TestValueStructPtr(t *testing.T) {
 	//	InnerAge:  2212,
 	//	InnerName: "inner_宋江",
 	//}}
-	//result, err = validate.Check(value, "inner")
+	//result, _, err = validate.Check(value, "inner")
 	//TrueErr(t, result, err)
 	//
 	////测试 正常情况
@@ -239,12 +239,12 @@ func TestValueStructPtr(t *testing.T) {
 	//	InnerAge:  2213,
 	//	InnerName: "inner_宋江",
 	//}}
-	//result, err = validate.Check(value, "inner")
+	//result, _, err = validate.Check(value, "inner")
 	//TrueErr(t, result, err)
 	//
 	//// 测试 核查其他情况
 	//value = ValueStructPtrEntity{Age: 12}
-	//result, err = validate.Check(value, "age")
+	//result, _, err = validate.Check(value, "age")
 	//TrueErr(t, result, err)
 	//
 	//// 测试 核查其他情况
@@ -252,7 +252,7 @@ func TestValueStructPtr(t *testing.T) {
 	//	InnerAge:  2213,
 	//	InnerName: "inner_宋江",
 	//}}
-	//result, err = validate.Check(value, "age", "inner")
+	//result, _, err = validate.Check(value, "age", "inner")
 	//TrueErr(t, result, err)
 	//
 	//// 测试 核查其他情况
@@ -260,7 +260,7 @@ func TestValueStructPtr(t *testing.T) {
 	//	InnerAge:  2213,
 	//	InnerName: "inner_宋江",
 	//}}
-	//result, err = validate.Check(value, "age", "inner")
+	//result, _, err = validate.Check(value, "age", "inner")
 	//Equal(t, false, result, "属性 Age 的值 14 不在只可用列表 [12 13] 中", err)
 
 	//测试 异常情况
@@ -268,7 +268,7 @@ func TestValueStructPtr(t *testing.T) {
 		InnerAge:  2214,
 		InnerName: "inner_宋江",
 	}}
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, false, result, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", err)
 }
 
@@ -281,7 +281,7 @@ func TestValueMapValue(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueMapValueEntity{Age: 12, Name: "宋江"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
@@ -289,7 +289,7 @@ func TestValueMapValue(t *testing.T) {
 	innerMap = make(map[string]ValueInnerEntity)
 	innerMap["a"] = ValueInnerEntity{InnerAge: 2212, InnerName: "inner_zhou"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
@@ -297,7 +297,7 @@ func TestValueMapValue(t *testing.T) {
 	innerMap = make(map[string]ValueInnerEntity)
 	innerMap["a"] = ValueInnerEntity{InnerAge: 2213, InnerName: "inner_宋江"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
@@ -305,7 +305,7 @@ func TestValueMapValue(t *testing.T) {
 	innerMap = make(map[string]ValueInnerEntity)
 	innerMap["a"] = ValueInnerEntity{InnerAge: 2213}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	Equal(t, false, result, "属性 InnerName 的值  不在只可用列表 [inner_zhou inner_宋江] 中", err)
 
 	// 测试 异常情况
@@ -313,7 +313,7 @@ func TestValueMapValue(t *testing.T) {
 	innerMap = make(map[string]ValueInnerEntity)
 	innerMap["a"] = ValueInnerEntity{InnerAge: 2213, InnerName: "inner_陈"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	Equal(t, false, result, "属性 InnerName 的值 inner_陈 不在只可用列表 [inner_zhou inner_宋江] 中", err)
 }
 
@@ -329,7 +329,7 @@ func TestValueMapKey(t *testing.T) {
 	innerMap = make(map[ValueInnerEntity]string)
 	innerMap[ValueInnerEntity{InnerAge: 2212, InnerName: "inner_zhou"}] = "a"
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
@@ -337,7 +337,7 @@ func TestValueMapKey(t *testing.T) {
 	innerMap = make(map[ValueInnerEntity]string)
 	innerMap[ValueInnerEntity{InnerAge: 2213, InnerName: "inner_zhou"}] = "a"
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
@@ -345,7 +345,7 @@ func TestValueMapKey(t *testing.T) {
 	innerMap = make(map[ValueInnerEntity]string)
 	innerMap[ValueInnerEntity{InnerAge: 2214, InnerName: "inner_zhou"}] = "a"
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	Equal(t, false, result, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", err)
 }
 
@@ -361,7 +361,7 @@ func TestValueMapValuePtr(t *testing.T) {
 	innerMap = make(map[string]*ValueInnerEntity)
 	innerMap["a"] = &ValueInnerEntity{InnerAge: 2212, InnerName: "inner_zhou"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 正常情况
@@ -369,7 +369,7 @@ func TestValueMapValuePtr(t *testing.T) {
 	innerMap = make(map[string]*ValueInnerEntity)
 	innerMap["a"] = &ValueInnerEntity{InnerAge: 2213, InnerName: "inner_宋江"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
@@ -377,7 +377,7 @@ func TestValueMapValuePtr(t *testing.T) {
 	innerMap = make(map[string]*ValueInnerEntity)
 	innerMap["a"] = &ValueInnerEntity{InnerAge: 2213}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	Equal(t, false, result, "属性 InnerName 的值  不在只可用列表 [inner_zhou inner_宋江] 中", err)
 
 	// 测试 异常情况
@@ -385,7 +385,7 @@ func TestValueMapValuePtr(t *testing.T) {
 	innerMap = make(map[string]*ValueInnerEntity)
 	innerMap["a"] = &ValueInnerEntity{InnerAge: 2213, InnerName: "inner_陈"}
 	value.InnerMap = innerMap
-	result, err = validate.Check(value, "InnerMap")
+	result, _, err = validate.Check(value, "InnerMap")
 	Equal(t, false, result, "属性 InnerName 的值 inner_陈 不在只可用列表 [inner_zhou inner_宋江] 中", err)
 }
 
@@ -403,7 +403,7 @@ func TestValueArray(t *testing.T) {
 	innerArray[2] = ValueInnerEntity{InnerAge: 2212, InnerName: "inner_宋江"}
 	value.Inner = innerArray
 
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	// 异常
@@ -412,7 +412,7 @@ func TestValueArray(t *testing.T) {
 	innerArray[1] = ValueInnerEntity{InnerAge: 2213, InnerName: "inner_zhou"}
 	innerArray[2] = ValueInnerEntity{InnerAge: 2214, InnerName: "inner_宋江"}
 	value.Inner = innerArray
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, err, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", false, result)
 }
 
@@ -430,7 +430,7 @@ func TestValueArrayPtr(t *testing.T) {
 	innerArray[2] = &ValueInnerEntity{InnerAge: 2212, InnerName: "inner_宋江"}
 	value.Inner = innerArray
 
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	// 异常
@@ -439,7 +439,7 @@ func TestValueArrayPtr(t *testing.T) {
 	innerArray[1] = &ValueInnerEntity{InnerAge: 2213, InnerName: "inner_zhou"}
 	innerArray[2] = &ValueInnerEntity{InnerAge: 2214, InnerName: "inner_宋江"}
 	value.Inner = innerArray
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, err, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", false, result)
 }
 
@@ -457,7 +457,7 @@ func TestValueSlice(t *testing.T) {
 	innerSlice = append(innerSlice, ValueInnerEntity{InnerAge: 2212, InnerName: "inner_宋江"})
 	value.Inner = innerSlice
 
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	// 异常
@@ -467,7 +467,7 @@ func TestValueSlice(t *testing.T) {
 	innerSlice = append(innerSlice, ValueInnerEntity{InnerAge: 2214, InnerName: "inner_宋江"})
 	value.Inner = innerSlice
 
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, err, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", false, result)
 }
 
@@ -485,7 +485,7 @@ func TestValueSlicePtr(t *testing.T) {
 	innerSlice = append(innerSlice, &ValueInnerEntity{InnerAge: 2212, InnerName: "inner_宋江"})
 	value.Inner = innerSlice
 
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	TrueErr(t, result, err)
 
 	// 异常
@@ -494,7 +494,7 @@ func TestValueSlicePtr(t *testing.T) {
 	innerSlice = append(innerSlice, &ValueInnerEntity{InnerAge: 2213, InnerName: "inner_zhou"})
 	innerSlice = append(innerSlice, &ValueInnerEntity{InnerAge: 2214, InnerName: "inner_宋江"})
 	value.Inner = innerSlice
-	result, err = validate.Check(value, "inner")
+	result, _, err = validate.Check(value, "inner")
 	Equal(t, err, "属性 InnerAge 的值 2214 不在只可用列表 [2212 2213] 中", false, result)
 }
 

@@ -22,6 +22,8 @@ const (
 
 /* 匹配后处理 */
 const (
+	// ErrCode 自定义错误异常
+	ErrCode = "errCode"
 	// ErrMsg 自定义错误异常
 	ErrMsg = "errMsg"
 	// Accept 匹配后是否接受

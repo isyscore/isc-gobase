@@ -10,8 +10,13 @@ import (
 )
 
 type BlackWhiteMatch struct {
+	ErrCode string
 	BlackMsg string
 	WhiteMsg string
+}
+
+func (blackWhiteMatch *BlackWhiteMatch) SetErrCode(errCode string) {
+	blackWhiteMatch.ErrCode = errCode
 }
 
 func (blackWhiteMatch *BlackWhiteMatch) SetBlackMsg(format string, a ...any) {
@@ -30,7 +35,11 @@ func (blackWhiteMatch *BlackWhiteMatch) GetBlackMsg() string {
 	return blackWhiteMatch.BlackMsg
 }
 
-func addMatcher(objectTypeFullName string, objectFieldName string, matcher Matcher, errMsg string, accept bool) {
+func (blackWhiteMatch *BlackWhiteMatch) GetErrCode() string {
+	return blackWhiteMatch.ErrCode
+}
+
+func addMatcher(objectTypeFullName string, objectFieldName string, matcher Matcher, errCode, errMsg string, accept bool) {
 	fieldMatcherMap, c1 := MatchMap[objectTypeFullName]
 
 	if !c1 {
@@ -54,9 +63,9 @@ func addMatcher(objectTypeFullName string, objectFieldName string, matcher Match
 				return
 			}
 
-			fieldMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrMsgProgram: program, Matchers: matchers, Accept: accept}
+			fieldMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrCode: errCode, Matchers: matchers, Accept: accept, ErrMsgProgram: program}
 		} else {
-			fieldMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, Matchers: matchers, Accept: accept}
+			fieldMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrCode: errCode, Matchers: matchers, Accept: accept}
 		}
 
 		MatchMap[objectTypeFullName] = fieldMap
@@ -81,9 +90,9 @@ func addMatcher(objectTypeFullName string, objectFieldName string, matcher Match
 					return
 				}
 
-				fieldMatcherMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrMsgProgram: program, Matchers: matchers, Accept: accept}
+				fieldMatcherMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrCode: errCode, Matchers: matchers, Accept: accept, ErrMsgProgram: program}
 			} else {
-				fieldMatcherMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, Matchers: matchers, Accept: accept}
+				fieldMatcherMap[objectFieldName] = &FieldMatcher{FieldName: objectFieldName, ErrCode: errCode, Matchers: matchers, Accept: accept}
 			}
 		} else {
 			if matcher != nil {

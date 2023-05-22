@@ -168,12 +168,12 @@ func TestRangeInt1(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity1{Age: 1}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity1{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [3] 没有命中只允许的范围 [[1, 2]]", result, false)
 }
 
@@ -185,17 +185,17 @@ func TestRangeInt2(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity2{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity2{Age: 5}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeIntEntity2{Age: 2}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [[3，]]", result, false)
 }
 
@@ -207,17 +207,17 @@ func TestRangeInt3(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity3{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity3{Age: 5}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeIntEntity3{Age: 2}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [[3,)]", result, false)
 }
 
@@ -226,7 +226,7 @@ func TestRangeInt4(t *testing.T) {
 
 	//测试 正常情况
 	//value = RangeIntEntity4{Age: 3}
-	//result, err = validate.Check(value, "age")
+	//result, _, err = validate.Check(value, "age")
 	//assert.TrueErr(t, result, err)
 }
 
@@ -238,22 +238,22 @@ func TestRangeInt5(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity5{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity5{Age: 7}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeIntEntity5{Age: 8}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(2, 7]]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity5{Age: 2}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [(2, 7]]", result, false)
 }
 
@@ -265,22 +265,22 @@ func TestRangeInt6(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity6{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity6{Age: 7}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [7] 没有命中只允许的范围 [(2, 7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity6{Age: 8}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(2, 7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity6{Age: 2}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [2] 没有命中只允许的范围 [(2, 7)]", result, false)
 }
 
@@ -292,22 +292,22 @@ func TestRangeInt7(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntity7{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntity7{Age: -1}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeIntEntity7{Age: 7}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [7] 没有命中只允许的范围 [(,7)]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntity7{Age: 8}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [8] 没有命中只允许的范围 [(,7)]", result, false)
 }
 
@@ -319,22 +319,22 @@ func TestRangeIntChinaComma(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeIntEntityChina{Age: 3}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeIntEntityChina{Age: 5}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeIntEntityChina{Age: 0}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [0] 没有命中只允许的范围 [[1，10]]", result, false)
 
 	//测试 异常情况
 	value = RangeIntEntityChina{Age: 12}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [12] 没有命中只允许的范围 [[1，10]]", result, false)
 }
 
@@ -346,27 +346,27 @@ func TestRangeFloat1(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeFloatEntity{Money: 10.37}
-	result, err = validate.Check(value, "money")
+	result, _, err = validate.Check(value, "money")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeFloatEntity{Money: 15.0}
-	result, err = validate.Check(value, "money")
+	result, _, err = validate.Check(value, "money")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeFloatEntity{Money: 20.31}
-	result, err = validate.Check(value, "money")
+	result, _, err = validate.Check(value, "money")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeFloatEntity{Money: 10.01}
-	result, err = validate.Check(value, "money")
+	result, _, err = validate.Check(value, "money")
 	Equal(t, err, "属性 [Money] 值 [10.01] 没有命中只允许的范围 [[10.37， 20.31]]", result, false)
 
 	//测试 异常情况
 	value = RangeFloatEntity{Money: 20.32}
-	result, err = validate.Check(value, "money")
+	result, _, err = validate.Check(value, "money")
 	Equal(t, err, "属性 [Money] 值 [20.32] 没有命中只允许的范围 [[10.37， 20.31]]", result, false)
 }
 
@@ -378,37 +378,37 @@ func TestRangeString(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeStringEntity{Name: "zh"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeStringEntity{Name: "zhou"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeStringEntity{Name: "zhou zhen yo"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeStringEntity{Name: "zhou zhen yong"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 [Name] 值 [zhou zhen yong] 长度没有命中只允许的范围 [[2, 12]]", result, false)
 
 	//测试 异常情况
 	value = RangeStringEntity{Name: "z"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 [Name] 值 [z] 长度没有命中只允许的范围 [[2, 12]]", result, false)
 
 	//测试中文 异常情况
 	value = RangeStringEntity{Name: "中"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	Equal(t, err, "属性 [Name] 值 [中] 长度没有命中只允许的范围 [[2, 12]]", result, false)
 
 	//测试中文 正常情况
 	value = RangeStringEntity{Name: "中国"}
-	result, err = validate.Check(value, "name")
+	result, _, err = validate.Check(value, "name")
 	TrueErr(t, result, err)
 }
 
@@ -420,27 +420,27 @@ func TestRangeSlice(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeSliceEntity{Age: []int{1, 2}}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeSliceEntity{Age: []int{1, 2, 3, 4, 5}}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeSliceEntity{Age: []int{1, 2, 3, 4, 5, 6}}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeSliceEntity{Age: []int{1, 2, 3, 4, 5, 6, 7}}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [[1 2 3 4 5 6 7]] 数组长度没有命中只允许的范围 [[2, 6]]", result, false)
 
 	//测试 异常情况
 	value = RangeSliceEntity{Age: []int{1}}
-	result, err = validate.Check(value, "age")
+	result, _, err = validate.Check(value, "age")
 	Equal(t, err, "属性 [Age] 值 [[1]] 数组长度没有命中只允许的范围 [[2, 6]]", result, false)
 }
 
@@ -452,17 +452,17 @@ func TestRangeTime1(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity1{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity1{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 
 	//测试 异常情况
 	value = RangeTimeEntity1{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-09-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, 2019-08-23 12:00:23.321]] 中", result, false)
 }
 
@@ -474,17 +474,17 @@ func TestRangeTime2(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity2{CreateTime: time.Date(2019, 7, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeTimeEntity2{CreateTime: time.Date(2019, 9, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity2{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-06-14 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-13 12:00:23.321, ]] 中", result, false)
 }
 
@@ -496,12 +496,12 @@ func TestRangeTime3(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity3{CreateTime: time.Date(2019, 6, 14, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity3{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2019-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [(, 2019-07-23 12:00:23.321]] 中", result, false)
 }
 
@@ -513,17 +513,17 @@ func TestRangeTime4(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity4{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity4{CreateTime: time.Date(2018, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 
 	//测试 异常情况
 	value = RangeTimeEntity4{CreateTime: time.Date(9018, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [9018-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [[2019-07-23 12:00:23.321, now)] 中", result, false)
 }
 
@@ -535,12 +535,12 @@ func TestRangeTime5(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity5{CreateTime: time.Date(2019, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity5{CreateTime: time.Date(2218, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [2218-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [past] 中", result, false)
 }
 
@@ -552,12 +552,12 @@ func TestRangeTime6(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeEntity6{CreateTime: time.Date(2119, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeEntity6{CreateTime: time.Date(1918, 7, 24, 12, 0, 23, 321, LocationCST)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, err, "属性 [CreateTime] 值 [1918-07-24 12:00:23.000000321 +0800 CST] 时间没有命中只允许的时间段 [future] 中", result, false)
 }
 
@@ -569,12 +569,12 @@ func TestRangeCalTime1(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeCalEntity1{CreateTime: time.Now().AddDate(0, -3, 0)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeCalEntity1{CreateTime: time.Now().AddDate(-2, 0, 0)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -586,17 +586,17 @@ func TestRangeCalTime2(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2{CreateTime: time.Now().AddDate(0, 0, -2)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2{CreateTime: time.Now().AddDate(0, -1, 1)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeCalEntity2{CreateTime: time.Now().AddDate(0, -1, -1)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -608,17 +608,17 @@ func TestRangeCalTime2And1(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2And1{CreateTime: time.Now().AddDate(0, 0, -2)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2And1{CreateTime: time.Now().AddDate(0, -1, -1)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeCalEntity2And1{CreateTime: time.Now().AddDate(0, -1, -4)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -630,17 +630,17 @@ func TestRangeCalTime2And2(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2And2{CreateTime: time.Now().AddDate(-1, 0, -2)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeTimeCalEntity2And2{CreateTime: time.Now().AddDate(-1, 0, -1)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeCalEntity2And2{CreateTime: time.Now().AddDate(-1, -1, 0)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -652,17 +652,17 @@ func TestRangeCalTime3(t *testing.T) {
 
 	//测试 正常情况
 	value = RangeTimeCalEntity3{CreateTime: time.Now().AddDate(0, 0, -2)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	value = RangeTimeCalEntity3{CreateTime: time.Now().AddDate(0, 0, 1)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	value = RangeTimeCalEntity3{CreateTime: time.Now().AddDate(0, 0, -6)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -675,19 +675,19 @@ func TestRangeCalTime4(t *testing.T) {
 	//测试 正常情况
 	d, _ := time.ParseDuration("-1h")
 	value = RangeTimeCalEntity4{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	d, _ = time.ParseDuration("4h")
 	value = RangeTimeCalEntity4{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	d, _ = time.ParseDuration("-6h")
 	value = RangeTimeCalEntity4{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -701,19 +701,19 @@ func TestRangeCalTime5(t *testing.T) {
 	//测试 正常情况
 	d, _ = time.ParseDuration("-10m")
 	value = RangeTimeCalEntity5{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	d, _ = time.ParseDuration("4m")
 	value = RangeTimeCalEntity5{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	d, _ = time.ParseDuration("-20m")
 	value = RangeTimeCalEntity5{CreateTime: time.Now().Add(d)}
-	result, _ = validate.Check(value, "createTime")
+	result, _, _ = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -727,19 +727,19 @@ func TestRangeCalTime6(t *testing.T) {
 	//测试 正常情况
 	d, _ = time.ParseDuration("-10s")
 	value = RangeTimeCalEntity6{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	d, _ = time.ParseDuration("4s")
 	value = RangeTimeCalEntity6{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	d, _ = time.ParseDuration("-200s")
 	value = RangeTimeCalEntity6{CreateTime: time.Now().Add(d)}
-	result, _ = validate.Check(value, "createTime")
+	result, _, _ = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 
@@ -753,19 +753,19 @@ func TestRangeCalTime7(t *testing.T) {
 	//测试 正常情况
 	d, _ = time.ParseDuration("10h")
 	value = RangeTimeCalEntity7{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 正常情况
 	d, _ = time.ParseDuration("+3h")
 	value = RangeTimeCalEntity7{CreateTime: time.Now().Add(d)}
-	result, err = validate.Check(value, "createTime")
+	result, _, err = validate.Check(value, "createTime")
 	TrueErr(t, result, err)
 
 	//测试 异常情况
 	d, _ = time.ParseDuration("-5h")
 	value = RangeTimeCalEntity7{CreateTime: time.Now().Add(d)}
-	result, _ = validate.Check(value, "createTime")
+	result, _, _ = validate.Check(value, "createTime")
 	Equal(t, result, false)
 }
 

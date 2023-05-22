@@ -36,7 +36,7 @@ func (valueMatch *ValueMatch) IsEmpty() bool {
 	return len(valueMatch.Values) == 0
 }
 
-func BuildValuesMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
+func BuildValuesMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errCode, errMsg string) {
 	if constants.MATCH != tagName {
 		return
 	}
@@ -73,5 +73,5 @@ func BuildValuesMatcher(objectTypeFullName string, fieldKind reflect.Kind, objec
 			return
 		}
 	}
-	addMatcher(objectTypeFullName, objectFieldName, &ValueMatch{Values: availableValues}, errMsg, true)
+	addMatcher(objectTypeFullName, objectFieldName, &ValueMatch{Values: availableValues}, errCode, errMsg, true)
 }

@@ -33,12 +33,12 @@ func TestModelIdCard(t *testing.T) {
 
 	// 测试 异常情况
 	value = ValueModelIdCardEntity{Data: "4109281002226311"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 4109281002226311 不符合身份证要求", result, false)
 
 	// 测试 异常情况
 	value = ValueModelIdCardEntity{Data: "28712381"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 28712381 不符合身份证要求", result, false)
 }
 
@@ -50,12 +50,12 @@ func TestModelPhone(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueModelPhone{Data: "15700092345"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueModelPhone{Data: "28712381"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 28712381 没有命中只允许类型 [phone]", result, false)
 }
 
@@ -67,12 +67,12 @@ func TestModelPhone2(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueModelPhone{Data: "14500092345"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueModelPhone{Data: "28712381"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 28712381 没有命中只允许类型 [phone]", result, false)
 }
 
@@ -84,12 +84,12 @@ func TestModelFixedPhone(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueModelFixedPhoneEntity{Data: "0393-3879765"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueModelFixedPhoneEntity{Data: "1387772"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 1387772 没有命中只允许类型 [fixed_phone]", result, false)
 }
 
@@ -101,12 +101,12 @@ func TestModelMail(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueModelEmailEntity{Data: "123lan@163.com"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueModelEmailEntity{Data: "123@"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 123@ 没有命中只允许类型 [mail]", result, false)
 }
 
@@ -118,16 +118,16 @@ func TestModelIpAddress(t *testing.T) {
 
 	// 测试 正常情况
 	value = ValueModelIpAddressEntity{Data: "192.123.231.222"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	TrueErr(t, result, err)
 
 	// 测试 异常情况
 	value = ValueModelIpAddressEntity{Data: "123.231.222"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 123.231.222 没有命中只允许类型 [ip]", result, false)
 
 	// 测试 异常情况
 	value = ValueModelIpAddressEntity{Data: "192.123.231.adf"}
-	result, err = validate.Check(value)
+	result, _, err = validate.Check(value)
 	Equal(t, err, "属性 Data 的值 192.123.231.adf 没有命中只允许类型 [ip]", result, false)
 }

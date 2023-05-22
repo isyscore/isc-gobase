@@ -28,7 +28,7 @@ func (regexMatch *RegexMatch) IsEmpty() bool {
 	return regexMatch.Reg == nil
 }
 
-func BuildRegexMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
+func BuildRegexMatcher(objectTypeFullName string, fieldKind reflect.Kind, objectFieldName string, tagName string, subCondition string, errCode, errMsg string) {
 	if constants.MATCH != tagName {
 		return
 	}
@@ -47,5 +47,5 @@ func BuildRegexMatcher(objectTypeFullName string, fieldKind reflect.Kind, object
 	if err != nil {
 		return
 	}
-	addMatcher(objectTypeFullName, objectFieldName, &RegexMatch{Reg: reg}, errMsg, true)
+	addMatcher(objectTypeFullName, objectFieldName, &RegexMatch{Reg: reg}, errCode, errMsg, true)
 }

@@ -134,15 +134,17 @@ func main() {
 2. 提供标签match，标签内容中提供匹配器：value，该匹配器表示匹配的具体的一些值
 
 ## api说明
-只提供两个Api，`Check` 和 `CheckWithParameter`
+只提供四个Api，`Check` 和 `CheckWithParameter`
 ```go
 // 入参：
 //  @any            待核查对象
 //  @fieldNames     待核查对象的核查属性；不指定则核查所有属性名
 // 返回值：
 //  bool    是否匹配合法：true-合法，false-不合法
-//  string  不合法对应的说明
-func Check(object any, fieldNames ...string) (bool, string) {}
+//  string  不合法的errCode
+//  string  不合法对errMsg
+func Check(object any, fieldNames ...string) (bool, string, string) {}
+
 
 // 入参：
 //  @parameterMap   额外的参数，用于在自定义函数中进行使用，可见下面的customize的用法
@@ -150,7 +152,8 @@ func Check(object any, fieldNames ...string) (bool, string) {}
 //  @fieldNames     待核查对象的核查属性；不指定则核查所有属性名
 // 返回值：
 //  bool    是否匹配合法：true-合法，false-不合法
-//  string  不合法对应的说明
+//  string  不合法的errCode
+//  string  不合法对errMsg
 func CheckWithParameter(parameterMap map[string]interface{}, object interface{}, fieldNames ...string) (bool, string) {}
 ```
 
@@ -176,6 +179,7 @@ func CheckWithParameter(parameterMap map[string]interface{}, object interface{},
 
 #### 处理模块
 
+- errCode: 自定义错误码
 - errMsg: 自定义的异常
 - accept: 匹配后接受还是拒绝
 - disable: 是否启用匹配，默认启用
@@ -519,6 +523,12 @@ func init() {
 返回值：<br/>
 - 一个值：则为bool类型（表示是否匹配上）
 - 两个值：第一个为bool类型（表示是否匹配上），第二个为string类型（匹配或者没有匹配上的自定义错误）
+- 三个值：第一个为bool类型（表示是否匹配上），第二个为string类型（错误编码code），第三个为string类型（匹配或者没有匹配上的自定义错误）
+
+
+提示：<br/>
+返回值为三个时候，第二个为errCode，改优先级要比标签errCode要高，同时存在，则以自定义errCode为准
+
 
 更多详情请见测试类`customize_test.go` <br/><br/>
 示例：
@@ -560,10 +570,19 @@ func JudgeString3(customize CustomizeEntity3, name string) (bool, string) {
     }
 }
 
+func judgeErrCode1(name string) (bool, string, string) {
+  if name != "zhou" && name != "song" {
+    return false, "123", "只支持song和zhou"
+  }
+  return true, "", ""
+}
+
+
 // 由于go反射功能没那么强，因此需要用户自己先将函数和name进行注册
 func init() {
     validate.RegisterCustomize("judge2Name", JudgeString2)
     validate.RegisterCustomize("judge3Name", JudgeString3)
+    validate.RegisterCustomize("judgeErrCode1", judgeErrCode1)
 }
 ```
 
@@ -593,7 +612,72 @@ type AcceptEntity3 struct {
 }
 ```
 
-### 2. 自定义异常：errMsg
+### 2. 自定义异常错误码：errCode
+匹配后返回自定义的错误码
+
+```go
+type ErrCodeEntity1 struct {
+    Name string `match:"value={zhou, song}" errCode:"12"`
+}
+
+func TestErrCode1(t *testing.T) {
+    entity1 := ErrCodeEntity1{Name: "chen"}
+    result, errCode, _ := validate.Check(entity1, "name")
+    False(t, result)
+    Equal(t, errCode, "12")
+
+    entity1 = ErrCodeEntity1{Name: "zhou"}
+    result, errCode, _ = validate.Check(entity1, "name")
+    True(t, result)
+    Equal(t, errCode, "")
+}
+```
+在自定义函数中的错误码
+```go
+
+type ErrCodeEntity2 struct {
+    Name string `match:"customize=judgeErrCode1" errCode:"12"`
+    Name2 string `match:"customize=judgeErrCode2" errCode:"12"`
+}
+
+func TestErrCode2(t *testing.T) {
+    entity1 := ErrCodeEntity2{Name: "chen"}
+    result, errCode, _ := validate.Check(entity1, "name")
+    False(t, result)
+    Equal(t, errCode, "123")
+    
+    entity2 := ErrCodeEntity2{Name2: "chen"}
+    result, errCode, _ = validate.Check(entity2, "name2")
+    False(t, result)
+    Equal(t, errCode, "12")
+    
+    entity1 = ErrCodeEntity2{Name: "zhou"}
+    result, errCode, _ = validate.Check(entity1, "name")
+    True(t, result)
+    Equal(t, errCode, "")
+}
+
+func judgeErrCode1(name string) (bool, string, string) {
+    if name != "zhou" && name != "song" {
+        return false, "123", "只支持song和zhou"
+    }
+    return true, "", ""
+}
+
+func judgeErrCode2(name string) (bool, string, string) {
+    if name != "zhou" && name != "song" {
+    	return false, "", "只支持song和zhou"
+    }
+    return true, "", ""
+}
+
+func init()  {
+    validate.RegisterCustomize("judgeErrCode1", judgeErrCode1)
+    validate.RegisterCustomize("judgeErrCode2", judgeErrCode2)
+}
+```
+
+### 3. 自定义异常：errMsg
 匹配后返回自定义的异常，提供了两个占位符#current表示修饰的当前属性的值，#root当前属性所在的结构的值，#root.Age表示当前结构中的属性Age对应的值
 
 ```go
@@ -608,7 +692,7 @@ type ErrMsgEntity2 struct {
 }
 ```
 
-### 3. 启用：disable
+### 4. 启用：disable
 表示是否启用整个核查
 ```go
 type DisableEntity1 struct {

@@ -97,7 +97,7 @@ func (customizeMatch *CustomizeMatch) Match(parameterMap map[string]interface{},
 			customizeMatch.SetWhiteMsg("属性 %v 的值 %v 没命中只允许条件回调 [%v] ", field.Name, fieldValue, customizeMatch.expression)
 		}
 		return retValues[0].Bool()
-	} else {
+	} else if len(retValues) == 2 {
 		kind0 := retValues[0].Kind()
 		kind1 := retValues[1].Kind()
 
@@ -118,6 +118,17 @@ func (customizeMatch *CustomizeMatch) Match(parameterMap map[string]interface{},
 		} else {
 			return retValues[0].Bool()
 		}
+	} else if len(retValues) == 3 {
+		if retValues[0].Bool() {
+			customizeMatch.SetBlackMsg(retValues[1].String())
+		} else {
+			customizeMatch.SetWhiteMsg(retValues[1].String())
+		}
+		customizeMatch.SetErrCode(retValues[1].String())
+		return retValues[0].Bool()
+	} else {
+		logger.Error("函数返回值不合规")
+		return true
 	}
 }
 
@@ -125,7 +136,7 @@ func (customizeMatch *CustomizeMatch) IsEmpty() bool {
 	return customizeMatch.expression == ""
 }
 
-func BuildCustomizeMatcher(objectTypeFullName string, _ reflect.Kind, objectFieldName string, tagName string, subCondition string, errMsg string) {
+func BuildCustomizeMatcher(objectTypeFullName string, _ reflect.Kind, objectFieldName string, tagName string, subCondition string, errCode, errMsg string) {
 	if constants.MATCH != tagName {
 		return
 	}
@@ -146,7 +157,7 @@ func BuildCustomizeMatcher(objectTypeFullName string, _ reflect.Kind, objectFiel
 		logger.Warn("the name of fun not find, funName is [%v]", expression)
 		return
 	}
-	addMatcher(objectTypeFullName, objectFieldName, &CustomizeMatch{funValue: reflect.ValueOf(fun), expression: expression}, errMsg, true)
+	addMatcher(objectTypeFullName, objectFieldName, &CustomizeMatch{funValue: reflect.ValueOf(fun), expression: expression}, errCode, errMsg, true)
 }
 
 func RegisterCustomize(funName string, fun interface{}) {
@@ -161,8 +172,8 @@ func RegisterCustomize(funName string, fun interface{}) {
 		return
 	}
 
-	if funValue.Type().NumOut() > 2 {
-		logger.Warn("the num of fun[%v] return need to be less than or equal to 2", funName)
+	if funValue.Type().NumOut() > 3 {
+		logger.Warn("the num of fun[%v] return need to be less than or equal to 3", funName)
 		return
 	}
 
@@ -185,6 +196,15 @@ func RegisterCustomize(funName string, fun interface{}) {
 
 		if kind1 != reflect.Bool && kind1 != reflect.String {
 			logger.Warn("return type of fun[%v] return must be bool or string", funName)
+			return
+		}
+	} else if funValue.Type().NumOut() == 3 {
+		kind0 := funValue.Type().Out(0).Kind()
+		kind1 := funValue.Type().Out(1).Kind()
+		kind2 := funValue.Type().Out(2).Kind()
+
+		if kind0 != reflect.Bool || kind1 != reflect.String || kind2 != reflect.String {
+			logger.Warn("return type of fun[%v] return must be (bool, string, string)", funName)
 			return
 		}
 	}
