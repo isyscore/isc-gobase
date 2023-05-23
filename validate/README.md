@@ -289,8 +289,8 @@ type IsBlankEntity1 struct {
 - 整数：比较大小，int、int8、int16、int32、int64
 - 无符号整数：比较大小，uint、uint8、uint16、uint32、uint64
 - 浮点数：比较大小，float32、float64
-- 分片：匹配分片的长度
-- 时间类型（time.Time）：时间的范围，时间格式支持如下
+- 分片：比较分片的长度
+- 时间类型（time.Time）：比较时间的范围，目前支持的时间格式支持如下
   - yyyy
   - yyyy-MM
   - yyyy-MM-dd
@@ -526,7 +526,7 @@ func init() {
 
 
 提示：<br/>
-返回值为三个时候，第二个为errCode，改优先级要比标签errCode要高，同时存在，则以自定义errCode为准
+- 返回值为三个时候，第二个为errCode，优先级要比标签errCode要高，同时存在，则以自定义errCode为准
 
 
 更多详情请见测试类`customize_test.go` <br/><br/>
@@ -692,7 +692,7 @@ type ErrMsgEntity2 struct {
 ```
 
 ### 4. 启用：disable
-表示是否启用整个核查
+表示是否启用属性本身的核查
 ```go
 type DisableEntity1 struct {
     Name string `match:"value=zhou" disable:"true"`
