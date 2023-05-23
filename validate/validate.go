@@ -36,10 +36,27 @@ var checkerEntities []CollectorEntity
 /* 核查的标签 */
 var matchTagArray = []string{constants.Value, constants.IsBlank, constants.Range, constants.Model, constants.Condition, constants.Regex, constants.Customize}
 
+// Check
+// 入参
+// 	- object: 检查对象
+// 	- fieldNames...: 待检查对象的属性
+// 返回值
+// 	- bool: 核查结果
+// 	- string: 错误code
+// 	- string: 错误异常
 func Check(object any, fieldNames ...string) (bool, string, string) {
 	return CheckWithParameter(map[string]interface{}{}, object, fieldNames...)
 }
 
+// Check
+// 入参
+// 	- parameterMap: 外部参数map，这个一般用于'customize'自定义函数里面的参数用
+// 	- object: 检查对象
+// 	- fieldNames...: 待检查对象的属性
+// 返回值
+// 	- bool: 核查结果
+// 	- string: 错误code
+// 	- string: 错误异常
 func CheckWithParameter(parameterMap map[string]interface{}, object interface{}, fieldNames ...string) (bool, string, string) {
 	if object == nil {
 		return true, "", ""
