@@ -41,8 +41,8 @@ func InsertData(c *gin.Context) {
     }
 
     // api示例：核查入参
-    if result, errCode, errMsg := validate.Check(insertReq); !result {
-        rsp.FailedOfStandard(c, isc.ToInt(errCode), errMsg)
+    if result, _, errMsg := validate.Check(insertReq); !result {
+        rsp.FailedOfStandard(c, 53, errMsg)
         logger.Error(errMsg)
         return
     }
