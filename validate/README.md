@@ -11,7 +11,7 @@ validate包核查模块，用于对入参的校验
 package main
 
 import (
-  "bytes"
+    "bytes"
     "encoding/json"
     "github.com/gin-gonic/gin"
     "github.com/isyscore/isc-gobase/http"
@@ -36,18 +36,18 @@ func InsertData(c *gin.Context) {
     // 读取body数据，可以采用isc提供的工具
     err := isc.DataToObject(c.Request.Body, &insertReq)
     if err != nil {
-        // ... 省略异常日志
+        // ... 省略
         return
     }
 
     // api示例：核查入参
-    if result, msg := validate.Check(insertReq); !result {
-        // 参数异常
-        rsp.FailedOfStandard(c, 53, msg)
-        logger.Error(msg)
+    if result, errCode, errMsg := validate.Check(insertReq); !result {
+        rsp.FailedOfStandard(c, isc.ToInt(errCode), errMsg)
+        logger.Error(errMsg)
         return
     }
 
+    // ... 省略
     rsp.SuccessOfStandard(c, "ok")
 }
 
@@ -81,8 +81,7 @@ base:
 
 请求
 ```shell
-curl -X POST \
-  http://localhost:8080/api/app/sample/test/insert \
+curl -X POST http://localhost:8080/api/app/sample/test/insert \
   -H 'Content-Type: application/json' \
   -d '{
 	"name": "zhou",
