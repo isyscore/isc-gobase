@@ -5,6 +5,7 @@
 1. 新增：增加kafka的配置化
 2. 新增：增加validate包的errCode功能（validate功能不兼容低版本）
 3. 新增：增加validate包中自定义功能属性修改能力
+4. 新增：增加ToMap中的key标签，用于struct向map转换时候的key的别名定义
 
 #### 优化
 1. 优化：优化在类里面包含继承类时候的序列化无法赋值问题(todo)

@@ -12,6 +12,7 @@ import (
 // mapToObject
 // strToObject
 // arrayToObject
+// ToMap
 // dataToObject：这个是总况
 //
 // objectToJson
@@ -21,6 +22,20 @@ import (
 type ValueInnerEntity1 struct {
 	Name string
 	Age  int
+}
+
+type ValueInnerToMap1 struct {
+	Name string `key:"name_test"`
+	Age  int `key:"age_test"`
+}
+
+func TestToMap1(t *testing.T) {
+	var targetObj ValueInnerToMap1
+	targetObj.Age = 12
+	targetObj.Name = "test"
+
+	inner1 := isc.ToMap(targetObj)
+	test.Equal(t, isc.ToJsonString(inner1), "{\"age_test\":12,\"name_test\":\"test\"}")
 }
 
 func TestMapToObject1(t *testing.T) {

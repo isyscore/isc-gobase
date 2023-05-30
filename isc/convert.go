@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
-
-	"gopkg.in/yaml.v2"
 )
 
 type ChangeError struct {
@@ -51,13 +49,18 @@ func ToMap(data any) map[string]any {
 		return resultMap
 	} else if reflect.TypeOf(data).Kind() == reflect.Struct {
 		resultMap := map[string]any{}
-		jsonStr, err := json.Marshal(data)
-		if err != nil {
-			return resultMap
-		}
-		err = yaml.Unmarshal(jsonStr, &resultMap)
-		if err != nil {
-			return resultMap
+		targetType := reflect.TypeOf(data)
+		targetValue := reflect.ValueOf(data)
+		for index, num := 0, targetType.NumField(); index < num; index++ {
+			field := targetType.Field(index)
+			fieldValue := targetValue.Field(index)
+
+			key := field.Name
+			mapKey := field.Tag.Get("key")
+			if mapKey != "" {
+				key = mapKey
+			}
+			resultMap[key] = fieldValue.Interface()
 		}
 		return resultMap
 	}
