@@ -58,6 +58,9 @@ func ToMap(data any) map[string]any {
 			key := field.Name
 			mapKey := field.Tag.Get("key")
 			if mapKey != "" {
+				if strings.Contains(mapKey, " ignore") {
+					continue
+				}
 				key = mapKey
 			}
 			resultMap[key] = fieldValue.Interface()

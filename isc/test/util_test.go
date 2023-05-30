@@ -29,7 +29,22 @@ type ValueInnerToMap1 struct {
 	Age  int `key:"age_test"`
 }
 
+type ValueInnerToMap2 struct {
+	Name string `key:"name_test"`
+	Age  int `key:"age_test"`
+	Address  int `key:"age_test ignore"`
+}
+
 func TestToMap1(t *testing.T) {
+	var targetObj ValueInnerToMap1
+	targetObj.Age = 12
+	targetObj.Name = "test"
+
+	inner1 := isc.ToMap(targetObj)
+	test.Equal(t, isc.ToJsonString(inner1), "{\"age_test\":12,\"name_test\":\"test\"}")
+}
+
+func TestToMap2(t *testing.T) {
 	var targetObj ValueInnerToMap1
 	targetObj.Age = 12
 	targetObj.Name = "test"
