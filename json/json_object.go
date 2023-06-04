@@ -117,67 +117,71 @@ func (jsonObject *Object) doGet(parentValue any, key string) any {
 	parentValueKind := reflect.ValueOf(parentValue).Kind()
 	if parentValueKind == reflect.Map {
 		keys := strings.SplitN(key, ".", 2)
-
 		currentKey := keys[0]
-		nextKey := keys[1]
-		if strings.Contains(keys[0], "[") && strings.Contains(keys[0], "]") {
-			startIndex := strings.Index(keys[0], "[")
-			endIndex := strings.Index(keys[0], "]")
-			dataIndex := keys[0][startIndex+1 : endIndex]
-			if isc.ToInt(dataIndex) >= 0 {
-				currentKey = keys[0][:startIndex]
-				nextKey = key[startIndex:]
+		if strings.Contains(currentKey, "[") && strings.Contains(currentKey, "]") {
+			var nextKey string
+
+			startIndex := strings.Index(currentKey, "[")
+			endIndex := strings.Index(currentKey, "]")
+			dataIndex := isc.ToInt(currentKey[startIndex+1 : endIndex])
+			if dataIndex >= 0 {
+				currentKey = currentKey[:startIndex]
+				nextKey = key[endIndex+1:]
+
+				if strings.Index(nextKey, ".") == 0 {
+					nextKey = nextKey[1:]
+				}
+			}
+
+			v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
+			emptyValue := reflect.Value{}
+			if v1 == emptyValue {
+				return nil
+			}
+
+			valueData := v1.Interface()
+			if reflect.ValueOf(valueData).Kind() != reflect.Slice && reflect.ValueOf(valueData).Kind() != reflect.Array {
+				return nil
+			}
+
+			for arrayIndex := 0; arrayIndex < reflect.ValueOf(valueData).Len(); arrayIndex++ {
+				if arrayIndex == dataIndex {
+					return jsonObject.doGet(reflect.ValueOf(valueData).Index(arrayIndex).Interface(), fmt.Sprintf("%v", nextKey))
+				}
+			}
+		} else {
+			v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
+			emptyValue := reflect.Value{}
+			if v1 == emptyValue {
+				return nil
+			}
+			if len(keys) == 1 {
+				return v1.Interface()
+			} else {
+				return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", keys[1]))
 			}
 		}
-		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
-		emptyValue := reflect.Value{}
-		if v1 == emptyValue {
+	} else if parentValueKind == reflect.Slice {
+		if !strings.Contains(key, "[") && !strings.Contains(key, "]") {
 			return nil
 		}
-		if len(keys) == 1 {
-			return v1.Interface()
-		} else {
-			return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", nextKey))
+
+		startIndex := strings.Index(key, "[")
+		endIndex := strings.Index(key, "]")
+		dataIndex := isc.ToInt(key[startIndex+1 : endIndex])
+
+		parentValueT := reflect.ValueOf(parentValue)
+		for arrayIndex := 0; arrayIndex < parentValueT.Len(); arrayIndex++ {
+			if arrayIndex == dataIndex {
+				fieldValue := parentValueT.Index(arrayIndex)
+
+				if strings.Index(key[endIndex+1:], ".") == 0 {
+					return jsonObject.doGet(fieldValue.Interface(), key[endIndex+2:])
+				} else {
+					return jsonObject.doGet(fieldValue.Interface(), key[endIndex+1:])
+				}
+			}
 		}
-	} else if parentValueKind == reflect.Slice {
-		// todo 柿子 还没写完，继续
-		//if !strings.Contains(key, "[") && !strings.Contains(key, "]") {
-		//	return nil
-		//}
-		//
-		//startIndex := strings.Index(key, "[")
-		//endIndex := strings.Index(key, "]")
-		//dataIndex := isc.ToInt(key[startIndex+1 : endIndex])
-		//
-		//parentValueT := reflect.ValueOf(parentValue)
-		//arrayLen := parentValueT.Len()
-		//for arrayIndex := 0; arrayIndex < arrayLen; arrayIndex++ {
-		//	if arrayIndex == dataIndex {
-		//		fieldValue := parentValueT.Index(arrayIndex)
-		//
-		//		currentKey := keys[0]
-		//		nextKey := keys[1]
-		//		if strings.Contains(keys[0], "[") && strings.Contains(keys[0], "]") {
-		//			startIndex := strings.Index(keys[0], "[")
-		//			endIndex := strings.Index(keys[0], "]")
-		//			dataIndex := keys[0][startIndex+1 : endIndex]
-		//			if isc.ToInt(dataIndex) >= 0 {
-		//				currentKey = keys[0][:startIndex]
-		//				nextKey = key[startIndex:]
-		//			}
-		//		}
-		//		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
-		//		emptyValue := reflect.Value{}
-		//		if v1 == emptyValue {
-		//			return nil
-		//		}
-		//		if len(keys) == 1 {
-		//			return v1.Interface()
-		//		} else {
-		//			return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", nextKey))
-		//		}
-		//	}
-		//}
 	}
 	return nil
 }
