@@ -117,3 +117,19 @@ type TestEntity2 struct {
 	F21 int
 	K2array []int
 }
+
+
+func TestGet5(t *testing.T) {
+	jsonObject := json.Object{}
+	str := "{\"data\":{\"values\":[{\"name\":\"zhou\",\"age\":1},{\"name\":\"song\",\"age\":2}]}}"
+	err := jsonObject.Load(str)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	//assert.Equal(t, jsonObject.GetString("data.values[0].name"), "zhou")
+	//assert.Equal(t, jsonObject.GetString("data.values[0].age"), "1")
+	//assert.Equal(t, jsonObject.GetString("data.values[1].name"), "song")
+	//assert.Equal(t, jsonObject.GetString("data.values[1].age"), "2")
+}

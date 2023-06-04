@@ -117,16 +117,67 @@ func (jsonObject *Object) doGet(parentValue any, key string) any {
 	parentValueKind := reflect.ValueOf(parentValue).Kind()
 	if parentValueKind == reflect.Map {
 		keys := strings.SplitN(key, ".", 2)
-		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(keys[0]))
+
+		currentKey := keys[0]
+		nextKey := keys[1]
+		if strings.Contains(keys[0], "[") && strings.Contains(keys[0], "]") {
+			startIndex := strings.Index(keys[0], "[")
+			endIndex := strings.Index(keys[0], "]")
+			dataIndex := keys[0][startIndex+1 : endIndex]
+			if isc.ToInt(dataIndex) >= 0 {
+				currentKey = keys[0][:startIndex]
+				nextKey = key[startIndex:]
+			}
+		}
+		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
 		emptyValue := reflect.Value{}
 		if v1 == emptyValue {
 			return nil
 		}
 		if len(keys) == 1 {
-			return jsonObject.doGet(v1.Interface(), "")
+			return v1.Interface()
 		} else {
-			return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", keys[1]))
+			return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", nextKey))
 		}
+	} else if parentValueKind == reflect.Slice {
+		// todo 柿子 还没写完，继续
+		//if !strings.Contains(key, "[") && !strings.Contains(key, "]") {
+		//	return nil
+		//}
+		//
+		//startIndex := strings.Index(key, "[")
+		//endIndex := strings.Index(key, "]")
+		//dataIndex := isc.ToInt(key[startIndex+1 : endIndex])
+		//
+		//parentValueT := reflect.ValueOf(parentValue)
+		//arrayLen := parentValueT.Len()
+		//for arrayIndex := 0; arrayIndex < arrayLen; arrayIndex++ {
+		//	if arrayIndex == dataIndex {
+		//		fieldValue := parentValueT.Index(arrayIndex)
+		//
+		//		currentKey := keys[0]
+		//		nextKey := keys[1]
+		//		if strings.Contains(keys[0], "[") && strings.Contains(keys[0], "]") {
+		//			startIndex := strings.Index(keys[0], "[")
+		//			endIndex := strings.Index(keys[0], "]")
+		//			dataIndex := keys[0][startIndex+1 : endIndex]
+		//			if isc.ToInt(dataIndex) >= 0 {
+		//				currentKey = keys[0][:startIndex]
+		//				nextKey = key[startIndex:]
+		//			}
+		//		}
+		//		v1 := reflect.ValueOf(parentValue).MapIndex(reflect.ValueOf(currentKey))
+		//		emptyValue := reflect.Value{}
+		//		if v1 == emptyValue {
+		//			return nil
+		//		}
+		//		if len(keys) == 1 {
+		//			return v1.Interface()
+		//		} else {
+		//			return jsonObject.doGet(v1.Interface(), fmt.Sprintf("%v", nextKey))
+		//		}
+		//	}
+		//}
 	}
 	return nil
 }
