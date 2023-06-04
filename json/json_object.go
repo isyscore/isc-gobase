@@ -31,6 +31,10 @@ func (jsonObject *Object) Load(jsonContent string) error {
 	return nil
 }
 
+func (jsonObject *Object) IsEmpty() bool {
+	return len(jsonObject.ValueDeepMap) == 0 && len(jsonObject.ValueMap) == 0
+}
+
 func (jsonObject *Object) Put(key string, value any) {
 	if nil == value {
 		return
