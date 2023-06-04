@@ -275,7 +275,7 @@ func PropertiesToMap(contentOfProperties string) (map[string]any, error) {
 		key := lineKVs[0]
 		value := lineKVs[1]
 
-		if strings.Contains(value, "\n") {
+		if strings.Contains(value, "\n") || value == "" {
 			value = YamlNewLineDom + value
 		}
 
