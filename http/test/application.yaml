@@ -1,7 +1,7 @@
 base:
   http:
     # 通用的超时配置，链接、重定向、响应的所有超时时间；默认0，就是不超时
-    timeout: 5s
+    timeout: 50s
     transport:
       # 握手的最长时间
       tls-handshake-timeout: 10s

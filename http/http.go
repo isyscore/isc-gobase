@@ -1,11 +1,13 @@
 package http
 
 import (
+    "bytes"
     "context"
     "encoding/json"
     "fmt"
     "github.com/isyscore/isc-gobase/config"
     "github.com/isyscore/isc-gobase/logger"
+    "mime/multipart"
 
     //"github.com/isyscore/isc-gobase/goid"
     "io"
@@ -308,31 +310,38 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
     return callToStandard(httpRequest, url)
 }
 
-func PostForm(url string, header http.Header, parameterMap map[string]any) (int, http.Header, any, error) {
-    var httpRequest http.Request
-    _ = httpRequest.ParseForm()
-    if parameterMap != nil {
-        _ = httpRequest.ParseForm()
-        for k, v := range parameterMap {
-            httpRequest.Form.Add(k, fmt.Sprintf("%v", v))
-        }
-    }
-    if header != nil {
-        httpRequest.Header = header
-    }
-    body := strings.NewReader(httpRequest.Form.Encode())
+func PostForm(urlHost string, header http.Header, formMap map[string]any) (int, http.Header, any, error) {
+    // 创建一个字节缓冲区，用于构建表单数据
+    bodyBuffer := &bytes.Buffer{}
+    writer := multipart.NewWriter(bodyBuffer)
 
-    // 简单封装一下
-    httpReq, err := http.NewRequest("POST", url, body)
+    // 将表单数据写入multipart.Writer
+    for k, v := range formMap {
+        _ = writer.WriteField(k, fmt.Sprintf("%v", v))
+    }
+
+    // 关闭multipart.Writer，并获取最终的Content-Type
+    err := writer.Close()
     if err != nil {
+        logger.Error("关闭multipart.Writer时出错:", err)
         return 0, nil, nil, err
     }
-    httpReq.Header.Set("Content-Type", ContentPostForm)
+    contentType := writer.FormDataContentType()
+
+    // 创建一个请求对象
+    httpReq, err := http.NewRequest("POST", urlHost, bodyBuffer)
+    if err != nil {
+        logger.Error("创建请求对象时出错:", err)
+        return 0, nil, nil, err
+    }
+
+    // 设置请求头
     for k, values := range header {
         for _, value := range values {
             httpReq.Header.Add(k, value)
         }
     }
+    httpReq.Header.Set("Content-Type", contentType)
 
     ctx := context.Background()
     for _, hook := range NetHttpHooks {
