@@ -328,6 +328,11 @@ func PostForm(url string, header http.Header, parameterMap map[string]any) (int,
         return 0, nil, nil, err
     }
     httpReq.Header.Set("Content-Type", ContentPostForm)
+    for k, values := range header {
+        for _, value := range values {
+            httpReq.Header.Add(k, value)
+        }
+    }
 
     ctx := context.Background()
     for _, hook := range NetHttpHooks {

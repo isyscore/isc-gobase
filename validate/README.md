@@ -11,49 +11,49 @@ validate包核查模块，用于对入参的校验
 package main
 
 import (
-    "bytes"
-    "encoding/json"
-    "github.com/gin-gonic/gin"
-    "github.com/isyscore/isc-gobase/http"
-    "github.com/isyscore/isc-gobase/isc"
-    "github.com/isyscore/isc-gobase/logger"
-    "github.com/isyscore/isc-gobase/server"
-    "github.com/isyscore/isc-gobase/server/rsp"
-    "github.com/isyscore/isc-gobase/validate"
-    "io/ioutil"
-    "strings"
+  "bytes"
+  "encoding/json"
+  "github.com/gin-gonic/gin"
+  "github.com/isyscore/isc-gobase/http"
+  "github.com/isyscore/isc-gobase/isc"
+  "github.com/isyscore/isc-gobase/logger"
+  "github.com/isyscore/isc-gobase/server"
+  "github.com/isyscore/isc-gobase/server/rsp"
+  "github.com/isyscore/isc-gobase/validate"
+  "io/ioutil"
+  "strings"
 )
 
 func main() {
-    server.Post("test/insert", InsertData)
-    server.Run()
+  server.Post("test/insert", InsertData)
+  server.Run()
 }
 
 // InsertData 数据插入
 func InsertData(c *gin.Context) {
-    insertReq := InsertReq{}
+  insertReq := InsertReq{}
 
-    // 读取body数据，可以采用isc提供的工具
-    err := isc.DataToObject(c.Request.Body, &insertReq)
-    if err != nil {
-        // ... 省略
-        return
-    }
-
-    // api示例：核查入参
-    if result, _, errMsg := validate.Check(insertReq); !result {
-        rsp.FailedOfStandard(c, 53, errMsg)
-        logger.Error(errMsg)
-        return
-    }
-
+  // 读取body数据，可以采用isc提供的工具
+  err := isc.DataToObject(c.Request.Body, &insertReq)
+  if err != nil {
     // ... 省略
-    rsp.SuccessOfStandard(c, "ok")
+    return
+  }
+
+  // api示例：核查入参
+  if result, _, errMsg := validate.Check(insertReq); !result {
+    rsp.FailedOfStandard(c, 53, errMsg)
+    logger.Error(errMsg)
+    return
+  }
+
+  // ... 省略
+  rsp.SuccessOfStandard(c, "ok")
 }
 
 type InsertReq struct {
-    Name    string `match:"value={zhou, chen}"`
-    Profile string `match:"range=[0, 10)"`
+  Name    string `match:"value={zhou, chen}"`
+  Profile string `match:"range=[0, 10)"`
 }
 ```
 ```yaml
@@ -167,11 +167,11 @@ func CheckWithParameter(parameterMap map[string]interface{}, object interface{},
 - isUnBlank：值是否为非空字符
 - range：匹配数值的范围（最大值和最小值，用法是数学表达式）：数值（整数和浮点数）的大小、字符串的长度、数组的长度、时间的范围、时间的移动
 - model：匹配指定的类型：
-    - id_card：身份证
-    - phone: 手机号
-    - fixed_phone:固定电话
-    - mail: 邮件地址
-    - ip: ip地址
+  - id_card：身份证
+  - phone: 手机号
+  - fixed_phone:固定电话
+  - mail: 邮件地址
+  - ip: ip地址
 - condition：修饰的属性的表达式的匹配，提供#current和#root占位符，用于获取相邻属性的值
 - regex：匹配正则表达式
 - customize：匹配自定义的回调函数
@@ -192,7 +192,7 @@ func CheckWithParameter(parameterMap map[string]interface{}, object interface{},
 匹配指定的一些值，可以修饰一个，也可以修饰多个值，可以修饰字符，也可修饰整数（int、int8、int16、int32、int64）、无符号整数（uint、uint8、uint16、uint32、uint64）、浮点数（float32、float64）、bool类型和string类型。<br/>
 
 提示：
- - 中间逗号也可以为中文，为了防止某些手误写错为中文字符
+- 中间逗号也可以为中文，为了防止某些手误写错为中文字符
 
 
 ```go
@@ -290,6 +290,7 @@ type IsBlankEntity1 struct {
 - 无符号整数：比较大小，uint、uint8、uint16、uint32、uint64
 - 浮点数：比较大小，float32、float64
 - 分片：比较分片的长度
+- 字符串：匹配字符串的长度
 - 时间类型（time.Time）：比较时间的范围，目前支持的时间格式支持如下
   - yyyy
   - yyyy-MM
@@ -695,8 +696,8 @@ type ErrMsgEntity2 struct {
 表示是否启用属性本身的核查
 ```go
 type DisableEntity1 struct {
-    Name string `match:"value=zhou" disable:"true"`
-    Age  int
+Name string `match:"value=zhou" disable:"true"`
+Age  int
 }
 
 ```
