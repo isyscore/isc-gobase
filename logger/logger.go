@@ -9,6 +9,7 @@ import (
 	"github.com/isyscore/isc-gobase/listener"
 	"github.com/isyscore/isc-gobase/store"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	cmap "github.com/orcaman/concurrent-map"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -30,15 +31,15 @@ const (
 )
 
 var gColor = false
-var loggerMap map[string]*logrus.Logger
-var rotateMap map[string]*rotatelogs.RotateLogs
+//var loggerMap map[string]*logrus.Logger
+var loggerMap cmap.ConcurrentMap
+//var rotateMap map[string]*rotatelogs.RotateLogs
+var rotateMap cmap.ConcurrentMap
 var rootLogger *logrus.Logger
 
 func init() {
-	_loggerMap := map[string]*logrus.Logger{}
-	loggerMap = _loggerMap
-	_rotateMap := map[string]*rotatelogs.RotateLogs{}
-	rotateMap = _rotateMap
+	loggerMap = cmap.New()
+	rotateMap = cmap.New()
 	rootLogger = Group("root")
 
 	_gColor := config.GetValueBoolDefault("base.logger.color.enable", false)
@@ -49,8 +50,8 @@ func Group(groupNames... string) *logrus.Logger {
 	var resultLogger *logrus.Logger
 	groupNamesOfUnContain := []string{}
 	for _, groupName := range groupNames {
-		if logger, exit := loggerMap[groupName]; exit {
-			resultLogger = logger
+		if logger, exit := loggerMap.Get(groupName); exit {
+			resultLogger = logger.(*logrus.Logger)
 		} else {
 			groupNamesOfUnContain = append(groupNamesOfUnContain, groupName)
 		}
@@ -100,7 +101,7 @@ func Group(groupNames... string) *logrus.Logger {
 	resultLogger.SetLevel(maxValueLevel)
 
 	for _, groupName := range groupNamesOfUnContain {
-		loggerMap[groupName] = resultLogger
+		loggerMap.Set(groupName, resultLogger)
 	}
 	return resultLogger
 }
@@ -109,12 +110,12 @@ func doGroup(groupName string) *logrus.Logger {
 	if groupName == "" {
 		return rootLogger
 	}
-	if logger, exit := loggerMap[groupName]; exit {
-		return logger
+	if logger, exit := loggerMap.Get(groupName); exit {
+		return logger.(*logrus.Logger)
 	}
 
 	if loggerMap == nil {
-		loggerMap = map[string]*logrus.Logger{}
+		loggerMap = cmap.New()
 	}
 	logger := logrus.New()
 	logger.SetReportCaller(true)
@@ -146,7 +147,7 @@ func doGroup(groupName string) *logrus.Logger {
 	}
 	logger.SetLevel(lgLevel)
 
-	loggerMap[groupName] = logger
+	loggerMap.Set(groupName, logger)
 	return logger
 }
 
@@ -276,7 +277,7 @@ func Record(level, format string, v ...any) {
 
 func rotateLog(path, level string) *rotatelogs.RotateLogs {
 	if rotateMap == nil {
-		rotateMap = map[string]*rotatelogs.RotateLogs{}
+		rotateMap = cmap.New()
 	}
 
 	if path == "" {
@@ -303,13 +304,13 @@ func rotateLog(path, level string) *rotatelogs.RotateLogs {
 	}
 
 	data, _ := rotatelogs.New(path+"app-"+level+".%Y%m%d.log", rotateOptions...)
-	rotateMap[path+"-"+level] = data
+	rotateMap.Set(path+"-"+level, data)
 	return data
 }
 
 func rotateLogWithCache(path, level string) *rotatelogs.RotateLogs {
-	if pRotateValue, exist := rotateMap[path+"-"+level]; exist {
-		return pRotateValue
+	if pRotateValue, exist := rotateMap.Get(path+"-"+level); exist {
+		return pRotateValue.(*rotatelogs.RotateLogs)
 	}
 
 	return rotateLog(path, level)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	baseHttp "github.com/isyscore/isc-gobase/http"
 	"github.com/isyscore/isc-gobase/isc"
-	"github.com/isyscore/isc-gobase/logger"
 	"net/http"
 	"testing"
 	"unsafe"
