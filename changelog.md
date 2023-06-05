@@ -13,6 +13,7 @@
 
 #### 修复
 1. 修复：修复http包中的postform的header传递问题
+2. 修复：优化logger的分组功能的并发map问题
 
 ---
 
