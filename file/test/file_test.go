@@ -54,3 +54,10 @@ func TestFileSize(t *testing.T) {
 func TestFileFormatSize(t *testing.T) {
 	assert.Equal(t, "40.00B", file.SizeFormat("./assert_file_size.txt"))
 }
+
+func TestFileCopy(t *testing.T) {
+	err := file.CopyFileWithError("./assert_file_size.txt", "./temp/assert_file_size_copy.txt")
+	assert.Equal(t, err, nil)
+	assert.Equal(t, "40.00B", file.SizeFormat("./temp/assert_file_size_copy.txt"))
+	file.DeleteDirs("./temp")
+}
