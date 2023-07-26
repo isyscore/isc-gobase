@@ -129,6 +129,7 @@ func AppendFileBytes(filePath string, data []byte) bool {
 	}
 }
 
+// Deprecated:this function is replaced by CopyFileWithError, which will return the reason for copy failure.
 func CopyFile(srcFilePath string, destFilePath string) bool {
 	p0 := ExtractFilePath(destFilePath)
 	if !DirectoryExists(p0) {
@@ -213,4 +214,29 @@ func SizeList(filePaths []string) int64 {
 // SizeFormat 返回文件/目录的可读大小
 func SizeFormat(filePath string) string {
 	return isc.FormatSize(Size(filePath))
+}
+
+func CopyFileWithError(srcFilePath string, destFilePath string) error {
+	dirPath := ExtractFilePath(destFilePath)
+	var err error
+	if !DirectoryExists(dirPath) {
+		err = os.MkdirAll(dirPath, os.ModePerm)
+	}
+	if err != nil {
+		return err
+	}
+	src, err := os.Open(srcFilePath)
+	if err != nil {
+		return err
+	}
+	defer func(src *os.File) { _ = src.Close() }(src)
+	dst, err := os.OpenFile(destFilePath, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer func(dst *os.File) { _ = dst.Close() }(dst)
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
+	}
+	return nil
 }
