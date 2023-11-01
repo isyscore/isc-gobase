@@ -309,23 +309,23 @@ func PostOfStandard(url string, header http.Header, parameterMap map[string]stri
 }
 
 func PostForm(url string, header http.Header, parameterMap map[string]any) (int, http.Header, any, error) {
+	// resolve parameterMap
 	var httpRequest http.Request
 	_ = httpRequest.ParseForm()
 	if parameterMap != nil {
-		_ = httpRequest.ParseForm()
 		for k, v := range parameterMap {
 			httpRequest.Form.Add(k, fmt.Sprintf("%v", v))
 		}
 	}
-	if header != nil {
-		httpRequest.Header = header
-	}
 	body := strings.NewReader(httpRequest.Form.Encode())
-
 	// 简单封装一下
 	httpReq, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return 0, nil, nil, err
+	}
+	// resolve header
+	if header != nil {
+		httpReq.Header = header
 	}
 	httpReq.Header.Set("Content-Type", ContentPostForm)
 
