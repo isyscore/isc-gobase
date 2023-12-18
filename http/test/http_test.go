@@ -1,4 +1,4 @@
-package test
+package http
 
 import (
 	"context"
@@ -33,4 +33,54 @@ func TestGetSimple(t *testing.T) {
 	datas := isc.ToInt(unsafe.Sizeof(data))
 
 	fmt.Println("====" + isc.ToString(datas))
+}
+
+func Test_urlWithParameter(t *testing.T) {
+	type args struct {
+		url          string
+		parameterMap map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "normal.",
+			args: args{
+				url: "http://127.0.0.1:38080",
+				parameterMap: map[string]string{
+					"msg": "{\"a\":1}",
+				},
+			},
+			want: "http://127.0.0.1:38080?msg=%7B%22a%22%3A1%7D",
+		},
+		{
+			name: "url with queryParam",
+			args: args{
+				url: "http://127.0.0.1:38080?example=1",
+				parameterMap: map[string]string{
+					"msg": "{\"a\":1}",
+				},
+			},
+			want: "http://127.0.0.1:38080?example=1&msg=%7B%22a%22%3A1%7D",
+		},
+		{
+			name: "url with simple",
+			args: args{
+				url: "www.example.com",
+				parameterMap: map[string]string{
+					"msg": "{\"a\":1}",
+				},
+			},
+			want: "www.example.com?msg=%7B%22a%22%3A1%7D",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := baseHttp.UrlWithParameter(tt.args.url, tt.args.parameterMap); got != tt.want {
+				t.Errorf("UrlWithParameter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
