@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/logger"
+	gourl "net/url"
 
 	//"github.com/isyscore/isc-gobase/goid"
 	"io"
@@ -219,7 +220,7 @@ func GetSimpleOfStandard(url string) (int, http.Header, any, error) {
 }
 
 func Get(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
-	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
+	httpRequest, err := http.NewRequest("GET", UrlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -233,7 +234,7 @@ func Get(url string, header http.Header, parameterMap map[string]string) (int, h
 }
 
 func GetOfStandard(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
-	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
+	httpRequest, err := http.NewRequest("GET", UrlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -253,7 +254,7 @@ func HeadSimple(url string) error {
 }
 
 func Head(url string, header http.Header, parameterMap map[string]string) error {
-	httpRequest, err := http.NewRequest("GET", urlWithParameter(url, parameterMap), nil)
+	httpRequest, err := http.NewRequest("GET", UrlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return err
@@ -279,7 +280,7 @@ func PostSimpleOfStandard(url string, body any) (int, http.Header, any, error) {
 func Post(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("POST", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -295,7 +296,7 @@ func Post(url string, header http.Header, parameterMap map[string]string, body a
 func PostOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("POST", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("POST", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -358,7 +359,7 @@ func PutSimpleOfStandard(url string, body any) (int, http.Header, any, error) {
 func Put(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("PUT", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -374,7 +375,7 @@ func Put(url string, header http.Header, parameterMap map[string]string, body an
 func PutOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("PUT", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("PUT", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -398,7 +399,7 @@ func DeleteSimpleOfStandard(url string) (int, http.Header, any, error) {
 }
 
 func Delete(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
-	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
+	httpRequest, err := http.NewRequest("DELETE", UrlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -412,7 +413,7 @@ func Delete(url string, header http.Header, parameterMap map[string]string) (int
 }
 
 func DeleteOfStandard(url string, header http.Header, parameterMap map[string]string) (int, http.Header, any, error) {
-	httpRequest, err := http.NewRequest("DELETE", urlWithParameter(url, parameterMap), nil)
+	httpRequest, err := http.NewRequest("DELETE", UrlWithParameter(url, parameterMap), nil)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -438,7 +439,7 @@ func PatchSimpleOfStandard(url string, body any) (int, http.Header, any, error) 
 func Patch(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("PATCH", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -454,7 +455,7 @@ func Patch(url string, header http.Header, parameterMap map[string]string, body 
 func PatchOfStandard(url string, header http.Header, parameterMap map[string]string, body any) (int, http.Header, any, error) {
 	bytes, _ := json.Marshal(body)
 	payload := strings.NewReader(string(bytes))
-	httpRequest, err := http.NewRequest("PATCH", urlWithParameter(url, parameterMap), payload)
+	httpRequest, err := http.NewRequest("PATCH", UrlWithParameter(url, parameterMap), payload)
 	if err != nil {
 		log.Printf("NewRequest error(%v)\n", err)
 		return -1, nil, nil, err
@@ -563,7 +564,22 @@ func parseStandard(statusCode int, headers http.Header, responseResult any, errs
 	return statusCode, headers, standRsp.Data, nil
 }
 
-func urlWithParameter(url string, parameterMap map[string]string) string {
+func UrlWithParameter(url string, parameterMap map[string]string) string {
+	goUrl, err := gourl.Parse(url)
+	if err != nil {
+		//Here, in order to be compatible with the old logic, if parsing fails, it will call the old method.
+		return oldUrlWithParameter(url, parameterMap)
+	}
+	queryValue := goUrl.Query()
+	for key, value := range parameterMap {
+		queryValue.Set(key, value)
+	}
+	goUrl.RawQuery = queryValue.Encode()
+	return goUrl.String()
+}
+
+// Deprecated
+func oldUrlWithParameter(url string, parameterMap map[string]string) string {
 	if parameterMap == nil || len(parameterMap) == 0 {
 		return url
 	}
