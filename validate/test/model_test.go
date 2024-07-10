@@ -53,10 +53,15 @@ func TestModelPhone(t *testing.T) {
 	result, err = validate.Check(value)
 	TrueErr(t, result, err)
 
-	// 测试 异常情况
-	value = ValueModelPhone{Data: "28712381"}
+	// 测试 正常情况
+	value = ValueModelPhone{Data: "15200092345"}
 	result, err = validate.Check(value)
-	Equal(t, err, "属性 Data 的值 28712381 没有命中只允许类型 [phone]", result, false)
+	TrueErr(t, result, err)
+
+	// 测试 异常情况
+	value = ValueModelPhone{Data: "28712381887"}
+	result, err = validate.Check(value)
+	Equal(t, err, "属性 Data 的值 28712381887 没有命中只允许类型 [phone]", result, false)
 }
 
 // 手机号
