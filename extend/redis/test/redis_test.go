@@ -2,9 +2,9 @@ package test
 
 import (
 	"context"
-	goredis "github.com/go-redis/redis/v8"
 	redis2 "github.com/isyscore/isc-gobase/extend/redis"
 	"github.com/magiconair/properties/assert"
+	goredis "github.com/redis/go-redis/v9"
 	"testing"
 	"time"
 )
