@@ -9,7 +9,6 @@ require (
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/assert/v2 v2.2.0
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/gorilla/websocket v1.5.0
@@ -20,6 +19,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/qustavo/sqlhooks/v2 v2.1.0
+	github.com/redis/go-redis/v9 v9.7.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/rs/zerolog v1.26.1
 	github.com/sirupsen/logrus v1.6.0
@@ -47,7 +47,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
