@@ -20,6 +20,11 @@ type ValueConditionEntity2 struct {
 
 // 身份证号
 func TestCondition(t *testing.T) {
+
+	go func() {
+		println("")
+	}()
+
 	var value ValueConditionEntity1
 	var result bool
 	var err string
