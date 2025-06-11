@@ -49,13 +49,13 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 		// host=127.0.0.1 port=54321 user=isyscore password=Isysc0re dbname=isyscore sslmode=disable search_path=isc_permission
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable search_path=%s",
 			datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Username, datasourceConfig.DbName)
-		if len(sqlConfigMap) != 0 {
-			var kvList []string
-			for key, value := range sqlConfigMap {
-				kvList = append(kvList, fmt.Sprintf("%s=%s", key, value))
-			}
-			dsn += fmt.Sprintf(" %s", strings.Join(kvList, " "))
-		}
+		//if len(sqlConfigMap) != 0 {
+		//	var kvList []string
+		//	for key, value := range sqlConfigMap {
+		//		kvList = append(kvList, fmt.Sprintf("%s=%s", key, value))
+		//	}
+		//	dsn += fmt.Sprintf(" %s", strings.Join(kvList, " "))
+		//}
 		return dsn
 	case "sqlite":
 		// 格式： gorm.db
