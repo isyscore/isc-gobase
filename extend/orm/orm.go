@@ -46,7 +46,9 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 		return dsn
 	case "postgresql":
 		// 格式：host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d", datasourceConfig.Host, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.DbName, datasourceConfig.Port)
+		// host=127.0.0.1 port=54321 user=isyscore password=Isysc0re dbname=isyscore sslmode=disable search_path=isc_permission
+		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable search_path=%s",
+			datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Username, datasourceConfig.DbName)
 		if len(sqlConfigMap) != 0 {
 			var kvList []string
 			for key, value := range sqlConfigMap {
