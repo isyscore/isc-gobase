@@ -2,12 +2,13 @@ package orm
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/isyscore/isc-gobase/config"
 	"github.com/isyscore/isc-gobase/isc"
 	"github.com/isyscore/isc-gobase/listener"
 	"github.com/isyscore/isc-gobase/logger"
 	"github.com/sirupsen/logrus"
-	"strings"
 )
 
 func getDbDsnWithName(datasourceName string) (string, error) {
@@ -47,8 +48,11 @@ func getDbDsn(dbType string, datasourceConfig config.DatasourceConfig) string {
 	case "postgresql":
 		// 格式：host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai
 		// host=127.0.0.1 port=54321 user=isyscore password=Isysc0re dbname=isyscore sslmode=disable search_path=isc_permission
+		if datasourceConfig.SearchPath == "" {
+			datasourceConfig.SearchPath = "public"
+		}
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable search_path=%s,public,sys_catalog",
-			datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.Username, datasourceConfig.DbName)
+			datasourceConfig.Host, datasourceConfig.Port, datasourceConfig.Username, datasourceConfig.Password, datasourceConfig.DbName, datasourceConfig.SearchPath)
 		if len(sqlConfigMap) != 0 {
 			var kvList []string
 			for key, value := range sqlConfigMap {
